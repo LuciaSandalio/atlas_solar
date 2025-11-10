@@ -1,0 +1,26 @@
+name: atlas_solar
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8
+  - numpy
+  - pandas
+  - xarray
+  - netcdf4
+  - bottleneck
+  - dask
+  - geopandas
+  - pyproj
+  - shapely
+  - rtree
+  - pvlib
+  - boto3
+  - botocore
+  - pyarrow
+  - fastparquet
+  - tqdm
+  - pip
+  - pip:
+      - ruff
+      - black
+      - pre-commit

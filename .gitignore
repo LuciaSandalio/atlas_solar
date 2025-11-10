@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.env
+.venv/
+.ipynb_checkpoints/
+
+# Datos y artefactos pesados (no versionar)
+data/goes/
+data/processed/
+data/geometry/*.parquet
+data/**/*.nc
+*.nc
+*.parquet
+
+# Manifests generados
+metadata/fase1_manifest.json
+data/goes/*/_index.csv
+
+# Otros
+*.log
+.DS_Store
