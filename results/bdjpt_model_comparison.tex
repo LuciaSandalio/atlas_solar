@@ -1,0 +1,16 @@
+\begin{table}[htpb]
+\centering
+\caption{Comparación de modelos predictivos del Índice de Claridad ($Kt$) con validación cruzada espacial estricta.}
+\label{tab:bdjpt_models}
+\begin{tabular}{llllll}
+\toprule
+Modelo & $R^2_{Kt}$ & $R^2_{GHI}$ & RMSE (W/m$^2$) & MAE (W/m$^2$) & MBE (W/m$^2$) \\
+\midrule
+BD-JPT (Baseline) & -0.198 & 0.440 & 233.9 & 187.5 & 2.3 \\
+Linear (Kt) & 0.027 & 0.462 & 229.2 & 182.2 & -7.8 \\
+Ridge (Kt) & 0.027 & 0.462 & 229.3 & 182.2 & -7.8 \\
+RandomForest (Kt) & 0.358 & 0.680 & 176.5 & 128.7 & -6.6 \\
+HistGradBoost (Kt) & 0.349 & 0.675 & 177.8 & 131.7 & -7.1 \\
+\bottomrule
+\end{tabular}
+\end{table}

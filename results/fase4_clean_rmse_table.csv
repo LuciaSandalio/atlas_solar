@@ -1,0 +1,5 @@
+Region,Season,BD-JPT (Baseline),HistGradBoost (Kt),Linear (Kt),RandomForest (Kt),Ridge (Kt)
+R0,Primavera,247.7,232.1,301.6,236.7,294.2
+R1,Primavera,153.7,148.8,125.7,150.8,123.4
+R2,Primavera,150.0,117.6,112.6,114.4,112.3
+R3,Primavera,230.2,126.8,221.7,122.4,221.3
