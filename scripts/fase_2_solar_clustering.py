@@ -100,8 +100,8 @@ def main():
     
     print(f"   ✓ Estaciones listas para clustering: {len(df_merge)}")
     
-    # 4. Preparación de variables de clustering
-    features = ['lat_num', 'lon_num', 'altitude_m', 'mean_calibrated_ghi', 'mean_clearness_index']
+    # 4. Preparación de variables de clustering puramente físicas
+    features = ['altitude_m', 'mean_calibrated_ghi', 'mean_clearness_index']
     print(f"   Variables seleccionadas: {features}")
     
     X = df_merge[features].copy()

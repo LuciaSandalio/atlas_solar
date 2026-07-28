@@ -31,7 +31,7 @@ def extract_table():
     return df_final
 
 def plot_performance(df):
-    plt.style.use('seaborn-whitegrid')
+    plt.style.use('seaborn-v0_8-whitegrid')
     
     # Solo comparar BD-JPT vs RandomForest para simplificar
     df_plot = df[df['Model'].isin(['BD-JPT (Baseline)', 'RandomForest (Kt)'])]
@@ -41,34 +41,43 @@ def plot_performance(df):
     df_plot['Season'] = pd.Categorical(df_plot['Season'], categories=season_order, ordered=True)
     df_plot = df_plot.sort_values(['Region', 'Season'])
 
-    fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharey=True)
+    regions = sorted(df_plot['Region'].unique())
+    n_regions = len(regions)
+    cols = 2
+    rows = (n_regions + 1) // cols
+    
+    fig, axes = plt.subplots(rows, cols, figsize=(16, 5 * rows), sharey=True)
     fig.suptitle('Desempeño de Calibración: RMSE (W/m²) por Región y Estación\nBaseline Físico vs Machine Learning', fontsize=18, fontweight='bold', y=0.95)
     
-    regions = ['R0', 'R1', 'R2', 'R3']
-    titles = [
-        'Región 0: Sierras Altas (>850m)', 
-        'Región 1: Llanura Baja (Este)', 
-        'Región 2: Llanura Despejada (Sur)', 
-        'Región 3: Sierras Medias/Pedemonte'
-    ]
-    
-    for i, (reg, title) in enumerate(zip(regions, titles)):
-        ax = axes[i//2, i%2]
+    # Flatten axes if necessary
+    if rows == 1:
+        axes = [axes]
+    else:
+        axes = axes.ravel()
+        
+    for i, reg in enumerate(regions):
+        ax = axes[i]
         df_reg = df_plot[df_plot['Region'] == reg]
         
         sns.barplot(data=df_reg, x='Season', y='RMSE', hue='Model', ax=ax, palette=['#e74c3c', '#2ecc71'])
-        ax.set_title(title, fontsize=14)
+        ax.set_title(f"Región {reg}", fontsize=14)
         ax.set_xlabel('')
-        ax.set_ylabel('RMSE (W/m²)' if i%2 == 0 else '')
+        ax.set_ylabel('RMSE (W/m²)' if i % cols == 0 else '')
         
         # Add values on top of bars
         for container in ax.containers:
             ax.bar_label(container, fmt='%.0f', padding=3, fontsize=10)
             
         if i != 1:
-            ax.legend_.remove()
+            if ax.get_legend() is not None:
+                ax.legend_.remove()
         else:
-            ax.legend(title='', fontsize=12)
+            if ax.get_legend() is not None:
+                ax.legend(title='', fontsize=12)
+
+    # Hide any unused subplots
+    for j in range(i + 1, len(axes)):
+        fig.delaxes(axes[j])
 
     plt.tight_layout(rect=[0, 0, 1, 0.93])
     plt.savefig('results/fase4_seasonal_rmse_comparison.png', dpi=300, bbox_inches='tight')
