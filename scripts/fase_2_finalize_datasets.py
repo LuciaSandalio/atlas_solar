@@ -46,6 +46,28 @@ def main():
     final_stations = set(df_final['estacion'].unique())
     print(f"   Estaciones filtradas retenidas: {len(final_stations)} | Registros: {len(df_final)}")
     
+    # 2.5 Corregir desfasajes horarios (Timezone Shifts) dinámicamente
+    print("🕒 Aplicando correcciones de husos horarios (shifts dinámicos)...")
+    df_final = df_final.reset_index()
+    
+    # Asegurarnos de que `tiempo_utc` es dt
+    df_final['tiempo_utc'] = pd.to_datetime(df_final['tiempo_utc'])
+    
+    shifted_count = 0
+    for s in final_stations:
+        mask = df_final['estacion'] == s
+        df_s = df_final[mask]
+        if not df_s.empty:
+            envelope = df_s.groupby(df_s['tiempo_utc'].dt.hour)['solar_radiation'].quantile(0.90)
+            peak_hour = envelope.idxmax()
+            shift_hours = 16 - peak_hour
+            if shift_hours != 0:
+                df_final.loc[mask, 'tiempo_utc'] = df_final.loc[mask, 'tiempo_utc'] + pd.Timedelta(hours=shift_hours)
+                shifted_count += 1
+                
+    df_final = df_final.set_index('tiempo_utc')
+    print(f"   ✅ Correcciones dinámicas aplicadas a {shifted_count} estaciones.")
+    
     # Guardar Parquet Final
     print("💾 Guardando dataset calibrado de radiación final en Parquet...")
     df_final.to_parquet(CALIBRATED_OUT, index=True)

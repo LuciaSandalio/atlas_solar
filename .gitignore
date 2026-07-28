@@ -22,3 +22,6 @@ data/goes/*/_index.csv
 # Otros
 *.log
 .DS_Store
+*.zip
+*.docx
+*.pptx
