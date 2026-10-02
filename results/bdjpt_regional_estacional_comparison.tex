@@ -1,38 +1,60 @@
 \begin{table}[htpb]
 \centering
+\small
 \caption{Comparación de modelos predictivos regionalizados y estacionales con validación cruzada espacial estricta.}
 \label{tab:bdjpt_regional_estacional_models}
-\begin{tabular}{llllllll}
+\begin{tabular}{llllllllll}
 \toprule
-Región & Estación & Modelo & $R^2_{Kt}$ & $R^2_{GHI}$ & RMSE (W/m$^2$) & MAE (W/m$^2$) & MBE (W/m$^2$) \\
+Región & Estación del año & Modelo & $R^2_{Kt}$ & $R^2_{GHI}$ & RMSE (W/m$^2$) & MAE (W/m$^2$) & MBE (W/m$^2$) & nRMSE (\%) & nMBE (\%) \\
 \midrule
-R1 & Verano & BD-JPT (Baseline) & -0.423 & 0.335 & 258.2 & 203.5 & 50.3 \\
-R1 & Verano & RandomForest (Kt) & 0.561 & 0.765 & 149.7 & 115.3 & -8.8 \\
-R1 & Verano & Híbrido (BD-JPT + RF) & 0.453 & 0.725 & 162.4 & 125.4 & -12.5 \\
-R1 & Otono & BD-JPT (Baseline) & -0.458 & 0.451 & 188.3 & 139.0 & 24.2 \\
-R1 & Otono & RandomForest (Kt) & 0.584 & 0.818 & 105.3 & 82.0 & -19.0 \\
-R1 & Otono & Híbrido (BD-JPT + RF) & 0.500 & 0.791 & 111.7 & 86.2 & -16.9 \\
-R1 & Invierno & BD-JPT (Baseline) & -0.394 & 0.241 & 163.2 & 131.5 & 0.2 \\
-R1 & Invierno & RandomForest (Kt) & 0.390 & 0.735 & 94.1 & 72.2 & -15.0 \\
-R1 & Invierno & Híbrido (BD-JPT + RF) & 0.338 & 0.695 & 101.6 & 78.1 & -12.4 \\
-R1 & Primavera & BD-JPT (Baseline) & -0.466 & 0.516 & 208.1 & 164.0 & -14.7 \\
-R1 & Primavera & RandomForest (Kt) & 0.367 & 0.829 & 127.0 & 95.4 & -19.9 \\
-R1 & Primavera & Híbrido (BD-JPT + RF) & 0.324 & 0.812 & 132.5 & 100.7 & -22.1 \\
-R2 & Verano & BD-JPT (Baseline) & -0.813 & 0.290 & 276.1 & 226.2 & 78.0 \\
-R2 & Verano & RandomForest (Kt) & 0.087 & 0.571 & 212.2 & 163.9 & 17.1 \\
-R2 & Verano & Híbrido (BD-JPT + RF) & 0.027 & 0.533 & 222.5 & 178.2 & 19.9 \\
-R2 & Otono & BD-JPT (Baseline) & -0.531 & 0.498 & 196.8 & 150.4 & 25.3 \\
-R2 & Otono & RandomForest (Kt) & 0.740 & 0.874 & 98.2 & 71.4 & -14.8 \\
-R2 & Otono & Híbrido (BD-JPT + RF) & 0.738 & 0.865 & 101.7 & 74.5 & -13.6 \\
-R2 & Primavera & BD-JPT (Baseline) & -0.562 & 0.636 & 178.1 & 134.0 & 49.1 \\
-R2 & Primavera & RandomForest (Kt) & 0.088 & 0.725 & 158.6 & 125.8 & -5.5 \\
-R2 & Primavera & Híbrido (BD-JPT + RF) & -0.148 & 0.671 & 171.4 & 132.7 & 9.5 \\
-R3 & Primavera & BD-JPT (Baseline) & -1.381 & 0.422 & 239.9 & 178.6 & 43.2 \\
-R3 & Primavera & RandomForest (Kt) & -0.753 & 0.498 & 223.9 & 174.4 & -8.4 \\
-R3 & Primavera & Híbrido (BD-JPT + RF) & -0.662 & 0.496 & 218.7 & 159.5 & 23.0 \\
-R4 & Primavera & BD-JPT (Baseline) & -0.693 & 0.724 & 187.5 & 141.0 & 32.9 \\
-R4 & Primavera & RandomForest (Kt) & 0.423 & 0.874 & 125.1 & 89.3 & -15.5 \\
-R4 & Primavera & Híbrido (BD-JPT + RF) & 0.398 & 0.869 & 127.4 & 89.3 & -17.4 \\
+R0 & Verano & BD-JPT (Baseline) & 0.032 & 0.292 & 294.9 & 244.9 & -3.1 & 59.3 & -0.6 \\
+R0 & Verano & Machine Learning (Kt) & 0.151 & 0.340 & 284.8 & 235.5 & -12.1 & 57.3 & -2.4 \\
+R0 & Verano & Híbrido (BD-JPT + ML) & 0.167 & 0.362 & 279.9 & 232.0 & -16.8 & 56.3 & -3.4 \\
+R0 & Otono & BD-JPT (Baseline) & 0.014 & 0.199 & 250.8 & 212.3 & -5.9 & 63.0 & -1.5 \\
+R0 & Otono & Machine Learning (Kt) & 0.170 & 0.270 & 239.6 & 197.4 & -11.7 & 60.2 & -2.9 \\
+R0 & Otono & Híbrido (BD-JPT + ML) & 0.186 & 0.288 & 236.5 & 195.8 & -18.0 & 59.4 & -4.5 \\
+R0 & Invierno & BD-JPT (Baseline) & 0.072 & 0.281 & 195.1 & 166.0 & -4.2 & 56.6 & -1.0 \\
+R0 & Invierno & Machine Learning (Kt) & 0.184 & 0.331 & 188.2 & 156.5 & -10.8 & 54.6 & -3.0 \\
+R0 & Invierno & Híbrido (BD-JPT + ML) & 0.215 & 0.354 & 184.9 & 155.4 & -16.4 & 53.6 & -4.6 \\
+R0 & Primavera & BD-JPT (Baseline) & 0.058 & 0.309 & 278.0 & 232.7 & -13.4 & 57.5 & -2.8 \\
+R0 & Primavera & Machine Learning (Kt) & 0.217 & 0.403 & 258.3 & 212.3 & -8.6 & 53.5 & -1.8 \\
+R0 & Primavera & Híbrido (BD-JPT + ML) & 0.229 & 0.412 & 256.3 & 211.4 & -14.5 & 53.0 & -3.0 \\
+R1 & Verano & BD-JPT (Baseline) & -0.002 & 0.361 & 270.1 & 223.9 & -4.6 & 51.8 & -0.8 \\
+R1 & Verano & Machine Learning (Kt) & 0.111 & 0.398 & 262.3 & 215.4 & -9.7 & 50.3 & -1.8 \\
+R1 & Verano & Híbrido (BD-JPT + ML) & 0.138 & 0.415 & 258.5 & 213.4 & -16.3 & 49.5 & -3.0 \\
+R1 & Otono & BD-JPT (Baseline) & -0.057 & 0.244 & 225.0 & 190.6 & -12.1 & 55.5 & -3.0 \\
+R1 & Otono & Machine Learning (Kt) & 0.148 & 0.318 & 213.8 & 175.2 & -12.9 & 52.7 & -3.2 \\
+R1 & Otono & Híbrido (BD-JPT + ML) & 0.160 & 0.332 & 211.6 & 174.6 & -17.6 & 52.1 & -4.3 \\
+R1 & Invierno & BD-JPT (Baseline) & -0.014 & 0.248 & 183.4 & 157.1 & -8.1 & 57.9 & -2.5 \\
+R1 & Invierno & Machine Learning (Kt) & 0.164 & 0.317 & 174.8 & 145.9 & -13.4 & 55.2 & -4.2 \\
+R1 & Invierno & Híbrido (BD-JPT + ML) & 0.173 & 0.329 & 173.3 & 145.1 & -16.8 & 54.7 & -5.2 \\
+R1 & Primavera & BD-JPT (Baseline) & 0.019 & 0.334 & 260.1 & 218.3 & -11.2 & 54.5 & -2.3 \\
+R1 & Primavera & Machine Learning (Kt) & 0.178 & 0.407 & 245.6 & 202.2 & -8.8 & 51.5 & -1.8 \\
+R1 & Primavera & Híbrido (BD-JPT + ML) & 0.199 & 0.422 & 242.4 & 200.4 & -15.5 & 50.8 & -3.2 \\
+R2 & Verano & BD-JPT (Baseline) & -0.023 & 0.430 & 253.8 & 207.2 & -5.6 & 45.6 & -1.0 \\
+R2 & Verano & Machine Learning (Kt) & 0.159 & 0.489 & 240.1 & 193.2 & -11.3 & 43.1 & -2.0 \\
+R2 & Verano & Híbrido (BD-JPT + ML) & 0.186 & 0.508 & 235.7 & 192.1 & -17.5 & 42.3 & -3.1 \\
+R2 & Otono & BD-JPT (Baseline) & -0.060 & 0.330 & 215.1 & 180.7 & -18.6 & 49.7 & -4.3 \\
+R2 & Otono & Machine Learning (Kt) & 0.193 & 0.429 & 198.7 & 160.6 & -13.8 & 45.9 & -3.2 \\
+R2 & Otono & Híbrido (BD-JPT + ML) & 0.209 & 0.444 & 196.1 & 159.7 & -17.8 & 45.3 & -4.1 \\
+R2 & Invierno & BD-JPT (Baseline) & 0.023 & 0.341 & 176.0 & 149.3 & -11.5 & 50.9 & -3.3 \\
+R2 & Invierno & Machine Learning (Kt) & 0.230 & 0.429 & 163.9 & 134.3 & -14.3 & 47.3 & -4.1 \\
+R2 & Invierno & Híbrido (BD-JPT + ML) & 0.243 & 0.446 & 161.5 & 133.5 & -17.2 & 46.7 & -4.9 \\
+R2 & Primavera & BD-JPT (Baseline) & 0.012 & 0.378 & 251.8 & 211.0 & -14.5 & 49.3 & -2.8 \\
+R2 & Primavera & Machine Learning (Kt) & 0.225 & 0.468 & 232.9 & 188.9 & -10.4 & 45.6 & -2.0 \\
+R2 & Primavera & Híbrido (BD-JPT + ML) & 0.248 & 0.489 & 228.3 & 188.0 & -17.3 & 44.7 & -3.4 \\
+R3 & Verano & BD-JPT (Baseline) & 0.068 & 0.413 & 266.4 & 218.9 & -4.6 & 50.1 & -0.8 \\
+R3 & Verano & Machine Learning (Kt) & 0.213 & 0.459 & 255.5 & 209.2 & -11.8 & 48.0 & -2.2 \\
+R3 & Verano & Híbrido (BD-JPT + ML) & 0.231 & 0.478 & 251.1 & 206.9 & -16.2 & 47.2 & -3.0 \\
+R3 & Otono & BD-JPT (Baseline) & -0.002 & 0.323 & 221.2 & 185.9 & -13.5 & 52.1 & -3.2 \\
+R3 & Otono & Machine Learning (Kt) & 0.209 & 0.405 & 207.4 & 167.8 & -9.1 & 48.9 & -2.1 \\
+R3 & Otono & Híbrido (BD-JPT + ML) & 0.234 & 0.426 & 203.7 & 166.8 & -15.2 & 48.0 & -3.6 \\
+R3 & Invierno & BD-JPT (Baseline) & 0.106 & 0.369 & 179.5 & 150.8 & -10.8 & 49.0 & -2.9 \\
+R3 & Invierno & Machine Learning (Kt) & 0.217 & 0.406 & 174.1 & 141.1 & -11.4 & 47.5 & -3.1 \\
+R3 & Invierno & Híbrido (BD-JPT + ML) & 0.269 & 0.449 & 167.7 & 139.1 & -18.5 & 45.7 & -5.0 \\
+R3 & Primavera & BD-JPT (Baseline) & 0.095 & 0.401 & 254.1 & 212.8 & -18.1 & 49.5 & -3.5 \\
+R3 & Primavera & Machine Learning (Kt) & 0.262 & 0.484 & 236.0 & 192.0 & -10.6 & 45.9 & -2.0 \\
+R3 & Primavera & Híbrido (BD-JPT + ML) & 0.290 & 0.499 & 232.5 & 191.3 & -18.2 & 45.2 & -3.5 \\
 \bottomrule
 \end{tabular}
 \end{table}

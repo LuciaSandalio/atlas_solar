@@ -1,0 +1,252 @@
+\documentclass[11pt,a4paper]{article}
+% ===============================================================
+% Convenio ATLAS II - Provincia de Córdoba - Componente Solar
+% Cuarto Informe de Avance: Modelo Satelital Híbrido, Potencial
+% Fotovoltaico y Atlas Solar Territorial a 2 km
+% ===============================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{fancyhdr}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small Convenio ATLAS II — Componente Solar}
+\lhead{\small Cuarto Informe de Avance}
+\rfoot{\small Página \thepage}
+
+\begin{document}
+
+% ===============================================================
+% PORTADA
+% ===============================================================
+\begin{titlepage}
+\centering
+
+\vspace*{-2cm}
+
+%\includegraphics[height=1.8cm]{figures/logo-fcefyn.png}
+\hspace{1.5cm}
+%\includegraphics[height=2.2cm]{figures/logo_ohmc.jpeg}
+
+\vspace{4.5cm}
+
+{\fontsize{30}{36}\selectfont \textbf{Convenio ATLAS II} \par}
+\vspace{0.4cm}
+{\fontsize{26}{32}\selectfont \textbf{Provincia de Córdoba} \par}
+
+\vspace{0.8cm}
+
+{\fontsize{22}{28}\selectfont \textcolor{gray}{\textbf{Componente Solar}} \par}
+
+\vspace{2.5cm}
+
+{\large
+Facultad de Ciencias Exactas, Físicas y Naturales (FCEFyN) \par}
+\vspace{0.2cm}
+{\large
+Universidad Nacional de Córdoba (UNC) \par}
+\vspace{0.2cm}
+{\large
+Laboratorio de Hidrometeorología (LHM) / OHMC \par}
+
+\vspace{3.5cm}
+
+{\normalsize \textbf{Cuarto Informe de Avance: Modelo Satelital Híbrido, Potencial Fotovoltaico y Atlas Solar Territorial a 2 km} \par}
+\vspace{0.8cm}
+{\normalsize Septiembre 2026 \par}
+
+\end{titlepage}
+
+\newpage
+
+% ===============================================================
+% RESUMEN EJECUTIVO
+% ===============================================================
+\section*{Resumen Ejecutivo}
+
+
+
+% ===============================================================
+% CUARTO INFORME DE AVANCE
+% ATLAS SOLAR TERRITORIAL Y POTENCIAL FOTOVOLTAICO DE CÓRDOBA
+% ===============================================================
+
+\tableofcontents
+\newpage
+
+
+% ===============================================================
+% 1. INTRODUCCIÓN
+% ===============================================================
+
+\section{Introducción}
+
+\subsection{Objetivo del Cuarto Informe de Avance}
+\subsection{Alcance de esta etapa del proyecto}
+\subsection{Síntesis de los desarrollos previos}
+\subsection{Productos desarrollados en esta etapa}
+
+
+% ===============================================================
+% 2. CONSTRUCCIÓN METODOLÓGICA DEL ATLAS
+% ===============================================================
+
+\section{Construcción Metodológica del Atlas Solar Territorial}
+
+\subsection{Grilla territorial de la Provincia de Córdoba}
+\subsection{Resolución espacial y dominio provincial}
+\subsection{Regionalización solar del territorio}
+
+\subsection{Asignación de modelos regionales}
+\subsubsection{Asignación rígida: Modo Hard}
+\subsubsection{Ponderación continua: Modo Blended}
+
+\subsection{Análisis de sensibilidad de la regionalización}
+\subsubsection{Comparación Hard vs. Blended}
+\subsubsection{Continuidad espacial en las fronteras regionales}
+\subsubsection{Impacto sobre las métricas provinciales}
+
+\subsection{Configuración territorial adoptada}
+\subsection{Arquitectura de inferencia territorial}
+\subsection{Agregación temporal y construcción de climatologías}
+\subsection{Control de cobertura y consistencia}
+\subsection{Validación numérica de la cadena territorial}
+
+
+% ===============================================================
+% 3. RECURSO SOLAR TERRITORIAL
+% ===============================================================
+
+\section{Distribución Territorial del Recurso Solar}
+
+\subsection{Irradiación Global Horizontal (GHI)}
+\subsection{Irradiación Directa Normal (DNI)}
+\subsection{Irradiación Difusa Horizontal (DHI)}
+\subsection{Horas Sol Pico (PSH)}
+\subsection{Variabilidad espacial del recurso solar}
+\subsection{Variabilidad estacional: verano e invierno}
+\subsection{Diferencias regionales dentro de la provincia}
+
+
+% ===============================================================
+% 4. MODELADO Y POTENCIAL FOTOVOLTAICO TERRITORIAL
+% ===============================================================
+
+\section{Modelado y Potencial Fotovoltaico Territorial}
+
+\subsection{Cadena física de conversión del recurso solar}
+
+\subsubsection{Descomposición de GHI mediante el modelo de Erbs}
+\subsubsection{Transposición al plano mediante el modelo de Perez}
+\subsubsection{Modelo térmico de módulo mediante NOCT}
+\subsubsection{Conversión DC/AC mediante PVWatts}
+\subsubsection{Pérdidas del sistema y supuestos tecnológicos}
+
+\subsection{Configuraciones fotovoltaicas analizadas}
+\subsubsection{Sistema fijo a 30° Norte}
+\subsubsection{Seguidor horizontal en un eje Norte-Sur}
+
+\subsection{Indicadores energéticos}
+\subsubsection{Irradiación en plano del generador}
+\subsubsection{Rendimiento específico anual}
+\subsubsection{Factor de capacidad}
+
+\subsection{Distribución territorial del potencial fotovoltaico}
+\subsubsection{Potencial en configuración fija}
+\subsubsection{Potencial con seguimiento en un eje}
+
+\subsection{Identificación de zonas de mayor y menor potencial eléctrico}
+
+
+% ===============================================================
+% 5. GANANCIA POR SEGUIMIENTO Y ANÁLISIS REGIONAL
+% ===============================================================
+
+\section{Ganancia por Seguimiento y Análisis Regional}
+
+\subsection{Definición de la ganancia relativa por seguimiento}
+
+\subsection{Distribución espacial de la ganancia}
+
+\subsection{Relación entre recurso solar y ganancia de seguimiento}
+
+\subsection{Influencia de la componente directa de la radiación}
+
+\subsection{Comportamiento estacional de la ganancia}
+
+\subsection{Análisis por regiones solares}
+
+\subsubsection{Región Serrana}
+\subsubsection{Región Centro-Sur}
+\subsubsection{Región Este}
+\subsubsection{Región Norte}
+
+\subsection{Comparación regional}
+\subsubsection{Recurso solar}
+\subsubsection{Rendimiento fotovoltaico}
+\subsubsection{Factor de capacidad}
+\subsubsection{Ganancia por seguimiento}
+
+\subsection{Síntesis territorial e implicancias tecnológicas}
+
+
+% ===============================================================
+% 6. PRODUCTOS CARTOGRÁFICOS Y GEOESPACIALES
+% ===============================================================
+
+\section{Productos Cartográficos y Base Geoespacial}
+
+\subsection{Atlas cartográfico temático}
+\subsection{Rásters Cloud-Optimized GeoTIFF (COG)}
+\subsection{GeoPackage provincial}
+\subsection{Variables incluidas en los productos geoespaciales}
+\subsection{Resolución espacial, sistema de referencia y metadatos}
+\subsection{Aplicaciones de los productos generados}
+
+
+% ===============================================================
+% 7. CONCLUSIONES
+% ===============================================================
+
+\section{Conclusiones}
+
+\subsection{Distribución provincial del recurso solar}
+\subsection{Potencial de generación fotovoltaica}
+\subsection{Beneficio territorial del seguimiento en un eje}
+\subsection{Principales contrastes regionales}
+\subsection{Productos generados para el Atlas Solar}
+
+
+% ===============================================================
+% ANEXOS
+% ===============================================================
+
+\appendix
+
+\section{Especificaciones del Sistema Fotovoltaico Modelado}
+\section{Formulación Matemática de los Modelos Físicos}
+\section{Tablas Estadísticas Provinciales y Regionales}
+\section{Especificaciones Técnicas de los Productos Geoespaciales}
+\section{Validaciones Numéricas y Pruebas de Consistencia del Pipeline}
+
+\end{document}

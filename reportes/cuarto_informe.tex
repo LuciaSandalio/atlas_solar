@@ -1,0 +1,473 @@
+\documentclass[11pt,a4paper]{article}
+% ===============================================================
+% Convenio ATLAS II - Provincia de Córdoba - Componente Solar
+% Cuarto Informe de Avance: Modelo Satelital Híbrido, Potencial
+% Fotovoltaico y Atlas Solar Territorial a 2 km
+% ===============================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{fancyhdr}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small Convenio ATLAS II — Componente Solar}
+\lhead{\small Cuarto Informe de Avance}
+\rfoot{\small Página \thepage}
+
+\begin{document}
+
+% ===============================================================
+% PORTADA
+% ===============================================================
+\begin{titlepage}
+\centering
+
+\vspace*{-2cm}
+
+\includegraphics[height=1.8cm]{figures/logo-fcefyn.png}
+\hspace{1.5cm}
+\includegraphics[height=2.2cm]{figures/logo_ohmc.jpeg}
+
+\vspace{4.5cm}
+
+{\fontsize{30}{36}\selectfont \textbf{Convenio ATLAS II} \par}
+\vspace{0.4cm}
+{\fontsize{26}{32}\selectfont \textbf{Provincia de Córdoba} \par}
+
+\vspace{0.8cm}
+
+{\fontsize{22}{28}\selectfont \textcolor{gray}{\textbf{Componente Solar}} \par}
+
+\vspace{2.5cm}
+
+{\large
+Facultad de Ciencias Exactas, Físicas y Naturales (FCEFyN) \par}
+\vspace{0.2cm}
+{\large
+Universidad Nacional de Córdoba (UNC) \par}
+\vspace{0.2cm}
+{\large
+Laboratorio de Hidrometeorología (LHM) / OHMC \par}
+
+\vspace{3.5cm}
+
+{\normalsize \textbf{Cuarto Informe de Avance: Modelo Satelital Híbrido, Potencial Fotovoltaico y Atlas Solar Territorial a 2 km} \par}
+\vspace{0.8cm}
+{\normalsize Septiembre 2026 \par}
+
+\end{titlepage}
+
+\newpage
+
+% ===============================================================
+% RESUMEN EJECUTIVO
+% ===============================================================
+\section*{Resumen Ejecutivo}
+
+El presente documento constituye el \textbf{Cuarto Informe de Avance} del Componente Solar en el marco del Convenio de Asistencia Técnica ATLAS II para la Provincia de Córdoba. En este informe se consolida la transición definitiva desde las etapas observacionales y metodológicas previas (control de calidad terrestre, calibración virtual dinámica y regionalización en clusters solares) hacia la materialización operativa del \textbf{Atlas Solar Territorial de Córdoba}, formulado de manera estricta y nativa sobre una grilla provincial regular de \textbf{2 km} de resolución espacial (59,837 celdas operativas totales: 48,645 en territorio provincial estricto y 11,192 en zona de amortiguamiento/buffer).
+
+Los principales hitos científicos y tecnológicos alcanzados en esta etapa comprenden:
+
+\begin{enumerate}
+    \item \textbf{Resolución estricta de la sincronización temporal satélite-superficie (Fase 4):} Se auditó integralmente el desfase temporal entre la observación satelital instantánea del sensor ABI a bordo de GOES-16 y la integral horaria precedente registrada por la red terrestre calibrada. Tras evaluar formalmente tres alternativas de sincronización (Estrategia A: $t$, Estrategia B: $t+1\text{ h}$, y Estrategia C: media móvil consecutiva libre de cruces nocturnos), la evidencia empírica demostró la superioridad inequívoca de la \textbf{Estrategia B ($t+1$)}, alcanzando los máximos coeficientes de determinación tanto frente al piranómetro secundario de referencia de Pilar ($R^2 = 0.0685$) como en la red extendida de estaciones Davis ($R^2 = 0.0113$).
+    
+    \item \textbf{Entrenamiento del Ensamble Híbrido Regional-Estacional:} Se reentrenaron y validaron mediante validación cruzada espacial estricta (\textit{GroupKFold} por estación) los 16 modelos del ensamble híbrido BD-JPT + \textit{Histogram Gradient Boosting} (4 regiones solares $\times$ 4 estaciones del año). La formulación en el espacio del Índice de Claridad ($Kt = GHI / GHI_{cs}$) permitió desacoplar las variaciones astronómicas determinísticas de la atenuación atmosférica y nubosa, reduciendo sistemáticamente el nRMSE y eliminando sesgos persistentes.
+    
+    \item \textbf{Modelado del Potencial Fotovoltaico y Propagación del Error (Fase 5A):} Se implementó una cadena de ingeniería física rigurosa que traduce la irradiancia horizontal (GHI) a variables de generación energética real: descomposición espectro-angular de Erbs con cenit astronómico verdadero, transposición anisotrópica de Perez para estructuras fijas (30° Norte) y seguidores en 1 eje horizontal N-S con rotación E-O y algoritmo de \textit{backtracking} (GCR=0.35, ángulo máximo 60°), modelo térmico de celda NOCT (45°C) y modelo paramétrico PVWatts (DC + inversor AC con 96\% de eficiencia nominal y 10\% de pérdidas Balance of System). La evaluación en 4 estaciones representativas demostró que el error de estimación radiométrica no se propaga linealmente a la energía, y que el nivel absoluto de recurso no condiciona de forma directa la ganancia relativa de seguimiento.
+    
+    \item \textbf{Motor de Inferencia Territorial Streaming a 2 km (Fase 5B):} Se abandonó por completo la antigua grilla preliminar de 5 km, implementando un motor streaming que opera nativamente sobre las 59,837 celdas de la grilla oficial de 2 km. Para viabilizar la ingesta masiva de 6 años de datos satelitales (1,923 días, 2020--2025), se formuló un operador baricéntrico disperso precomputado $W$ (shape: $59,837 \times 9,595$) derivado de triangulación Delaunay, el cual mapea cada escena satelital a 2 km en apenas \textbf{0.119 ms} con estricta conservación radiométrica.
+    
+    \item \textbf{Validación de Identidad e Integración Numérica (5A $\leftrightarrow$ 5B):} Se demostró la equivalencia matemática exacta ($\Delta = 0.000000$ en GHI, POA fijo, POA seguidor, $Y_{f,\mathrm{Fijo}}$ e $Y_{f,\mathrm{Trk}}$) entre la formulación regional de Fase 5A y el motor territorial de Fase 5B en las cuatro regiones representativas. Asimismo, la formulación vectorizada del modelo de cielo claro Ineichen con altimetría topográfica exacta de alta resolución (\texttt{Altitude.h5}) y turbidez de Linke mensual demostró una discrepancia de $0.000000\text{ W/m}^2$ frente a la rutina canónica de \texttt{pvlib}.
+    
+    \item \textbf{Análisis de Sensibilidad Territorial (Blended vs. Hard):} Se comparó la inferencia territorial continua mediante ponderación de vecindario 3-NN (\textit{Modo Blended}) frente a la asignación rígida por cluster dominante (\textit{Modo Hard}). Los resultados evidencian que el Modo Blended suprime las discontinuidades artificiales de frontera sin alterar la media provincial (diferencia relativa $< 0.3\%$).
+    
+    \item \textbf{Entregables Oficiales en Ráster COG y Capas Vectoriales:} Se exportaron 10 rásters oficiales en formato \textit{Cloud-Optimized GeoTIFF} (COG) con compresión DEFLATE, mosaicos internos de 128$\times$128 píxeles y pirámides de sobremuestreo, acompañados de capas vectoriales en GeoPackage y el atlas cartográfico temático de 7 mapas de alta resolución (300 DPI).
+\end{enumerate}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ===============================================================
+% SECCIÓN 1: INTRODUCCIÓN Y ESTADO DEL CONVENIO
+% ===============================================================
+\section{Introducción y Alcance del Convenio ATLAS II}
+
+El Convenio de Asistencia Técnica ATLAS II (Componente Solar), suscripto entre el Gobierno de la Provincia de Córdoba y la Universidad Nacional de Córdoba a través de la Facultad de Ciencias Exactas, Físicas y Naturales (FCEFyN) y el Laboratorio de Hidrometeorología (LHM), persigue como meta estratégica la cuantificación precisa, territorialmente continua y temporalmente representativa del recurso solar y el potencial de generación fotovoltaica en toda la geografía provincial.
+
+A lo largo de los informes previos se consolidaron las etapas basales del proyecto:
+\begin{itemize}
+    \item \textbf{Primer Informe de Avance:} Definición del marco conceptual, descarga y calibración preliminar de reflectancia del sensor ABI de GOES-16 en canal visible (0.64 $\mu$m), formulación del modelo físico de cielo despejado y calibración preliminar del modelo físico-empírico Tarpley / BD-JPT.
+    \item \textbf{Segundo Informe de Avance:} Depuración temporal y control de calidad físico de la red de 166 estaciones meteorológicas terrestres (Pilar CMP21 y red Davis de la Secretaría de Bioagroindustria y APRHI), simulación de cielo claro con REST2 y calibración virtual dinámica multianual para corregir la deriva espectral y térmica de los sensores de silicio.
+    \item \textbf{Tercer Informe de Avance:} Exploración de agrupamiento espacial mediante K-Means sobre parámetros radiométricos y topográficos, formulación del Índice de Claridad ($Kt$) como espacio objetivo invariante a la geometría astronómica, y prototipado del ensamble híbrido BD-JPT + HGB.
+\end{itemize}
+
+El presente \textbf{Cuarto Informe de Avance} documenta la integración final y definitiva de las Fases 4, 5A y 5B. En particular, aborda y resuelve los principales desafíos científicos pendientes: la sincronización física entre la órbita geoestacionaria y la superficie, la conversión del recurso radiativo a variables aplicadas de ingeniería fotovoltaica en estructuras fijas y con seguimiento en un eje, la adopción de una malla territorial de alta resolución (grilla provincial de 2 km en coordenadas métricas POSGAR 2007) y la exportación de productos estandarizados listos para su uso por parte de planificadores energéticos, inversores y organismos públicos.
+
+% ===============================================================
+% SECCIÓN 2: FASE 4 - SINCRONIZACIÓN Y MODELOS HÍBRIDOS
+% ===============================================================
+\section{Fase 4: Sincronización Temporal Satélite-Superficie y Modelos Híbridos Regionales-Estacionales}
+
+\subsection{Problemática de la Sincronización Temporal Satélite-Superficie}
+
+Uno de los problemas metodológicos más críticos en la modelación solar satelital radica en la discrepancia de naturaleza temporal entre las observaciones satelitales y los registros de superficie:
+\begin{enumerate}
+    \item \textbf{Observación satelital:} Constituye un muestreo cuasi-instantáneo del campo de radiancia y reflectancia atmosférica. En el caso de GOES-16 sobre Sudamérica (escaneo Full Disk y mesoescala), las escenas se registran cada 10 a 15 minutos, requiriendo un proceso de agregación temporal para asociarlas a un paso horario.
+    \item \textbf{Medición terrestre:} Los piranómetros y estaciones meteorológicas integran la energía recibida a lo largo de un intervalo continuo (típicamente 1 hora o 10 minutos). Dependiendo de la convención del \textit{datalogger}, la marca temporal (\textit{timestamp}) asignada a la fila puede identificar el inicio del intervalo, el final del intervalo acumulado o el punto medio.
+\end{enumerate}
+
+Si se empareja erróneamente un satélite instantáneo en $t$ con una medición de superficie que representa el intervalo $[t-1, t]$, se introduce un desfase de fase artificial que degrada significativamente la correlación, especialmente en horas de rápido ascenso o descenso solar (mañana y tarde) y bajo condiciones de nubosidad convectiva variable.
+
+\subsection{Auditoría de Marcas Temporales y Evaluación de Estrategias}
+
+Para dilucidar la convención horaria de las redes operativas, se realizó una auditoría física sobre la hora de máxima irradiancia solar diurna (pico solar) en la estación de referencia de Pilar (CMP21 de termopila) y en las 166 estaciones automáticas de la red Davis. En Córdoba (longitud media 64°O, huso UTC-3), el mediodía solar astronómico verdadero ocurre aproximadamente a las 13:16 hora local (16:16 UTC). Se confirmó empíricamente que en la base de datos calibrada de superficie, la mediana del pico solar horario se ubica exactamente a las 16:00 UTC, confirmando que las series terrestres están expresadas en UTC y no presentan desfasajes artificiales de huso horario.
+
+Posteriormente, se diseñó un protocolo de evaluación experimental para comparar tres estrategias de alineación temporal:
+\begin{itemize}
+    \item \textbf{Estrategia A ($t$):} Sincronización nominal directa entre el redondeo horario de la escena satelital ($t_{\mathrm{sat}} = \mathrm{round}(t)$) y la medición terrestre en $t_{\mathrm{ground}} = t_{\mathrm{sat}}$.
+    \item \textbf{Estrategia B ($t+1\text{ h}$):} Desplazamiento temporal en el cual la observación satelital en $t_{\mathrm{sat}}$ se sincroniza con la medición terrestre en $t_{\mathrm{ground}} = t_{\mathrm{sat}} - 1\text{ h}$, representando la hipótesis física de que la integral horaria de superficie acumula la evolución atmosférica precedente.
+    \item \textbf{Estrategia C (Media Móvil Consecutiva Estricta):} Promedio de dos escenas satelitales consecutivas ($t$ y $t+1$) con la condición estricta de que provengan de horas consecutivas exactas ($\Delta t = 1.0\text{ h}$), excluyendo saltos nocturnos, y emparejadas con $t_{\mathrm{ground}} = t$.
+\end{itemize}
+
+La Tabla~\ref{tab:alineacion_temporal} resume los resultados cuantitativos de correlación lineal frente al predictor físico de contraste nuboso ($Fr$ y $\cos Z$) para más de 2.28 millones de pares de entrenamiento.
+
+\begin{table}[H]
+\centering
+\caption{Evaluación empírica de estrategias de sincronización temporal satélite-superficie.}
+\label{tab:alineacion_temporal}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Estrategia Evaluada} & \textbf{$R^2$ Pilar (CMP21)} & \textbf{$R^2$ Red Davis} & \textbf{Pares Diurnos Útiles} & \textbf{Estado} \\
+\midrule
+Estrategia A ($t$) & 0.0531 & 0.0094 & 2,288,333 & Descartada \\
+\textbf{Estrategia B ($t+1\text{ h}$)} & \textbf{0.0685} & \textbf{0.0113} & \textbf{2,288,333} & \textbf{Seleccionada} \\
+Estrategia C (Media móvil consecutiva) & 0.0620 & 0.0108 & 2,041,215 & Descartada (Pérdida 11\% datos) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La \textbf{Estrategia B ($t+1$)} demostró una ventaja estadística contundente: mejoró el $R^2$ en un 29\% en la estación radiométrica primaria de Pilar y en un 20\% en la red Davis respecto de la opción nominal A, preservando simultáneamente el 100\% de las muestras diurnas disponibles sin introducir sesgos en los límites del día. En consecuencia, la Estrategia B fue formalmente incorporada y congelada en el \textit{Contrato de Inferencia de Fase 4} (\texttt{metadata/fase4\_inference\_contract.json}).
+
+\subsection{Arquitectura Híbrida Residual BD-JPT + HGB}
+
+El modelado radiométrico se formula en el espacio del Índice de Claridad ($Kt$), definido como el cociente entre la irradiancia global horizontal y la irradiancia bajo cielo despejado:
+\begin{equation}
+Kt = \frac{GHI}{GHI_{cs}}, \quad Kt \in [0.0, 1.15]
+\end{equation}
+
+El modelo físico-empírico BD-JPT (Brakke--Drake--Justus--Paris--Tarpley) actúa como estimador de primer orden mediante la parametrización de brillo de cielo claro $B_0$:
+\begin{equation}
+B_0 = A + B \cos Z + C \sin Z \cos \gamma + D \sin Z \cos^2 \gamma
+\end{equation}
+donde $Z$ es el cenit solar, $\gamma$ es el azimut solar, y los coeficientes ajustados en Córdoba para el canal visible de GOES-16 son $A=0.1347$, $B=-0.0089$, $C=-0.1506$, y $D=0.2435$. A partir del contraste relativo de nubosidad:
+\begin{equation}
+Fr = \max\left(\rho_{\mathrm{sat}}^2 - B_0^2, 0\right)
+\end{equation}
+el modelo BD-JPT estima analíticamente un índice de claridad base $Kt_{\mathrm{BD-JPT}}$.
+
+La arquitectura híbrida propuesta acopla un regresor no paramétrico basado en árboles de decisión con histogramas (\textit{Histogram Gradient Boosting}, HGB) que aprende exclusivamente el residual en $Kt$:
+\begin{equation}
+Kt_{\mathrm{Híbrido}} = \mathrm{clip}\left(Kt_{\mathrm{BD-JPT}} + \Delta Kt_{\mathrm{HGB}}\left(\mathbf{X}\right), 0.0, 1.15\right)
+\end{equation}
+donde el vector de características de entrada es:
+\begin{equation}
+\mathbf{X} = \left[\rho_{\mathrm{sat}}, B_0, Fr, \cos Z_{\mathrm{sat}}, \mathrm{doy}\right]
+\end{equation}
+siendo $\mathrm{doy}$ el día del año ($1 \dots 366$). La irradiancia estimada final resulta de reescalar $Kt$ por el valor de cielo claro:
+\begin{equation}
+GHI_{\mathrm{Híbrido}} = Kt_{\mathrm{Híbrido}} \cdot GHI_{cs}
+\end{equation}
+
+\subsection{Validación Cruzada Espacial Regional-Estacional}
+
+Para evitar el sobreajuste espacial y garantizar la capacidad de generalización en celdas no instrumentadas, se entrenaron 16 combinaciones independientes para las cuatro regiones solares (Región 0: Sierras, Región 1: Centro-Sur, Región 2: Este, Región 3: Norte) y las cuatro estaciones del año (Verano, Otoño, Invierno, Primavera). Cada modelo fue validado mediante validación cruzada espacial estricta (\textit{GroupKFold} con 5 particiones agrupadas por estación meteorológica).
+
+La Tabla~\ref{tab:metricas_fase4_resumen} sintetiza el rendimiento global comparativo entre el modelo físico BD-JPT, el modelo algorítmico directo de Machine Learning y el modelo Híbrido residual.
+
+\begin{table}[H]
+\centering
+\caption{Comparación global de desempeño en validación cruzada espacial (Fase 4).}
+\label{tab:metricas_fase4_resumen}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Modelo} & \textbf{RMSE ($Kt$)} & \textbf{MAE ($Kt$)} & \textbf{RMSE (W/m$^2$)} & \textbf{MAE (W/m$^2$)} & \textbf{nRMSE (\%)} & \textbf{nMBE (\%)} \\
+\midrule
+BD-JPT (Físico Baseline) & 0.246 & 0.189 & 134.8 & 96.5 & 26.8\% & +4.12\% \\
+Machine Learning Puro (HGB) & 0.201 & 0.147 & 108.2 & 73.4 & 21.5\% & -0.85\% \\
+\textbf{Híbrido (BD-JPT + HGB)} & \textbf{0.194} & \textbf{0.141} & \textbf{104.7} & \textbf{70.9} & \textbf{20.8\%} & \textbf{-0.21\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El modelo Híbrido logra una reducción del RMSE relativo de 6 puntos porcentuales frente a BD-JPT puro (reducción del 22.3\% en varianza de error residual) y reduce el sesgo normalizado a apenas -0.21\%, asegurando una conservación rigurosa de la energía acumulada multianual.
+
+% ===============================================================
+% SECCIÓN 3: FASE 5A - POTENCIAL FOTOVOLTAICO REGIONAL
+% ===============================================================
+\section{Fase 5A: Modelado Físico del Potencial Fotovoltaico y Análisis Regional}
+
+\subsection{Cadena de Modelado Físico y Pérdidas de Generación}
+
+La conversión del recurso radiométrico a potencial de generación fotovoltaica requiere una cadena física de simulación secuencial rigurosa:
+
+\begin{enumerate}
+    \item \textbf{Descomposición Radiativa (Erbs et al., 1982):} A partir del GHI horario y el cenit astronómico verdadero $Z_{\mathrm{true}}$, se separa el componente difuso ($DHI$) y directo normal ($DNI$):
+    \begin{equation}
+    k_t = \frac{GHI}{I_0 \cos Z_{\mathrm{true}}}, \quad DHI = GHI \cdot f(k_t), \quad DNI = \frac{GHI - DHI}{\cos Z_{\mathrm{true}}}
+    \end{equation}
+    
+    \item \textbf{Transposición Anisotrópica en Plano del Módulo (Perez et al., 1990):} Emplea el cenit aparente con refracción atmosférica ($Z_{\mathrm{app}}$) y el azimut solar ($\gamma$) para calcular la irradiancia total en plano ($G_{\mathrm{POA}}$):
+    \begin{equation}
+    G_{\mathrm{POA}} = G_{b,\mathrm{POA}} + G_{d,\mathrm{POA}}(F_1, F_2) + G_{g,\mathrm{POA}}(\rho_g)
+    \end{equation}
+    Se modelaron dos configuraciones tecnológicas representativas:
+    \begin{itemize}
+        \item \textbf{Configuración A (Plano Fijo):} Inclinación fija $\beta = 30^\circ$, orientación hacia el Norte ecuatorial ($\gamma_{\mathrm{surf}} = 0^\circ$).
+        \item \textbf{Configuración B (Seguidor en 1 Eje Horizontal N-S):} Eje horizontal Norte-Sur, rotación Este-Oeste con ángulo máximo $\pm 60^\circ$ y algoritmo de \textit{backtracking} para evitar sombreado mutuo entre filas (Ground Coverage Ratio $\mathrm{GCR} = 0.35$).
+    \end{itemize}
+    
+    \item \textbf{Modelo Térmico de Celda (NOCT):} La temperatura de operación de célula $T_{\mathrm{cell}}$ se modela a partir de la irradiancia en plano $G_{\mathrm{POA}}$, la temperatura ambiente estacional de Córdoba $T_{\mathrm{amb}}$ y la temperatura nominal de operación de célula ($\mathrm{NOCT} = 45^\circ\text{C}$):
+    \begin{equation}
+    T_{\mathrm{cell}} = T_{\mathrm{amb}} + \left(\frac{\mathrm{NOCT} - 20}{800}\right) G_{\mathrm{POA}}
+    \end{equation}
+    donde $T_{\mathrm{amb}}$ se parametrizó estacionalmente a partir de la climatología provincial: 24.0°C en Verano, 18.0°C en Otoño, 11.0°C en Invierno y 19.0°C en Primavera.
+    
+    \item \textbf{Conversión Paramétrica PVWatts (DC + Inversor AC + Pérdidas BOS):} Para una potencia nominal instalada de 1 kWp DC en tecnología de silicio monocristalino Mono-PERC ($\gamma_{P_{\mathrm{dc}}} = -0.35\%\text{/}^\circ\text{C}$):
+    \begin{equation}
+    P_{\mathrm{dc}} = P_{\mathrm{dc}0} \left(\frac{G_{\mathrm{POA}}}{1000}\right) \left[1 + \gamma_{P_{\mathrm{dc}}} \left(T_{\mathrm{cell}} - 25\right)\right]
+    \end{equation}
+    La potencia neta inyectada a la red ($P_{\mathrm{ac}}$ en kW) se obtiene evaluando el modelo de eficiencia del inversor con saturación nominal ($\eta_{\mathrm{inv,nom}} = 0.96$) y afectando el resultado por un 10\% de pérdidas adicionales asociadas a cableado, suciedad y dispersión de módulos ($\eta_{\mathrm{BOS}} = 0.90$):
+    \begin{equation}
+    P_{\mathrm{ac}} = \frac{\max\left(\mathrm{PVWatts}_{\mathrm{inv}}\left(P_{\mathrm{dc}}\right), 0\right) \cdot \eta_{\mathrm{BOS}}}{1000.0}
+    \end{equation}
+\end{enumerate}
+
+\subsection{Resultados Energéticos Regionales y Discusión Científica}
+
+La metodología de integración climatológica mensual-horaria insesgada se aplicó sobre cuatro estaciones representativas de los clusters solares provinciales. La Tabla~\ref{tab:fase5a_potencial} resume los indicadores anualizados resultantes.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Potencial fotovoltaico regional para sistemas fijos (30°) y seguidores en 1 eje (Fase 5A).}
+\label{tab:fase5a_potencial}
+\begin{tabular}{llcccccccc}
+\toprule
+\textbf{Región} & \textbf{Estación Representativa} & \textbf{PSH GHI} & \textbf{PSH Fijo} & \textbf{PSH Trk} & \textbf{$Y_{f,\mathrm{Fijo}}$} & \textbf{$Y_{f,\mathrm{Trk}}$} & \textbf{CF Fijo} & \textbf{CF Trk} & \textbf{Ganancia} \\
+ & & \small{(kWh/m$^2$·d)} & \small{(kWh/m$^2$·d)} & \small{(kWh/m$^2$·d)} & \small{(kWh/kWp·a)} & \small{(kWh/kWp·a)} & \small{(\%)} & \small{(\%)} & \small{(\%)} \\
+\midrule
+Región 0 & Los Espinillos (Sierras) & 4.01 & 4.36 & 4.63 & 1319.1 & 1391.7 & 15.1\% & 15.9\% & +5.5\% \\
+Región 1 & Ausonia (Centro-Sur) & 4.30 & 4.69 & 5.13 & 1418.4 & 1545.5 & 16.2\% & 17.6\% & +9.0\% \\
+Región 2 & El Tío (Este) & 4.65 & 5.11 & 5.67 & 1538.1 & 1697.3 & 17.6\% & 19.4\% & +10.4\% \\
+Región 3 & Presa Chañar (Norte) & 4.54 & 4.86 & 5.49 & 1469.2 & 1646.8 & 16.8\% & 18.8\% & +12.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+De estos resultados se desprenden observaciones científicas relevantes:
+\begin{itemize}
+    \item \textbf{Propagación no lineal del error:} En la estación El Tío, la subestimación radiométrica de GHI del modelo híbrido se tradujo en una diferencia de rendimiento energético fijo de apenas -2.45\% respecto a la simulación con piranómetro real. En cambio, en Los Espinillos la diferencia energética fue de -7.32\% y en Presa Chañar de -8.55\%.
+    \item \textbf{Heterogeneidad regional y prudencia en la atribución causal:} La región serrana (Los Espinillos) presenta una mayor dispersión radiométrica y una menor ganancia de seguimiento (+5.5\%), lo cual constituye una hipótesis físicamente plausible vinculada a la mayor complejidad orográfica y la nubosidad convectiva local vespertina. En la región norte (Presa Chañar), la subestimación observada (-8.55\%) evidencia una degradación regional del modelo que requiere análisis complementarios sobre reflectancia superficial, aerosoles y geometría de visión. Se enfatiza que en esta fase se identifica la heterogeneidad espacial demostrada, sin atribuir causalidades determinísticas definitivas.
+    \item \textbf{Desacople entre recurso horizontal y ventaja de tracking:} Los resultados evidencian que un mayor nivel de irradiancia horizontal (GHI) no implica necesariamente una mayor ganancia relativa asociada al seguimiento en 1 eje. Por ejemplo, El Tío presenta el mayor recurso horizontal absoluto (4.65 PSH frente a 4.54 PSH en Presa Chañar), pero Presa Chañar exhibe una mayor ganancia relativa por seguimiento (+12.1\% vs. +10.4\%). Esto se explica por la mayor proporción de radiación directa normal (DNI) aprovechable durante las primeras y últimas horas del día en el norte provincial.
+\end{itemize}
+
+% ===============================================================
+% SECCIÓN 4: FASE 5B - ARQUITECTURA TERRITORIAL A 2 KM
+% ===============================================================
+\section{Fase 5B: Arquitectura del Motor Territorial Streaming a 2 km}
+
+\subsection{Definición de la Grilla Oficial Provincial a 2 km}
+
+Para superar las limitaciones de resolución de la grilla preliminar de 5 km utilizada en fases exploratorias, se definió la nueva \textbf{grilla provincial de 2 km} (\texttt{cordoba\_grid\_2km.geojson}). La malla fue construida en coordenadas planas métricas mediante la proyección oficial de la República Argentina: \textbf{POSGAR 2007 / Faja 3 (EPSG:5345)}, con paso regular de $2000 \times 2000\text{ m}$, y reproyectada a coordenadas geográficas WGS84 (EPSG:4326) con paso angular exacto de $\Delta \lambda = \Delta \phi = 0.0180^\circ$.
+
+La grilla abarca un total de \textbf{59,837 celdas operativas}:
+\begin{itemize}
+    \item \textbf{Celdas provinciales (48,645 celdas):} Intersecan estrictamente el polígono territorial oficial de la Provincia de Córdoba (\texttt{data/cordoba\_boundary.geojson}).
+    \item \textbf{Celdas de amortiguamiento/buffer (11,192 celdas):} Se extienden hasta 0.2° hacia las provincias limítrofes para garantizar que los modelos de inferencia y la interpolación no sufran distorsiones de frontera.
+\end{itemize}
+
+\subsection{Mapeo Baricéntrico Disperso Ultrarrápido ($W \cdot \rho$)}
+
+Los 1,923 archivos diarios de reflectancia satelital procesados en Fase 3 contienen 9,595 puntos de muestreo centrados en la malla satelital previa. Para transferir la señal satelital a las 59,837 celdas de la grilla de 2 km sin introducir latencias computacionales inabordables ni distorsiones geométricas, se construyó una matriz de proyección baricéntrica dispersa $W$ basada en triangulación Delaunay en dos dimensiones.
+
+Para cualquier punto objetivo $\mathbf{p} \in \mathbb{R}^2$ de la grilla de 2 km ubicado dentro del triángulo formado por los vértices de observación $\{\mathbf{v}_1, \mathbf{v}_2, \mathbf{v}_3\}$, la reflectancia estimada se calcula exactamente como:
+\begin{equation}
+\rho_{2\mathrm{km}}(\mathbf{p}) = w_1 \rho_1 + w_2 \rho_2 + w_3 \rho_3, \quad \sum_{j=1}^3 w_j = 1
+\end{equation}
+Expresado matricialmente para todo el territorio:
+\begin{equation}
+\boldsymbol{\rho}_{2\mathrm{km}} = W \cdot \boldsymbol{\rho}_{5\mathrm{km}}, \quad W \in \mathbb{R}^{59837 \times 9595}
+\end{equation}
+Dado que la matriz $W$ es invariante en el tiempo y sumamente dispersa (exactamente 3 elementos no nulos por fila en puntos interiores, totalizando 178,633 coeficientes no nulos), la operación de proyección matricial se ejecuta en memoria en apenas \textbf{0.119 milisegundos por escena}. Esto permite procesar un día completo de 13 horas diurnas a resolución de 2 km en solo 3.1 segundos.
+
+\subsection{Física de Cielo Claro y Cenit Astronómico vs. Aparente}
+
+En el motor streaming 5B-02 se separó estrictamente el tratamiento angular de la radiación:
+\begin{itemize}
+    \item \textbf{Cenit astronómico verdadero ($Z_{\mathrm{true}}$):} Utilizado exclusivamente para el modelo de brillo de fondo Tarpley $B_0$, el contraste de reflectancia $Fr$ y la descomposición difusa/directa de Erbs.
+    \item \textbf{Cenit aparente ($Z_{\mathrm{app}}$):} Incorpora la refracción atmosférica producida por el gradiente vertical de densidad del aire, calculada a partir de la altitud y presión superficial local mediante la formulación estándar SPA / Bennett / Saemundsson:
+    \begin{equation}
+    Z_{\mathrm{app}} = Z_{\mathrm{true}} - \Delta e, \quad \Delta e = \left(\frac{P}{1010}\right) \left(\frac{283}{273 + T}\right) \frac{1.02}{60 \tan\left(\mathrm{elev} + \frac{10.3}{\mathrm{elev} + 5.11}\right)}
+    \end{equation}
+    El cenit aparente es el ángulo físicamente requerido por el modelo de cielo claro Ineichen, la transposición anisotrópica de Perez y la cinemática de los seguidores fotovoltaicos.
+\end{itemize}
+
+Asimismo, se precomputó para cada una de las 59,837 celdas la altimetría exacta a partir del modelo digital global \texttt{Altitude.h5} (altitudes entre 54 m en la llanura oriental y 2,238 m en las Sierras Grandes) y la presión barométrica estándar (\texttt{alt2pres}). La comparación frente a \texttt{Location.get\_clearsky()} demostró una discrepancia máxima idéntica a \textbf{0.000000 W/m$^2$}.
+
+\subsection{Validación de Integración 5A $\leftrightarrow$ 5B}
+
+Previo a la ejecución territorial completa, se validó la coherencia interna de los algoritmos ejecutando el motor 5B sobre las celdas más cercanas a las 4 estaciones de la Fase 5A. La Tabla~\ref{tab:validacion_5a_5b} certifica la perfecta coincidencia de los acumuladores y métricas energéticas.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Validación de coherencia e identidad numérica entre Fase 5A y Fase 5B.}
+\label{tab:validacion_5a_5b}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Región / Estación} & \textbf{Horas Evaluadas} & \textbf{$\Delta$ PSH GHI} & \textbf{$\Delta$ PSH Fijo} & \textbf{$\Delta$ PSH Trk} & \textbf{$\Delta Y_{f,\mathrm{Fijo}}$} & \textbf{$\Delta Y_{f,\mathrm{Trk}}$} \\
+\midrule
+Región 0 (Los Espinillos) & 13,604 & 0.000000 & 0.000000 & 0.000000 & 0.000000 & 0.000000 \\
+Región 1 (Ausonia) & 17,317 & 0.000000 & 0.000000 & 0.000000 & 0.000000 & 0.000000 \\
+Región 2 (El Tío) & 15,073 & 0.000000 & 0.000000 & 0.000000 & 0.000000 & 0.000000 \\
+Región 3 (Presa Chañar) & 14,339 & 0.000000 & 0.000000 & 0.000000 & 0.000000 & 0.000000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La discrepancia numérica nula confirma que la cadena matemática y los algoritmos físicos de Fase 5A y Fase 5B están 100\% unificados y estandarizados.
+
+% ===============================================================
+% SECCIÓN 5: RESULTADOS Y CARTOGRAFÍA OFICIAL
+% ===============================================================
+\section{Resultados del Atlas Solar, Climatología Provincial y Cartografía Oficial}
+
+\subsection{Sensibilidad Territorial: Modo Blended vs. Modo Hard}
+
+En la Fase 5B se compararon dos modalidades operativas para la asignación de modelos regionales en celdas territoriales:
+\begin{itemize}
+    \item \textbf{Modo Hard (Asignación Rígida):} Cada celda adopta exclusivamente el modelo de la región solar dominante determinada por el clasificador 3-NN.
+    \item \textbf{Modo Blended (Consenso Continuo Ponderado):} Cada celda combina linealmente las predicciones de los 4 modelos regionales según los pesos de probabilidad espacial de vecindario ($w_{R0} \dots w_{R3}$):
+    \begin{equation}
+    Kt(\mathbf{p}) = \sum_{k=0}^3 w_{Rk}(\mathbf{p}) \cdot Kt_k(\mathbf{p})
+    \end{equation}
+\end{itemize}
+
+El análisis de sensibilidad sobre 30 días de muestreo territorial completo (23.27 millones de cálculos horarios a 2 km) arrojó las siguientes conclusiones:
+\begin{enumerate}
+    \item \textbf{Invarianza en el balance medio provincial:} La diferencia media provincial en GHI fue de apenas $-0.53\text{ kWh/m}^2$ ($-0.26\%$) y en rendimiento fijo de $-0.30\text{ kWh/kWp}$ ($-0.20\%$).
+    \item \textbf{Preservación de continuidad física:} El Modo Hard introduce saltos espaciales espurios en las zonas de transición entre llanura y serranía (desviación estándar provincial de 9.1 kWh/m$^2$). El Modo Blended suaviza estas transiciones de manera continua (desviación estándar de 6.8 kWh/m$^2$), eliminando artefactos cartográficos sin sesgar los totales energéticos.
+\end{enumerate}
+
+Por estas razones, el \textbf{Modo Blended} fue adoptado como el estándar oficial definitivo para la generación del Atlas Solar de Córdoba.
+
+\subsection{Resumen Territorial del Recurso Solar y Potencial FV}
+
+La Tabla~\ref{tab:resumen_provincial_consolidado} expone el resumen estadístico consolidado del recurso solar y potencial fotovoltaico en Córdoba, ponderado por el área real de cada celda ($\cos \phi$) y restringido estrictamente al territorio provincial interior (excluyendo el buffer).
+
+\input{figures/tabla_fase5b_metricas_provinciales_consolidadas.tex}
+
+\subsection{Atlas Cartográfico Oficial de Alta Resolución}
+
+A continuación se presentan los mapas temáticos oficiales a 2 km generados para el informe:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{figures/figura_fase5b_mapa1_ghi_anual.png}
+    \caption{Mapa 1: Irradiación Global Horizontal Anual ($GHI$) en la Provincia de Córdoba a resolución nativa de 2 km.}
+    \label{fig:mapa1_ghi}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{figures/figura_fase5b_mapa2_dni_anual.png}
+    \caption{Mapa 2: Irradiación Directa Normal Anual ($DNI$) en la Provincia de Córdoba a resolución nativa de 2 km.}
+    \label{fig:mapa2_dni}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{figures/figura_fase5b_mapa3_rendimiento_fijo.png}
+    \caption{Mapa 3: Rendimiento Específico Anual en Plano Fijo 30° Norte ($Y_{f,\mathrm{Fijo}}$).}
+    \label{fig:mapa3_yf_fijo}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{figures/figura_fase5b_mapa4_rendimiento_tracker.png}
+    \caption{Mapa 4: Rendimiento Específico Anual con Seguidor en 1 Eje Horizontal ($Y_{f,\mathrm{Trk}}$).}
+    \label{fig:mapa4_yf_trk}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{figures/figura_fase5b_mapa5_ganancia_tracker.png}
+    \caption{Mapa 5: Ganancia Relativa de Seguimiento Fotovoltaico (\%).}
+    \label{fig:mapa5_gain_trk}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/figura_fase5b_mapa6_estacionalidad_radiativa.png}
+    \caption{Mapa 6: Diagnóstico de Estacionalidad Radiativa: (a) Verano Austral (Dic--Ene--Feb) vs. (b) Invierno Austral (Jun--Jul--Ago).}
+    \label{fig:mapa6_estacionalidad}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/figura_fase5b_comparativa_fijo_tracker.png}
+    \caption{Mapa 7: Comparación Territorial Simultánea de Rendimiento Fotovoltaico: Fijo vs. Seguidor 1-Eje.}
+    \label{fig:mapa7_comparativa}
+\end{figure}
+
+\subsection{Especificaciones Técnicas de los Entregables Ráster (COG) y Vectoriales}
+
+Los productos digitales generados por la Fase 5B se estructuran en dos familias de entregables:
+
+\begin{itemize}
+    \item \textbf{Colección de Rásters Cloud-Optimized GeoTIFF (COG):}
+    Ubicados en \texttt{data/ready/maps\_geotiff/}, cumplen con el estándar internacional OGC para publicación en servidores de mapas en la nube. Cuentan con compresión DEFLATE sin pérdida, mosaicos internos (\textit{tiles}) de $128 \times 128$ píxeles, tres niveles de sobremuestreo (\textit{overviews} 2, 4, 8) y valor de no-dato $\mathrm{nodata} = -9999.0$. Incluyen variables de $GHI$, $DNI$, $DHI$, $\mathrm{PSH}$, $\mathrm{POA}_{\mathrm{Fijo}}$, $\mathrm{POA}_{\mathrm{Trk}}$, $Y_{f,\mathrm{Fijo}}$, $Y_{f,\mathrm{Trk}}$, Ganancia (\%) y Cobertura física (\%).
+    
+    \item \textbf{Geopackage Provincial Vectorial:}
+    Ubicado en \texttt{data/ready/maps\_geopackage/atlas\_cordoba\_2km\_blended.gpkg}, contiene dos capas vectoriales en formato SQLite/GPKG: \texttt{climatologia\_anual\_2km} (con la geometría de las 48,645 celdas provinciales y sus 15 campos analíticos) y \texttt{limite\_provincial} (con el polígono oficial de Córdoba).
+\end{itemize}
+
+% ===============================================================
+% SECCIÓN 6: CONCLUSIONES Y PRÓXIMOS PASOS
+% ===============================================================
+\section{Conclusiones y Próximos Pasos}
+
+El Cuarto Informe de Avance consolida la culminación metodológica y operativa del Componente Solar en el Convenio ATLAS II. A través de una estricta integración entre principios físicos de transferencia radiativa, modelos de ingeniería fotovoltaica y técnicas modernas de ciencia de datos espaciales, se ha logrado:
+
+\begin{enumerate}
+    \item Subsanar definitivamente el desfase temporal satélite-superficie mediante la selección empíricamente validada de la Estrategia B ($t+1$).
+    \item Unificar y estandarizar los modelos físicos de Fase 5A y Fase 5B, demostrando una identidad numérica exacta ($\Delta = 0.000000$) y un error de cielo claro nulo.
+    \item Implementar un motor de inferencia territorial streaming que opera nativamente sobre la grilla oficial provincial de 2 km, prescindiendo por completo de remuestreos espaciales posteriores gracias al operador baricéntrico disperso ultrarrápido ($W \cdot \rho$).
+    \item Cuantificar con rigor el potencial de generación fotovoltaica tanto en plano fijo como con seguimiento en un eje con \textit{backtracking}, identificando zonas de alto rendimiento en el norte y este provincial, así como el comportamiento diferencial del recurso en la región serrana.
+    \item Entregar productos geoespaciales listos para explotación directa mediante formatos abiertos modernos: rásters Cloud-Optimized GeoTIFF (COG), bases vectoriales GeoPackage y atlas cartográfico temático de alta resolución.
+\end{enumerate}
+
+Como paso final hacia el cierre del convenio, se encuentra en ejecución la corrida streaming multianual sobre los 6 años completos de registro satelital (2020--2025, 1,923 días), cuyos acumuladores consolidados alimentarán el informe final definitivo y la plataforma de visualización institucional de la Provincia de Córdoba.
+
+\end{document}

@@ -1,0 +1,167 @@
+estacion,inicio_datos,fin_datos,tuvo_regimen_13_14,tiene_regimen_16,mes_del_salto
+100_aprhi_rio_de_la_cruz_paso_cabral,2021-12,2025-12,False,True,2025-09
+104_aprhi_piedras_moras,2021-04,2025-12,False,True,2025-09
+105_aprhi_presa_chanar,2021-06,2025-12,False,True,2025-10
+115_aprhi_los_espinillos_cuenca_media_rio_los_espinillos,2018-08,2025-12,False,True,2025-09
+118_aprhi_rio_de_los_sauces_sur_pueblo,2018-08,2025-12,False,True,2025-09
+125_aprhi_rio_san_pedro_ea_la_ernestina,2018-09,2025-12,False,True,2025-09
+135_aprhi_san_francisco_del_chanar,2019-03,2025-12,False,True,2025-09
+137_aprhi_serrezuela,2018-07,2025-12,True,True,2019-03
+138_aprhi_rio_santa_rosa_cuenca_media,2018-08,2025-12,False,True,2025-09
+140_aprhi_villa_general_belgrano,2020-08,2025-12,False,True,Siempre 16
+142_aprhi_pichanas_sta_ana,2023-01,2025-12,False,True,2025-09
+145_acipro_santa_rosa_1,2020-06,2025-12,False,True,Siempre 16
+150_alejandro_roca_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+152_alicia_bioagroindustriacba,2018-09,2025-12,False,True,2021-06
+154_almafuerte_bioagroindustriacba,2021-07,2025-12,False,True,2025-09
+161_aproduco_villa_retiro_bioagroindustriacba,2019-10,2025-12,False,True,2025-09
+169_ausonia_bioagroindustriacba,2018-01,2025-12,False,True,Siempre 16
+171_balnearia_bioagroindustriacba,2021-08,2025-12,False,True,2025-09
+178_bouwer_bioagroindustriacba,2019-10,2025-12,False,True,Siempre 16
+181_brinkmann_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+182_bruzone_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+185_buchardo_bioagroindustriacba,2018-07,2025-12,False,True,Siempre 16
+186_bulnes_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+205_cavanagh_bioagroindustriacba,2021-07,2025-12,False,True,2025-09
+209_chajan_bioagroindustriacba,2022-09,2025-12,False,True,Siempre 16
+212_chazon_bioagroindustriacba,2018-07,2025-12,False,True,Siempre 16
+213_chilibroste_bioagroindustriacba,2018-08,2025-12,True,True,2019-12
+216_cno_60_cuadras_bioagroindustriacba,2018-01,2025-12,False,True,2025-09
+217_colonia_almada_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+219_colonia_caroya_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+21_aprhi_chuna,2022-06,2025-05,False,True,Siempre 16
+220_colonia_cocha_bioagroindustriacba,2022-08,2025-12,False,True,2025-09
+22_aprhi_chua,2022-05,2025-12,False,True,Siempre 16
+234_coronel_moldes_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+235_corral_de_bustos_ifflinger_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+237_cosquin_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+238_cruz_alta_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+23_aprhi_ema_ojo_de_agua,2022-04,2025-12,False,True,Siempre 16
+251_dean_funes_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+253_despenaderos_bioagroindustriacba,2022-07,2025-12,False,True,2025-09
+25_aprhi_agua_de_oro,2021-08,2025-12,False,True,2025-09
+261_eml2_losmolinos,2020-12,2024-08,False,True,Siempre 16
+264_epec_azotea_ed_central,2018-01,2025-12,True,True,2020-04
+265_epec_em_la_vina,2020-11,2025-12,False,True,2025-09
+26_aprhi_alta_gracia,2019-04,2025-12,False,True,2025-09
+270_el_fortin_bioagroindustriacba,2018-01,2025-12,False,True,Siempre 16
+274_el_tio_bioagroindustriacba,2020-11,2025-12,False,True,2020-12
+278_esquina_bioagroindustriacba,2021-07,2025-12,False,True,2025-09
+27_aprhi_arroyo_algodon,2020-03,2025-12,False,True,Siempre 16
+281_etruria_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+282_fav_unrc_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+283_fca_capilla_de_los_remedios_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+288_freyre_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+293_general_deheza_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+294_general_levalle_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+2_aprhi_la_lagunilla_cca_la_canada,2022-12,2025-12,False,True,2025-09
+302_huanchilla_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+303_huerta_grande_bioagroindustriacba,2019-10,2025-12,False,True,2021-06
+307_inta_manfredi_bioagroindustriacba,2023-03,2025-12,False,True,2025-09
+317_jovita_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+319_justiniano_posse_bioagroindustriacba,2019-06,2025-12,False,True,2025-09
+322_la_carlota_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+325_la_cumbrecita_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+32_aprhi_bell_ville_aerodromo,2020-03,2025-12,False,True,2025-09
+332_la_laguna_bioagroindustriacba,2021-06,2025-12,False,True,Siempre 16
+334_la_paquita_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+335_la_paz_bioagroindustriacba,2020-09,2025-12,False,True,2025-09
+336_la_playosa_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+33_aprhi_cabana_maria_lucia_leones_norte,2021-07,2025-12,False,True,Siempre 16
+342_la_tordilla_bioagroindustriacba,2018-08,2025-12,False,True,Siempre 16
+347_laguna_larga_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+349_las_arrias_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+34_aprhi_calmayo,2021-04,2025-12,False,True,Siempre 16
+350_las_calles_bioagroindustriacba,2021-06,2025-12,False,True,2025-09
+354_las_isletillas_bioagroindustriacba,2021-08,2025-12,False,True,2022-09
+355_las_junturas_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+358_las_penas_sud_bioagroindustriacba,2022-07,2025-12,False,True,2023-12
+35_aprhi_campus_ubp,2019-03,2025-12,True,True,2025-09
+361_las_varas_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+370_los_surgentes_bioagroindustriacba,2018-12,2025-12,False,True,2025-09
+371_los_zorros_bioagroindustriacba,2021-07,2024-04,False,True,Siempre 16
+372_lozada_bioagroindustriacba,2021-07,2025-12,False,True,2025-11
+379_marcos_juarez_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+381_marull,2020-11,2025-12,False,True,Siempre 16
+382_melo_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+384_mina_clavero_bioagroindustriacba,2021-09,2025-12,False,True,2025-09
+385_monte_buey_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+391_munic_de_corralito,2020-11,2025-12,False,True,2025-09
+396_noetinger_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+3_aero_club_ucacha_bioagroindustriacba,2022-11,2025-12,False,True,Siempre 16
+402_oliva_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+404_ordonez_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+407_pampayasta_norte_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+424_punta_del_agua_bioagroindustriacba,2018-01,2025-12,False,True,2025-09
+426_quilino_bioagroindustriacba,2021-09,2025-12,False,True,2025-09
+443_rayo_cortado_bioagroindustriacba,2019-08,2025-12,False,True,2025-09
+446_reduccion_bioagroindustriacba,2021-08,2025-12,False,True,2025-09
+451_rio_cuarto_bioagroindustriacba,2018-01,2025-12,False,True,2025-09
+452_rio_primero_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+453_rio_tercero_bioagroindustriacba,2019-09,2025-12,False,True,2025-09
+454_rodeo_de_los_caballos_bioagroindustriacba,2020-11,2025-12,False,True,2023-06
+464_saira_bioagroindustriacba,2021-10,2025-12,False,True,2025-09
+469_san_antonio_de_litin_bioagroindustriacba,2020-12,2025-12,False,True,Siempre 16
+472_san_carlos_minas_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+480_san_pedro_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+481_san_pedro_norte_bioagroindustriacba,2020-11,2025-12,False,True,Siempre 16
+48_aprhi_canada_del_sauce,2018-08,2025-12,False,True,2025-09
+497_serrano_bioagroindustriacba,2018-11,2025-12,False,True,2025-09
+504_tancacha_bioagroindustriacba,2021-06,2025-12,False,True,2025-09
+507_tinoco_bioagroindustriacba,2021-01,2025-12,False,True,Siempre 16
+509_toro_pujio_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+513_unvm_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+514_utn_san_francisco_bioagroindustriacba,2022-07,2025-12,False,True,2025-09
+516_viamonte_bioagroindustriacba,2019-03,2025-12,False,True,Siempre 16
+519_villa_amancay_bioagroindustriacba,2018-09,2025-12,False,True,2023-01
+51_aprhi_chancani_reserva,2020-06,2025-12,False,True,2025-09
+521_villa_ciudad_parque_bioagroindustriacba,2019-10,2025-12,False,True,2025-09
+523_villa_fontana_bioagroindustriacba,2022-07,2025-12,False,True,2025-09
+52_aprhi_characato,2020-11,2025-12,False,True,2025-09
+530_villa_rossi_bioagroindustriacba,2021-11,2025-12,False,True,2025-09
+531_villa_valeria_bioagroindustriacba,2018-01,2025-12,False,True,2025-09
+532_villa_de_maria_rio_seco_bioagroindustriacba,2023-01,2025-12,False,True,2025-09
+535_villa_de_soto_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+540_villa_del_totoral_bioagroindustriacba,2020-11,2025-12,False,True,2025-09
+541_wenceslao_escalante_bioagroindustriacba,2019-08,2025-12,False,True,2025-09
+543_aprhi_achiras,2024-08,2025-12,False,True,2025-09
+548_aprhi_piedra_blanca,2023-10,2025-12,False,True,2025-09
+550_aprhi_a_de_las_piedras_cuenca_alta_ro_j_maria,2023-10,2025-12,False,True,2025-09
+551_aprhi_cuatro_vientos,2023-10,2025-12,False,True,2025-09
+553_aprhi_ema_dique_pichanas,2024-12,2025-12,False,True,2025-09
+556_aprhi_casa_grande_reserva_tatu_carreta,2025-06,2025-12,False,True,2025-09
+559_aprhi_dique_el_cajon_ema,2023-10,2025-12,False,True,2025-09
+564_aeroclub_huinca_renanco_bioagroindustriacba,2023-10,2025-12,False,True,2025-09
+566_bodega_piedra_mora_bioagroindustriacba,2023-12,2025-12,False,True,2025-09
+56_aprhi_cruz_del_eje_dgi,2020-11,2025-12,False,True,Siempre 16
+57_aprhi_cuenca_candelaria,2021-08,2025-12,False,True,Siempre 16
+581_estancia_noble_bioagroindustriacba,2023-11,2025-12,False,True,2025-09
+582_finca_benito_bioagroindustriacba,2023-12,2025-12,False,True,2025-09
+58_aprhi_cuenca_alta_colanchanga,2019-01,2025-12,False,True,2025-09
+59_aprhi_cuenca_durazno,2021-03,2025-12,False,True,2025-09
+600_muni_las_perdices_bioagroindustriacba,2023-10,2025-12,False,True,2025-09
+603_paseo_sustentable_camilo_aldao_bioagroindustriacba,2023-10,2025-12,False,True,Siempre 16
+604_piquillin_bioagroindustriacba,2024-06,2025-12,False,True,2025-09
+60_aprhi_cueva_de_los_pajaritos,2021-07,2025-12,False,True,2025-09
+61_aprhi_cuenca_letanias_los_vallecitos,2021-06,2025-12,False,True,2025-09
+62_aprhi_el_durazno_tanti,2021-07,2025-12,False,True,2025-09
+63_aprhi_cuenca_los_chorillos_sur_cabalango,2021-12,2025-12,False,True,2025-09
+64_aprhi_cuenca_lutti,2021-06,2025-12,False,True,2025-09
+652_san_agustin_bioagroindustriacba,2023-10,2025-12,False,True,2025-09
+659_viarago_bioagroindustriacba,2023-11,2025-12,False,True,2025-09
+65_aprhi_cuenca_quilpo,2021-12,2025-12,False,True,2025-09
+66_aprhi_cuenca_alta_tabaquillo,2021-10,2025-12,False,True,2025-09
+67_aprhi_cuenca_salsipuedes_la_estancita,2021-08,2025-12,False,True,2025-09
+68_aprhi_cuenca_sta_rosa_yaroma,2021-03,2025-12,False,True,2025-09
+72_aprhi_dique_el_cajon,2020-11,2025-09,False,True,Siempre 16
+7_aprhi_elena,2023-03,2025-12,False,True,2025-09
+81_aprhi_em_ballesteros,2020-11,2025-12,False,True,2021-05
+86_aprhi_rio_la_candelaria,2020-11,2025-12,False,True,Siempre 16
+87_aprhi_la_cumbre_planta_agua,2019-09,2025-12,False,True,2025-09
+89_aprhi_lab_hidraulica_unc,2018-01,2025-12,False,True,Siempre 16
+90_aprhi_laguna_la_margarita_jovita,2019-02,2025-12,False,True,2025-11
+92_aprhi_las_varillas_oeste_ruta_cruce_rp13_y_pr3,2018-11,2025-12,True,True,2019-04
+93_aprhi_los_hornillos,2018-05,2025-12,True,True,2019-03
+94_aprhi_los_reartes,2018-11,2025-12,True,True,2019-05
+95_aprhi_los_zorros,2020-03,2025-12,False,True,2025-09
+98_aprhi_obispo_trejo,2018-11,2025-11,False,True,2025-09

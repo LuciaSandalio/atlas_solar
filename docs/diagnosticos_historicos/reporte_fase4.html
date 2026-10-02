@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Reporte Fase 4 y Fase C</title>
+    <style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px;
+}
+h1, h2, h3 {
+    color: #2c3e50;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+h1 { font-size: 28px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+h2 { font-size: 22px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+p { margin-top: 0; margin-bottom: 16px; text-align: justify; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+th, td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+th:first-child, td:first-child { text-align: left; }
+th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 30px auto;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.img-caption {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    margin-top: -20px;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+blockquote {
+    border-left: 4px solid #3498db;
+    padding: 15px 20px;
+    margin: 20px 0;
+    background-color: #f8f9fa;
+    color: #555;
+    font-style: italic;
+    border-radius: 0 4px 4px 0;
+}
+.code-block {
+    background-color: #f1f3f5;
+    padding: 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 14px;
+    color: #c0392b;
+}
+@media print {
+    body { padding: 0; }
+    table { box-shadow: none; border: 1px solid #ddd; }
+    img { box-shadow: none; }
+}
+</style>
+</head>
+<body>
+    <h1>Resumen Metodológico Final: Calibración Híbrida y Escalamiento Big Data</h1>
+<p>El siguiente documento consolida las decisiones arquitectónicas, validaciones estadísticas y el escalamiento computacional implementados en la calibración del modelo satelital para el Atlas Solar de Córdoba. Este texto está formateado para ser incorporado directamente en el Informe Final o manuscrito científico.</p>
+<hr />
+<h2>1. Reformulación Física del Problema: Índice de Claridad ($Kt$)</h2>
+<p>El enfoque inicial de la calibración satelital consistía en modelar directamente la Irradiancia Global Horizontal absoluta ($GHI$) en función de la reflectancia satelital. Sin embargo, este enfoque presentaba severas limitaciones debido a que la geometría solar (ángulo cenital estacional y diario) dominaba artificialmente la regresión, enmascarando la atenuación real producida por la nubosidad.</p>
+<p>Para solucionar esto, se reformuló el problema al dominio del <strong>Índice de Claridad ($Kt$)</strong>. Se calculó la curva teórica de cielo despejado ($GHI_{cs}$) utilizando el modelo de Ineichen-Perez (disponible en la librería <code>pvlib</code>) y se definió el objetivo de los modelos como $Kt = GHI_{observado} / GHI_{cs}$. Este cambio aisló matemáticamente la posición del sol, permitiendo que los algoritmos se concentren exclusivamente en modelar la transmisividad atmosférica de las nubes.</p>
+
+<h2>2. El Modelo BD-JPT como Línea de Base Física</h2>
+<p>Para garantizar rigor metodológico y preservar interpretabilidad geofísica, se implementó el modelo semi-empírico de banda ancha <strong>BD-JPT (Badescu, Dumitrescu, Janjai, Perez, Tarpley)</strong>, el cual posee amplia validación a nivel continental (p. ej., Atlas Solar del Cono Sur). Su función dentro del proyecto fue servir como <em>Baseline</em> Físico (Modelo de Control), estableciendo el piso de rendimiento contra el cual los modelos de Machine Learning debían demostrar superioridad predictiva.</p>
+
+<h2>3. Implementación de Arquitectura Híbrida (Física + ML)</h2>
+<p>A pesar de su solidez en condiciones estables, los modelos puramente físicos como BD-JPT sufren de sesgos sistemáticos frente a nubes convectivas complejas y errores de perspectiva satelital en altos ángulos cenitales. Para sortear estas limitaciones, se implementó una <strong>Arquitectura Híbrida (Residual Corrective Modeling)</strong>.</p>
+<p>El modelo híbrido conserva a BD-JPT como estimador de primer orden. Luego, un algoritmo de Machine Learning entrena exclusivamente sobre el <strong>residual</strong> de la estimación física ($Error = Real - Predicción\_Física$). La predicción final se define como:</p>
+<p>$$Kt_{hibrido} = \text{clip}(Kt_{BDJPT} + \Delta Kt_{ML}, \ 0, \ 1.15)$$</p>
+<p>Esta arquitectura no reemplaza a la física, sino que la corrige de forma <em>data-driven</em>, logrando un balance óptimo entre generalización teórica y precisión local.</p>
+
+<h2>4. Transición a Escala de "Big Data" (GOES-16 Misión Completa)</h2>
+<p>Para dotar al modelo híbrido de una capacidad de generalización interanual robusta, se extendió la base de datos de entrenamiento para abarcar <strong>seis años completos (2020-2025)</strong> de la misión GOES-16, combinados con las mediciones in situ de la red de superficie (Pilar y red Davis).</p>
+<p>Esta decisión multiplicó exponencialmente el volumen de datos (superando las 20 millones de observaciones horarias). Para procesar esta carga sin exceder los límites de memoria RAM de la infraestructura local, se implementaron dos rediseños de software:</p>
+<ul>
+    <li><strong>Submuestreo Espacial Estricto:</strong> Se extrajo de los archivos satelitales <em>exclusivamente</em> el píxel vertical correspondiente a las 234 estaciones terrestres verificadas, descartando toda la matriz provincial irrelevante durante el entrenamiento.</li>
+    <li><strong>Algoritmia Optimizada:</strong> Se reemplazó el tradicional <code>RandomForestRegressor</code> por su variante de estado del arte <code>HistGradientBoostingRegressor</code> (Gradient Boosting basado en histogramas). Esto redujo el tiempo de entrenamiento estacional de ~45 minutos a escasos segundos, garantizando convergencia numérica exacta.</li>
+</ul>
+
+<h2>5. Regionalización Topográfica y Especialización Estacional</h2>
+<p>La topografía de Córdoba impone regímenes de atenuación dispares (nubes orográficas en las Sierras vs. llanuras húmedas del Este). Entrenar un único modelo global diluía estas firmas físicas. Por ello, utilizando los clústeres climáticos K-Means generados previamente, la provincia se particionó en <strong>4 Macro-Regiones topográficas</strong>.</p>
+<p>Asimismo, para capturar la diferencia entre la convección estival (verano húmedo) y la atenuación estratiforme (invierno seco), el espacio paramétrico se dividió en estaciones del año, entrenando una matriz independiente de <strong>16 modelos regionales-estacionales</strong>.</p>
+
+<h2>6. Validación Cruzada Espacial Estricta (Out-Of-Fold)</h2>
+<p>El entrenamiento masivo fue sometido a Validación Cruzada Espacial usando la estrategia <code>GroupKFold</code>, donde los "grupos" fueron los identificadores de estación (<code>station_id</code>). Este método garantiza que, al predecir el error en una región, el modelo <strong>nunca haya visto los datos de esa estación</strong> en el conjunto de entrenamiento, simulando un desempeño en el "mundo real" sobre ubicaciones no instrumentadas.</p>
+
+<h2>7. Diagnóstico Visual Avanzado</h2>
+<p>El análisis estadístico de los resultados (almacenados a partir de las predicciones Out-of-Fold) evidencia el profundo impacto de la corrección híbrida:</p>
+
+<h3>A. Mitigación del Error Geométrico (Sesgo Cenital)</h3>
+<p>El satélite GOES (situado en el Ecuador geostacionario) padece distorsiones visuales inherentes sobre latitudes medias durante el amanecer y el atardecer (altos ángulos cenitales). Como se observa en la figura, el modelo físico asimila este defecto subestimando sistemáticamente la radiación (MBE negativo). El Modelo Híbrido, mediante el ML, <strong>aprende este sesgo y aplana la curva casi perfectamente sobre el cero</strong>.</p>
+<img src="figures/figura_fase4_error_zenith.png" alt="Perfil Cenital del Sesgo">
+<div class="img-caption">Figura 1: Dependencia Geométrica del Error Predictivo (MBE) en función del Ángulo Cenital.</div>
+
+<h3>B. Compresión de la Varianza del Error</h3>
+<p>El gráfico de dispersión hexagonal revela la reducción de la incertidumbre. La nube de predicciones del modelo Físico (izquierda) presenta un ensanchamiento importante causado por su incapacidad de resolver nubes sub-píxel complejas. El modelo Híbrido (derecha) actúa como un compresor estadístico, llevando la densidad masiva de puntos firmemente hacia la diagonal perfecta.</p>
+<img src="figures/figura_fase4_scatter_density.png" alt="Scatter Hexagonal de Dispersión">
+<div class="img-caption">Figura 2: Dispersión de Alta Densidad (Hexbin). Izquierda: BD-JPT. Derecha: Híbrido ML.</div>
+
+<h3>C. Reconstrucción Dinámica frente al Ruido (Zoom Temporal)</h3>
+<p>El comportamiento real de la Arquitectura Híbrida no es el de "copiar" ruidosatamente la señal, sino corregir tendencias. En días de extrema volatilidad nubosa (observado en negro), el ML ajusta los picos y caídas físicas acercando notablemente la reconstrucción a la realidad, especialmente tras corregir la imputación de la señal nocturna (cero físico).</p>
+<img src="figures/figura_fase4_timeseries_estacion550.png" alt="Serie Temporal Estación 550">
+<div class="img-caption">Figura 3: Reconstrucción Temporal (Serie 7 días de Verano).</div>
+
+<h2>8. Resultados Consolidados: Métricas Normalizadas (nRMSE)</h2>
+<p>Para evitar que la alta radiación del Verano distorsione artificialmente el ranking de errores (RMSE absoluto), se calculó el Error Cuadrático Medio Normalizado (<strong>nRMSE</strong>) y el Sesgo Medio Normalizado (<strong>nMBE</strong>), expresados en porcentaje relativo respecto a la media estacional observada.</p>
+
+<blockquote>
+<p><em>Nota para Compilación LaTeX:</em> La tabla consolidada final con las métricas regionales (R², RMSE, MAE, MBE, nRMSE, nMBE) fue exportada por el pipeline directamente a formato TeX. Para incluirla en el documento maestro, utilice el siguiente comando en LaTeX:</p>
+<div class="code-block">\input{results/bdjpt_regional_estacional_comparison.tex}</div>
+</blockquote>
+
+<h3>Análisis Detallado de Desempeño</h3>
+<ul>
+    <li><strong>Reducción General del Error (RMSE y MAE):</strong> El modelo Híbrido (BD-JPT + RF) logra reducir sistemáticamente tanto el RMSE como el MAE frente al modelo físico Baseline en todas las combinaciones espacio-temporales. Particularmente, el Híbrido consolida mejoras relativas consistentes en nRMSE respecto al modelo puramente físico.</li>
+    <li><strong>Corrección del Sesgo (MBE):</strong> El modelo físico BD-JPT presenta una clara tendencia a la subestimación general (MBE negativo), siendo especialmente severa en Otoño y Primavera. La arquitectura híbrida logra mitigar esta desviación de manera sustancial, empujando la distribución del error hacia el cero y limitando drásticamente el sesgo sistémico de la formulación inicial.</li>
+    <li><strong>Coeficiente de Determinación ($R^2_{GHI}$):</strong> A nivel de captura de la varianza de la radiación, el modelo Híbrido presenta consistentemente el $R^2_{GHI}$ más alto de las tres estrategias. Mientras el modelo físico presenta serias dificultades (incluso con $R^2$ negativo en el dominio del Kt), el híbrido recompone notablemente la capacidad predictiva de la serie temporal.</li>
+    <li><strong>Competitividad del Random Forest Puro:</strong> Resulta destacable que el Random Forest puro obtiene resultados sumamente competitivos, muchas veces superando o igualando al híbrido. Esto demuestra el poder de los estimadores <code>HistGradientBoosting</code> para capturar relaciones no-lineales complejas en grandes volúmenes de datos satelitales.</li>
+</ul>
+
+<p>La evaluación visual agregada de RMSE absoluto se muestra a continuación, confirmando que la incorporación del ML logra disminuir consistentemente el margen de error del Baseline en todas las estaciones climáticas y topográficas analizadas:</p>
+<img src="../results/fase4_seasonal_rmse_comparison.png" alt="Comparación RMSE Regional">
+<div class="img-caption">Figura 4: Desempeño predictivo por Región y Estación del año.</div>
+
+</body>
+</html>

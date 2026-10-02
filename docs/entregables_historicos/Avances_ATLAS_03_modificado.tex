@@ -1,0 +1,940 @@
+\documentclass[../main.tex]{subfiles}
+% ===============================================================
+% Documento
+% ===============================================================
+\begin{document}
+
+\begin{titlepage}
+\centering
+
+\vspace*{-3cm}
+
+\includegraphics[height=1.5cm]{figuras/logo_fcefyn.png}
+\hspace{1cm}
+\includegraphics[height=2cm]{figuras/logo_ohmc.jpeg}
+
+\vspace{5cm}
+
+{\fontsize{33}{40}\selectfont Convenio ATLAS II \par}
+\vspace{0.4cm}
+{\fontsize{33}{40}\selectfont Provincia de Córdoba \par}
+
+\vspace{0.6cm}
+
+{\fontsize{26}{32}\selectfont \textcolor{gray}{Componente Solar} \par}
+
+\vspace{2.5cm}
+
+{\large
+Facultad de Ciencias Exactas, Físicas y Naturales (FCEFyN) \par}
+
+\vspace{0.15cm}
+
+{\large
+Laboratorio de Hidrometeorología \par}
+
+\vspace{3.5cm}
+
+{\normalsize Tercer Informe de Avance \par}
+\vspace{1cm}
+{\normalsize Agosto 2026 \par}
+
+\end{titlepage}
+
+\newpage
+
+\section*{Resumen general}
+
+El presente informe documenta el desarrollo, ejecución y validación de la fase de calibración híbrida  para el modelo de estimación satelital del Convenio ATLAS II de la Provincia de Córdoba. Esta etapa aborda la consolidación final de la arquitectura predictiva que permite mapear la radiación solar en todo el territorio provincial mediante la fusión de principios de transferencia radiativa (modelo BD-JPT) y algoritmos de Machine Learning (Histogram Gradient Boosting).
+
+Se detallan las decisiones metodológicas adoptadas para superar las limitaciones de los modelos físicos, particularmente la reformulación del espacio de modelado hacia el Índice de Claridad ($Kt$) para aislar los efectos puramente atmosféricos. Asimismo, se explica el proceso de escalamiento a grandes volúmenes de datos, procesando 6 años de imágenes de GOES-16/19 (2020–2025) junto con la red terrestre calibrada, conformada por 166 estaciones aprobadas y aproximadamente 3.05 millones de horas diurnas útiles. Finalmente, se cuantifica la reducción del error cuadrático obtenida por el modelo híbrido frente al modelo físico de referencia y al modelo algorítmico directo, se analizan sus sesgos residuales y se establece la base metodológica para la generación posterior de mapas provinciales de GHI y potencial fotovoltaico.
+
+\bigskip
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Introducción y Estado del Convenio}
+
+\subsection{Alcance y estado de avance del tercer informe}
+
+El Convenio ATLAS II, Componente Solar, tiene como objetivo desarrollar un modelo espacial y temporal de irradiancia solar global horizontal ($GHI$) para la provincia de Córdoba, basado en la integración consistente de observaciones satelitales geoestacionarias, mediciones terrestres calibradas y modelos físicos de referencia. En los informes anteriores se establecieron las bases metodológicas y observacionales necesarias para avanzar hacia la etapa de calibración satelital y generación de campos continuos de irradiancia.
+
+El Primer Informe de Avance presentó el marco general del proyecto, la definición del dominio espacial, la construcción de la rejilla provincial, la organización reproducible del flujo de datos, la incorporación de información satelital GOES y la formulación inicial del modelo físico-empírico tipo JPT/BD-JPT. En esa etapa se estableció la separación conceptual entre geometría solar, observación satelital, simulación de cielo despejado y calibración radiométrica, criterio que estructura el desarrollo completo del atlas.
+
+El Segundo Informe de Avance se concentró en la consolidación de la red de superficie. Allí se documentó el control de calidad físico-temporal de las estaciones Davis, la simulación de cielo despejado mediante REST2, la calibración virtual dinámica de los sensores de silicio y la validación de la red corregida. Como resultado, se obtuvo una base terrestre calibrada de 166 estaciones aprobadas, con aproximadamente 3.05 millones de horas diurnas útiles, además de un núcleo de 39 estaciones con series continuas para el período 2019-2025. Esta base constituye el patrón observacional sobre el cual se apoya la calibración satelital desarrollada en el presente informe.
+
+La etapa abordada en este tercer informe consiste en vincular dicha red terrestre calibrada con las observaciones satelitales GOES para construir el núcleo predictivo del Atlas Solar. El problema central ya no es únicamente corregir mediciones puntuales de superficie, sino estimar la irradiancia en ubicaciones no instrumentadas, preservando coherencia física y capacidad de generalización espacial. Para ello, se reformula el problema en el dominio del índice de claridad ($Kt$), definido como la relación entre la irradiancia observada y la esperada bajo cielo despejado. Esta transformación permite separar la variabilidad astronómica de primer orden de la atenuación atmosférica asociada a nubosidad, aerosoles, topografía y efectos geométricos de observación.
+
+En continuidad con el enfoque previsto originalmente, se implementa el modelo físico-empírico BD-JPT como estimador base y como referencia de control. Este modelo conserva una estructura interpretable, ya que relaciona la irradiancia en superficie con la geometría solar, el brillo satelital observado y el brillo característico de cielo despejado ($B_0$). Sin embargo, la heterogeneidad topográfica y atmosférica de Córdoba introduce errores sistemáticos que no siempre pueden ser captados por una parametrización física global. En particular, las zonas serranas y pedemontanas presentan regímenes de nubosidad y atenuación diferentes de los observados en las llanuras, lo que motiva la incorporación de una estrategia de corrección residual.
+
+Por este motivo, el presente informe introduce y evalúa una arquitectura híbrida. En ella, BD-JPT se mantiene como estimador físico de primer orden, mientras que un modelo de aprendizaje automático se entrena para corregir únicamente el residual en el dominio $Kt$. De esta manera, el componente estadístico no reemplaza al modelo físico, sino que aprende las desviaciones sistemáticas asociadas a nubosidad, topografía, estacionalidad y efectos subpíxel. La predicción final conserva límites físicamente plausibles y permite comparar de forma directa tres enfoques: el modelo físico BD-JPT, un modelo puramente algorítmico y el modelo híbrido residual.
+
+La validación se realiza mediante validación cruzada espacial estricta, agrupando las particiones por estación. Esta estrategia permite evaluar el desempeño del modelo frente a sitios no utilizados durante el entrenamiento, que constituyen el escenario operativo relevante para la generación de mapas provinciales. Además, se aplica una especialización regional y estacional de los modelos, utilizando la regionalización exploratoria desarrollada en el informe anterior como insumo para representar diferencias topoclimáticas dentro del territorio provincial.
+
+En síntesis, este tercer informe documenta la transición desde una red terrestre calibrada hacia un modelo satelital operacional de irradiancia. Sus resultados permiten seleccionar la arquitectura predictiva que será utilizada para la generación de mapas horarios, diarios, mensuales y climatológicos de $GHI$, y establecen la base metodológica para la etapa posterior de estimación del potencial de generación fotovoltaica en la provincia de Córdoba.
+
+
+\newpage
+
+\section{Base de Datos e Integración Satélite-Superficie}
+
+La calibración del modelo satelital requiere construir una base integrada que vincule, para cada estación y hora útil, tres fuentes de información: observaciones satelitales GOES, mediciones terrestres calibradas de irradiancia global horizontal ($GHI$) y variables auxiliares de geometría solar y cielo despejado. Esta sección describe la construcción de dicho conjunto de datos, que constituye la base de entrenamiento y validación de los modelos evaluados en las secciones siguientes.
+
+\subsection{Datos satelitales}
+
+La información satelital utilizada proviene de observaciones del sensor ABI a bordo de GOES-16/19 \cite{schmit2017}, correspondientes al período 2020--2025. El procesamiento se centró en la señal visible, utilizada como proxy radiométrico de la nubosidad y de su efecto atenuador sobre la irradiancia solar en superficie. A partir de las escenas satelitales se derivaron variables como la reflectancia observada, el brillo de cielo despejado ($B_0$), el término nuboso relativo ($Fr$) y variables geométricas asociadas a la posición solar.
+
+El uso de una serie multianual permite incorporar al entrenamiento una variedad amplia de condiciones atmosféricas, estacionales e interanuales. Esto resulta especialmente importante para evitar que el modelo quede condicionado por un único año meteorológico y para mejorar su capacidad de generalización frente a situaciones de nubosidad, aerosoles o circulación regional no representadas de forma uniforme en todo el período.
+
+\subsection{Datos de superficie}
+
+El patrón observacional utilizado para la calibración corresponde a la base de estaciones de superficie depurada y calibrada en las etapas previas del convenio. Esta base integra la estación de referencia Pilar, equipada con un piranómetro de termopila CMP21, y la red de estaciones automáticas Davis corregidas mediante la metodología de calibración virtual dinámica descripta en el Segundo Informe de Avance.
+
+Luego de los controles de calidad físico-temporales, definidos en continuidad con criterios radiométricos recomendados para redes de radiación superficial \cite{long2002}, la red operativa quedó conformada por 166 estaciones aprobadas, con aproximadamente 3.05 millones de horas diurnas calibradas. Estas mediciones constituyen la referencia empírica contra la cual se ajustan y validan los modelos satelitales. La red original de estaciones disponibles fue más amplia, pero el entrenamiento se apoya únicamente en los registros que superaron los criterios de calidad, completitud y consistencia radiométrica definidos en las fases previas.
+
+Para cada registro horario se calculó además la irradiancia de cielo despejado ($GHI_{cs}$), utilizada para expresar la observación terrestre en el dominio del índice de claridad:
+\begin{equation}
+Kt = \frac{GHI_{observado}}{GHI_{cs}}.
+\end{equation}
+Esta transformación permite comparar estaciones y horarios bajo una escala radiométrica normalizada, reduciendo la dominancia directa de la geometría solar sobre el problema de aprendizaje.
+
+\subsection{Integración espacial y sincronización temporal}
+
+La integración satélite-superficie se realizó asociando cada estación de superficie con la celda o píxel satelital más próximo a su ubicación geográfica, luego de proyectar las coordenadas de la estación al sistema de referencia correspondiente al sensor ABI. De este modo, para cada hora coincidente se construyó un par observacional compuesto por la medición terrestre calibrada y las variables satelitales y geométricas correspondientes.
+
+Desde el punto de vista temporal, todas las fuentes fueron expresadas en UTC y agregadas a resolución horaria. Las observaciones subhorarias de superficie fueron promediadas por hora durante las fases previas de control de calidad, mientras que las escenas satelitales fueron asociadas a la marca horaria correspondiente según la estrategia de sincronización evaluada para el entrenamiento. Esta homogeneización permite reducir ambigüedades entre acumulaciones horarias de superficie e instantáneas satelitales.
+
+El producto final de esta etapa es una tabla de entrenamiento satélite-superficie, en la cual cada fila representa una observación horaria válida para una estación determinada. Cada registro contiene la irradiancia observada calibrada, el índice de claridad, la irradiancia de cielo despejado, la reflectancia satelital, el brillo de cielo despejado ($B_0$), el término nuboso relativo ($Fr$), variables de geometría solar y metadatos espaciales y temporales. Esta estructura tabular permite entrenar y validar de forma consistente tanto el modelo físico BD-JPT como los modelos algorítmicos y la arquitectura híbrida residual.
+
+
+\section{Reformulación física del problema}
+
+\subsection{Limitaciones de modelar GHI directamente}
+
+La irradiancia global horizontal ($GHI$) presenta una variabilidad temporal fuertemente dominada por la geometría solar. A escala horaria, diaria y estacional, una parte sustancial de los cambios observados en la serie se explica por la altura solar, el ángulo cenital y la duración del día, aun en ausencia de variaciones meteorológicas significativas. Esta dependencia geométrica impone una dificultad metodológica cuando se intenta entrenar un modelo estadístico directamente sobre valores absolutos de irradiancia.
+
+Si el modelo se ajusta sobre $GHI$ sin una normalización física previa, una fracción importante de su capacidad predictiva se destina a reproducir el ciclo astronómico diario y anual. En consecuencia, el aprendizaje de la señal meteorológica de interés, principalmente la atenuación asociada a nubosidad, aerosoles y condiciones atmosféricas locales, queda parcialmente enmascarado por la variabilidad de primer orden impuesta por la posición del sol.
+
+Desde el punto de vista del modelo satelital, esta limitación es especialmente relevante. La reflectancia visible observada por GOES se relaciona de manera indirecta con la presencia de nubes y con su efecto sobre la radiación en superficie, pero no contiene por sí sola la información astronómica completa que determina el máximo radiativo disponible en cada hora y coordenada. Por este motivo, resulta conveniente separar explícitamente el componente geométrico-\textit{clear-sky} del componente atmosférico-nuboso que se busca estimar.
+
+\subsection{Índice de claridad como variable objetivo}
+
+Para resolver esta limitación, el problema de estimación se reformuló en el dominio del Índice de Claridad ($Kt$). Esta variable se define como la razón entre la irradiancia global horizontal observada o calibrada y la irradiancia global horizontal esperada bajo condiciones de cielo despejado:
+
+\begin{equation}
+Kt = \frac{GHI_{observado}}{GHI_{cs}}.
+\end{equation}
+
+En esta formulación, $GHI_{cs}$ representa la envolvente radiativa esperada en ausencia de nubosidad para una hora y ubicación determinadas. Al normalizar la irradiancia observada por esta referencia de cielo despejado, se reduce la influencia directa de la geometría solar y se obtiene una variable adimensional más directamente asociada a la transmitancia atmosférica efectiva.
+
+La interpretación física de $Kt$ es directa: valores cercanos a 1 indican condiciones próximas al cielo despejado, mientras que valores menores reflejan distintos grados de atenuación atmosférica, principalmente asociados a nubosidad. En la práctica, se admite un rango operacional levemente superior a la unidad, hasta $Kt = 1.15$, para contemplar incertidumbres instrumentales, diferencias entre modelos de cielo despejado, errores de sincronización satélite-superficie y posibles efectos locales de realce radiativo.
+
+Esta transformación permite que los modelos predictivos no intenten reconstruir directamente la irradiancia absoluta, sino la fracción de la irradiancia \textit{clear-sky} que efectivamente alcanza la superficie. Una vez estimado $Kt$, la irradiancia final se recupera mediante:
+
+\begin{equation}
+GHI_{estimado} = Kt_{estimado} \cdot GHI_{cs}.
+\end{equation}
+
+De este modo, la geometría solar y la envolvente física de cielo despejado permanecen representadas de forma explícita, mientras que el componente estadístico del modelo se concentra en estimar las desviaciones asociadas a nubosidad, topografía, variabilidad atmosférica y efectos subpíxel.
+
+\subsection{Selección operativa del modelo de cielo despejado}
+
+En las fases previas del proyecto, el modelo REST2 \cite{gueymard2008} fue utilizado como referencia radiométrica de alta precisión para la calibración de la red de estaciones de superficie. Esta elección respondió a la necesidad de corregir sesgos instrumentales de los sensores Davis frente a una estimación física detallada de cielo despejado, incorporando variables atmosféricas como vapor de agua precipitable, espesor óptico de aerosoles, presión superficial y geometría solar.
+
+Sin embargo, en esta nueva fase el rol del modelo de cielo despejado cambia. En esta etapa, $GHI_{cs}$ no se utiliza como patrón absoluto de calibración instrumental, sino como normalizador físico para expresar la irradiancia observada en el dominio del índice de claridad ($Kt$). Dado que esta normalización debe calcularse para grandes volúmenes de datos satelitales, múltiples años y eventualmente todos los puntos de la grilla provincial, se priorizó una formulación computacionalmente más liviana y operativamente reproducible.
+
+Por este motivo, para la generación de $GHI_{cs}$ en la etapa de modelado satelital se adoptó el modelo de Ineichen-Perez \cite{ineichen2002} implementado en \texttt{pvlib} \cite{pvlib}. A diferencia de una implementación REST2 forzada hora a hora con campos atmosféricos de reanálisis, esta aproximación permite obtener una estimación eficiente de cielo despejado a partir de la geometría solar y de una representación climatológica de la turbidez atmosférica. Esta decisión reduce de manera significativa la dependencia operativa de descargas masivas de ERA5/CAMS \cite{hersbach2020} y facilita el escalamiento del modelo a toda la provincia.
+
+La elección no implica reemplazar el rol físico de REST2 en la calibración de superficie. REST2 se mantiene como referencia de alta precisión para la etapa instrumental, mientras que Ineichen-Perez se utiliza como envolvente \textit{clear-sky} práctica para la normalización del problema satelital. En otras palabras, ambos modelos cumplen funciones distintas dentro del flujo metodológico: REST2 actúa como calibrador radiométrico detallado de la red terrestre, e Ineichen-Perez como normalizador operativo para el entrenamiento y aplicación espacial del modelo satelital.
+
+La posible pérdida de detalle físico asociada al uso de una climatología de turbidez, en lugar de campos atmosféricos horarios, se aborda mediante la arquitectura híbrida residual. El modelo físico-empírico proporciona una estimación inicial en el dominio $Kt$, mientras que el componente de aprendizaje automático corrige los errores sistemáticos observados en la comparación con la red terrestre calibrada. De este modo, sesgos persistentes asociados a nubosidad, topografía, albedo superficial, geometría satelital o diferencias entre la envolvente \textit{clear-sky} adoptada y la irradiancia observada pueden ser aprendidos empíricamente, siempre dentro del dominio representado por los datos de entrenamiento.
+
+Esta decisión metodológica permite construir un modelo más liviano, reproducible y aplicable operacionalmente, sin depender de la descarga e interpolación continua de campos atmosféricos externos para cada píxel y hora. La validez de esta simplificación no se asume a priori, sino que se evalúa mediante la validación cruzada espacial estricta presentada en las secciones posteriores.
+
+\subsection{Relación con las etapas previas del proyecto}
+
+La adopción de $Kt$ como variable objetivo mantiene continuidad con las etapas anteriores del proyecto. En el Segundo Informe de Avance, el índice de claridad fue utilizado como indicador radiométrico para comparar estaciones y explorar posibles agrupamientos regionales del recurso solar. En esta fase, dicho indicador deja de ser únicamente una métrica diagnóstica y pasa a constituir el espacio principal de modelado para la calibración satelital.
+
+Asimismo, la utilización de una referencia \textit{clear-sky} conserva la separación metodológica establecida desde el inicio del convenio: por un lado, el cálculo físico de la irradiancia esperada bajo condiciones despejadas; por otro, la estimación satelital de la atenuación producida por la atmósfera real. Esta separación resulta central para la arquitectura híbrida desarrollada en las secciones siguientes, donde el modelo BD-JPT proporciona una estimación física de primer orden y el componente de aprendizaje automático corrige el residual sistemático en el dominio de $Kt$.
+
+\section{Metodología del modelo: estimación satelital de irradiancia solar}
+
+La calibración satelital desarrollada en esta fase compara tres enfoques predictivos complementarios. En primer lugar, se implementa el modelo físico-empírico BD-JPT como estimador base y como referencia de control. En segundo lugar, se entrena un modelo puramente algorítmico en el dominio del índice de claridad ($Kt$), utilizado como comparación frente a una alternativa sin estructura física explícita. Finalmente, se desarrolla un modelo híbrido residual, en el cual BD-JPT proporciona la estimación física de primer orden y el componente de aprendizaje automático corrige únicamente el error residual.
+
+Esta comparación permite responder una pregunta metodológica central para el Atlas Solar: si conviene reemplazar el modelo físico por un modelo completamente \textit{data-driven}, o si resulta más robusto conservar la estructura física de BD-JPT y utilizar aprendizaje automático como corrección residual.
+
+\subsection{Modelo físico-empírico base: BD-JPT}
+
+El modelo BD-JPT se implementó como referencia física de primer orden para la estimación de irradiancia solar global a partir de información satelital visible. Su formulación deriva de la familia de modelos tipo Tarpley/JPT \cite{tarpley1979,alonsosuarez2012}, ya introducida en el Primer Informe de Avance, en la cual la irradiancia en superficie se expresa como la suma de una componente \textit{clear-sky} dependiente de la geometría solar y un término correctivo asociado al brillo satelital observado.
+
+En términos generales, el modelo puede representarse como:
+
+\begin{equation}
+GHI_{BDJPT} =
+I_{sc} \cos(\theta_z)
+\left(
+a + b \cos(\theta_z) + c \cos^2(\theta_z)
+\right)
++
+d\left(B_m^2 - B_0^2\right),
+\label{eq:GHI}
+\end{equation}
+
+donde $I_{sc}$ representa la constante solar efectiva, $\theta_z$ es el ángulo cenital solar, $B_m$ es el brillo o reflectancia observado por el satélite y $B_0$ representa el brillo característico de cielo despejado. El primer término de la \ref{eq:GHI} aproxima la envolvente radiativa de cielo despejado, mientras que el segundo introduce la atenuación asociada a nubosidad mediante la diferencia entre la señal satelital observada y su referencia despejada.
+
+En la implementación de esta fase, el término nuboso se expresa a partir de:
+
+\begin{equation}
+Fr = \max(B_m^2 - B_0^2, 0),
+\end{equation}
+
+de modo que los incrementos de reflectancia respecto del fondo despejado se interpreten como indicadores de nubosidad o aumento de brillo atmosférico. El coeficiente asociado a este término se ajusta con signo negativo, reflejando la relación física esperada: un aumento de la reflectancia de las nubes implica una menor irradiancia incidente en la superficie.
+
+Para mejorar la estabilidad del ajuste, se diferencian condiciones despejadas y nubosas mediante un umbral dinámico basado en $B_0$. Las observaciones próximas al brillo de cielo despejado se utilizan para ajustar la componente geométrica del modelo, mientras que el término correctivo se calibra separadamente para condiciones de baja y alta reflectancia relativa. Esta separación permite conservar la interpretabilidad del modelo físico y evitar que el término nuboso absorba completamente la variabilidad geométrica.
+
+Una vez calculado $GHI_{BDJPT}$, la predicción se expresa en el dominio del índice de claridad mediante:
+
+\begin{equation}
+Kt_{BDJPT} =
+\frac{GHI_{BDJPT}}{GHI_{cs}},
+\end{equation}
+
+lo que permite comparar de forma directa el modelo físico con los modelos algorítmicos entrenados sobre $Kt$.
+
+\subsection{Modelo algorítmico de referencia}
+
+Además del modelo físico-empírico, se entrenó un modelo de aprendizaje automático directamente sobre el índice de claridad. Este modelo actúa como referencia \textit{data-driven}, es decir, como una estimación de cuánto desempeño puede obtenerse si se prescinde de la estructura analítica de BD-JPT y se deja que el algoritmo aprenda directamente la relación entre las variables satelitales, geométricas y temporales y el valor observado de $Kt$.
+
+En la implementación final evaluada, el modelo algorítmico corresponde a un \texttt{HistGradientBoostingRegressor} (HGBR) \cite{scikit-learn}. Esta elección reemplaza a las pruebas iniciales realizadas con \textit{Random Forest}, debido a su mayor eficiencia computacional frente a bases de datos de gran volumen. El algoritmo utiliza árboles de decisión potenciados por gradiente y agrupa las variables continuas en intervalos discretos, lo que reduce el costo de búsqueda de particiones durante el entrenamiento y permite escalar mejor el pipeline a múltiples regiones, estaciones y años de datos satelitales.
+
+Las variables predictoras principales utilizadas fueron:
+
+\begin{itemize}
+\item reflectancia satelital observada;
+\item brillo de cielo despejado ($B_0$);
+\item término nuboso relativo ($Fr$);
+\item coseno del ángulo cenital solar ($\cos\theta_z$);
+\item día del año.
+\end{itemize}
+
+El modelo HGB permite representar relaciones no lineales entre la reflectancia satelital, la geometría solar y la respuesta radiométrica observada en superficie. Su inclusión en la comparación cumple dos funciones: establecer una referencia práctica de desempeño estadístico y evaluar si un modelo puramente algorítmico supera al enfoque físico-empírico tradicional.
+
+Sin embargo, un modelo directo de aprendizaje automático presenta una limitación importante desde el punto de vista operacional: su estructura interna no separa explícitamente los aportes físicos de geometría solar, cielo despejado y nubosidad. Por lo tanto, aunque pueda alcanzar buen desempeño predictivo, su interpretación física y su comportamiento ante condiciones poco representadas en el entrenamiento resultan menos transparentes que en un modelo con núcleo radiativo explícito.
+
+\subsection{Modelo híbrido residual BD-JPT + HGB}
+
+Con el objetivo de combinar interpretabilidad física y capacidad predictiva no lineal, se desarrolló un modelo híbrido residual. En esta arquitectura, BD-JPT no es descartado ni reemplazado, sino conservado como estimador físico de primer orden. El modelo de aprendizaje automático, implementado mediante HGBR, se entrena únicamente para corregir el error residual que queda luego de aplicar BD-JPT.
+
+El procedimiento de entrenamiento se define de la siguiente manera. Primero, se ajusta el modelo BD-JPT utilizando las observaciones terrestres calibradas de $GHI$. Luego, sus predicciones se transforman al dominio del índice de claridad:
+
+\begin{equation}
+Kt_{fisico} = Kt_{BDJPT}.
+\end{equation}
+
+A partir de esta estimación física inicial, se calcula el residual observado:
+
+\begin{equation}
+\Delta Kt =
+Kt_{observado} - Kt_{fisico}.
+\end{equation}
+
+El modelo HGB se entrena entonces para aproximar este residual, utilizando como variables de entrada las variables satelitales, geométricas y temporales disponibles, junto con la propia predicción física $Kt_{fisico}$. De este modo, el algoritmo no debe reconstruir la irradiancia completa desde cero, sino aprender en qué condiciones el modelo físico tiende a sobreestimar o subestimar la transmitancia efectiva de la atmósfera.
+
+La predicción final del modelo híbrido queda definida como:
+
+\begin{equation}
+K_{t,\mathrm{hibrido}}
+=
+\operatorname{clip}
+\left(
+K_{t,\mathrm{fisico}}
++
+\lambda \, \Delta K_{t,\mathrm{HGB}},
+0,
+1.15
+\right).
+\label{eq:kt_hibrido}
+\end{equation}
+
+donde $\Delta Kt_{HGB}$ es el residual estimado por el modelo de aprendizaje automático y $\lambda$ es un factor de contracción del residual. En la implementación actual se adoptó $\lambda = 1$, equivalente a incorporar completamente la corrección aprendida. La optimización de este parámetro se reserva como análisis de sensibilidad posterior.
+
+El operador \texttt{clip} impone límites físicos operativos al índice de claridad estimado. El límite inferior evita valores negativos de irradiancia, mientras que el límite superior permite contemplar valores levemente mayores que la envolvente \textit{clear-sky} nominal, asociados a incertidumbre instrumental, diferencias entre modelos de cielo despejado, errores de sincronización o realces radiativos locales.
+
+Finalmente, la irradiancia global horizontal se reconstruye multiplicando el índice de claridad estimado por la irradiancia de cielo despejado correspondiente:
+
+\begin{equation}
+    GHI_{hibrido} = Kt_{hibrido} \cdot GHI_{cs}
+\end{equation}
+
+Esta arquitectura permite conservar la descomposición física del problema y, al mismo tiempo, incorporar correcciones empíricas asociadas a nubosidad, topografía, albedo superficial, geometría satelital y efectos sub-píxel. En consecuencia, el modelo híbrido se plantea como una alternativa operacional intermedia entre un modelo físico-empírico clásico y un modelo puramente estadístico.
+
+\subsection{Comparación metodológica de los enfoques}
+
+La evaluación conjunta de los tres modelos permite distinguir sus roles dentro del desarrollo del Atlas Solar. BD-JPT proporciona la referencia física e interpretable, el HGB directo permite estimar el desempeño alcanzable mediante aprendizaje automático sin estructura radiativa explícita, y el modelo híbrido evalúa si es posible mejorar el modelo físico conservando su estructura conceptual.
+
+En términos metodológicos, la comparación no busca únicamente identificar el menor error absoluto, sino también analizar el compromiso entre precisión, interpretabilidad, estabilidad operacional y capacidad de generalización espacial. Este punto es relevante porque el producto final del convenio no consiste solo en predecir estaciones existentes, sino en generar campos continuos de irradiancia sobre zonas no instrumentadas de la provincia, en línea con antecedentes regionales de cartografía satelital de irradiancia \cite{alonsosuarez2014}.
+
+Por esta razón, el modelo híbrido se interpreta como una estrategia de corrección físicamente guiada: el componente BD-JPT representa el comportamiento radiativo de primer orden, mientras que el componente estadístico aprende desviaciones sistemáticas observadas en la red calibrada de superficie.
+
+
+\section{Estrategias de validación}
+
+La validación del modelo satelital constituye una etapa central del desarrollo del Atlas Solar, ya que el objetivo operativo no es únicamente reproducir las estaciones utilizadas durante el entrenamiento, sino estimar la irradiancia en zonas de la provincia donde no existe instrumental de superficie. Por esta razón, la evaluación del desempeño se diseñó para medir la capacidad de generalización espacial del modelo frente a ubicaciones no observadas durante el ajuste.
+
+A diferencia de una partición aleatoria convencional de registros horarios, que podría mezclar datos de una misma estación en entrenamiento y validación, se adoptó una estrategia de validación cruzada espacial estricta. Esta decisión evita que el modelo sea evaluado sobre estaciones cuya variabilidad histórica ya haya sido parcialmente aprendida durante el entrenamiento, reduciendo el riesgo de sobreajuste local y proporcionando una estimación más realista del error esperado al extrapolar el modelo a sitios no instrumentados.
+
+\subsection{Validación cruzada espacial mediante grupos}
+
+La estrategia de validación se implementó mediante \texttt{GroupKFold} \cite{scikit-learn}, utilizando como grupo el identificador único de cada estación de superficie. Bajo este esquema, todos los registros horarios pertenecientes a una misma estación se asignan de manera conjunta al conjunto de entrenamiento o al conjunto de validación, pero nunca a ambos simultáneamente dentro de un mismo \textit{fold}.
+
+Formalmente, sea $s_i$ el identificador de estación asociado a cada observación horaria $i$. La partición se construye imponiendo que, para cada \textit{fold} de validación, el conjunto de estaciones utilizadas para evaluar el modelo sea disjunto del conjunto de estaciones utilizadas para entrenarlo:
+
+\begin{equation}
+S_{train} \cap S_{test} = \emptyset.
+\end{equation}
+
+De este modo, cuando una estación es utilizada como validación, el modelo no ha tenido acceso previo a ninguno de sus registros históricos. Esta condición resulta fundamental para evaluar la capacidad del modelo de transferir la relación satélite-superficie hacia ubicaciones nuevas.
+
+En la implementación práctica, el número de particiones se definió como:
+
+\begin{equation}
+k = \min(5, N_{estaciones}),
+\end{equation}
+
+donde $N_{estaciones}$ representa el número de estaciones disponibles dentro del subconjunto analizado. Esta regla permite utilizar hasta cinco \textit{folds} cuando la cantidad de estaciones es suficiente, pero evita generar particiones inválidas en regiones o estaciones del año con menor disponibilidad de datos.
+
+\subsection{Flujo de validación out-of-fold}
+
+Para cada partición de validación, los modelos fueron entrenados exclusivamente con las estaciones pertenecientes al conjunto de entrenamiento y evaluados sobre las estaciones retenidas en el conjunto de validación. Este procedimiento se repitió para todos los \textit{folds}, generando predicciones \textit{out-of-fold} para las observaciones disponibles.
+
+El flujo aplicado en cada iteración fue el siguiente:
+
+
+\begin{enumerate}
+\item Se separaron las observaciones en entrenamiento y validación de acuerdo con el identificador de estación.
+\item Se ajustó el modelo BD-JPT utilizando únicamente las observaciones de entrenamiento.
+\item Se entrenó el modelo algorítmico directo sobre el índice de claridad observado ($Kt$).
+\item Se entrenó el modelo híbrido, en el cual BD-JPT genera una estimación física inicial y el modelo HGB aprende el residual correspondiente.
+\item Se calcularon predicciones de $Kt$ sobre las estaciones retenidas para validación.
+\item Las predicciones de $Kt$ se acotaron al intervalo operativo $[0, 1.15]$.
+\item Se reconstruyó la irradiancia global horizontal estimada mediante:
+\begin{equation}
+GHI_{estimado} = Kt_{estimado} \cdot GHI_{cs}.
+\end{equation}
+\item Se calcularon métricas de desempeño tanto en el dominio normalizado de $Kt$ como en unidades físicas de irradiancia ($W/m^2$).
+\end{enumerate}
+
+Este esquema permite comparar de manera homogénea los tres enfoques evaluados: BD-JPT como modelo físico de referencia, HGB directo como modelo puramente algorítmico y el modelo híbrido BD-JPT + HGB como corrección residual físicamente guiada.
+
+\subsection{Métricas de desempeño}
+
+El desempeño de los modelos se evaluó mediante métricas complementarias, calculadas tanto sobre el índice de claridad como sobre la irradiancia reconstruida. La evaluación en $Kt$ permite analizar la capacidad del modelo para estimar la transmitancia atmosférica efectiva, mientras que la evaluación en $GHI$ expresa el error final en la magnitud física de interés para el Atlas Solar.
+
+Las métricas principales utilizadas fueron:
+
+\begin{equation}
+RMSE =
+\sqrt{
+\frac{1}{N}
+\sum_{i=1}^{N}
+\left(
+\hat{GHI}_i - GHI_i
+\right)^2
+},
+\end{equation}
+
+\begin{equation}
+MAE =
+\frac{1}{N}
+\sum_{i=1}^{N}
+\left|
+\hat{GHI}_i - GHI_i
+\right|,
+\end{equation}
+
+\begin{equation}
+MBE =
+\frac{1}{N}
+\sum_{i=1}^{N}
+\left(
+\hat{GHI}_i - GHI_i
+\right),
+\end{equation}
+
+\begin{equation}
+R^2 = 1 - \frac{ \sum_{i=1}^{N} \left( GHI_i - \hat{GHI}_i \right)^2 }{ \sum_{i=1}^{N} \left( GHI_i - \overline{GHI} \right)^2 }.
+\end{equation}
+
+El $RMSE$ penaliza con mayor peso los errores grandes, por lo que resulta especialmente útil para evaluar fallas durante episodios de nubosidad intensa o cambios atmosféricos rápidos. El $MAE$ proporciona una medida más robusta del error medio típico. El $MBE$ permite identificar sesgos sistemáticos de sobrestimación o subestimación, mientras que el coeficiente $R^2$ cuantifica la fracción de varianza explicada por el modelo.
+
+Adicionalmente, para facilitar comparaciones entre regiones o estaciones del año con distintos niveles medios de irradiancia, se calcularon métricas normalizadas:
+
+\begin{equation}
+nRMSE =
+100 \cdot
+\frac{RMSE}{\overline{GHI}},
+\end{equation}
+
+\begin{equation}
+nMBE =
+100 \cdot
+\frac{MBE}{\overline{GHI}}.
+\end{equation}
+
+Estas métricas permiten interpretar el error relativo respecto del nivel medio de irradiancia del subconjunto evaluado.
+
+\subsection{Control de fuga de información}
+
+Durante la validación se prestó especial atención a evitar fugas de información entre entrenamiento y evaluación. En particular, el ajuste de cada modelo se realizó nuevamente dentro de cada \textit{fold}, utilizando exclusivamente las estaciones asignadas al conjunto de entrenamiento. Esto aplica tanto al modelo BD-JPT como al modelo HGB directo y al componente residual del modelo híbrido.
+
+En el caso del modelo híbrido, el residual de entrenamiento se calculó únicamente a partir de predicciones BD-JPT generadas sobre el subconjunto de entrenamiento. Luego, el modelo HGB residual fue aplicado sobre las estaciones de validación utilizando solamente sus variables satelitales, geométricas y temporales. De esta forma, las predicciones de validación representan un escenario en el cual la estación evaluada no participó en ninguna etapa del ajuste.
+
+Este punto es especialmente importante porque las series horarias de una misma estación presentan autocorrelación temporal y condiciones locales persistentes. Una partición aleatoria de registros podría producir métricas optimistas, ya que el modelo sería evaluado sobre horarios de estaciones cuyas características espaciales ya fueron vistas durante el entrenamiento. La validación agrupada por estación evita este problema y aproxima mejor la aplicación final del modelo sobre la grilla provincial.
+
+\subsection{Interpretación de la validación}
+
+Las métricas obtenidas deben interpretarse como una estimación del desempeño espacial del modelo bajo el conjunto de estaciones disponibles y sus condiciones observadas. No representan una validación punto a punto perfecta de cada píxel de la provincia, ya que siempre existen diferencias de representatividad entre una estación puntual, el píxel satelital asociado y la celda espacial sobre la que se generará el atlas.
+
+En particular, parte del error observado puede deberse a variabilidad nubosa sub-píxel, desfasajes temporales entre mediciones horarias e imágenes satelitales instantáneas, diferencias microclimáticas locales, incertidumbre residual de las estaciones calibradas y limitaciones propias del modelo de cielo despejado utilizado para calcular $Kt$. Por este motivo, la validación debe entenderse como una evaluación integrada de la cadena satélite-superficie, y no únicamente como una medida aislada del algoritmo de aprendizaje automático.
+
+Una vez completada la validación cruzada espacial, los modelos finales destinados a la generación cartográfica se ajustan nuevamente utilizando la totalidad de las observaciones válidas disponibles dentro de cada subconjunto regional y estacional. Esta etapa final no participa en el cálculo de las métricas de validación, sino que permite aprovechar toda la información observacional disponible para la aplicación operacional del modelo sobre la grilla provincial.
+
+    
+\section{Estrategia de especialización de los modelos}
+
+La calibración de un único modelo satelital para toda la Provincia de Córdoba supone, de manera implícita, que la relación entre reflectancia satelital, nubosidad e irradiancia en superficie es homogénea en todo el territorio y durante todo el año. Sin embargo, la provincia presenta una marcada variabilidad topográfica, radiométrica y estacional, por lo que esta hipótesis resulta restrictiva para la generación de un atlas solar espacialmente robusto.
+
+Por este motivo, además de comparar distintas arquitecturas predictivas, se implementó una estrategia de especialización espacial y temporal de los modelos. El objetivo de esta estrategia es evitar que dinámicas radiativas diferentes sean promediadas dentro de una única parametrización provincial. En lugar de ajustar un único modelo global, se entrenan modelos independientes para subconjuntos definidos por región solar y estación del año.
+
+\subsection{Especialización espacial: regionalización solar mediante clustering}
+
+La Provincia de Córdoba presenta contrastes espaciales relevantes para el modelado de la irradiancia solar. Las zonas serranas y pedemontanas pueden presentar mayor complejidad orográfica, diferencias en la geometría de observación satelital, mayor variabilidad sub-píxel y regímenes nubosos diferentes a los de las llanuras. En contraste, las regiones de llanura presentan una topografía más homogénea, aunque con patrones propios de humedad, nubosidad y atenuación atmosférica.
+
+En el Segundo Informe de Avance se presentó una metodología preliminar para evaluar la regionalización solar mediante clustering no supervisado. En esta fase, dicha metodología se consolidó como una herramienta operativa para segmentar el entrenamiento del modelo satelital. La clasificación final adoptada se obtuvo mediante K-Means multivariado \cite{scikit-learn} aplicado sobre variables geográficas, topográficas y radiométricas derivadas de la red Davis calibrada.
+
+El resultado de este procedimiento fue la definición de cuatro regiones solares operativas, identificadas como Región Solar 0, Región Solar 1, Región Solar 2 y Región Solar 3. Estas regiones no deben interpretarse como una zonificación climática definitiva de la provincia, sino como una partición metodológica destinada a mejorar la calibración satélite-superficie. Su función principal es reducir la heterogeneidad interna de los conjuntos de entrenamiento y permitir que los modelos aprendan relaciones específicas para cada contexto espacial.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figuras/figuras_informa_03/figura_10_mapa_clusters_solares.png}
+\caption{Regionalización solar climatológica de la Provincia de Córdoba obtenida mediante clustering multivariado K-Means sobre la red Davis calibrada. La estrella indica la estación de referencia Pilar equipada con piranómetro CMP21.}
+\label{fig:mapa_clusters}
+\end{figure}
+
+Como se observa en la Figura \ref{fig:mapa_clusters}, las regiones obtenidas no responden exclusivamente a límites administrativos, sino a patrones multivariados de similitud entre estaciones. Esta segmentación permite distinguir sectores con comportamientos radiométricos diferenciados y constituye el soporte espacial para el entrenamiento especializado de los modelos.
+
+Para cada región solar se entrenaron de manera independiente los tres enfoques evaluados: BD-JPT como modelo físico de referencia, HGB directo como modelo algorítmico y el modelo híbrido residual BD-JPT + HGB. Esta separación permite comparar si la ganancia del modelo híbrido se mantiene en distintos contextos espaciales y, al mismo tiempo, evita que las regiones con mayor densidad de estaciones dominen el ajuste provincial.
+
+\subsection{Especialización temporal: entrenamiento estacional}
+
+Además de la heterogeneidad espacial, la irradiancia solar presenta una marcada variabilidad estacional. Esta variabilidad no se limita al cambio astronómico de la altura solar, ya considerado mediante la normalización por $GHI_{cs}$, sino que también involucra cambios en los regímenes de nubosidad, humedad, aerosoles, circulación atmosférica y frecuencia de tormentas convectivas.
+
+Por este motivo, el conjunto de datos fue subdividido en cuatro estaciones climáticas convencionales:
+
+\begin{itemize}
+\item verano: diciembre, enero y febrero;
+\item otoño: marzo, abril y mayo;
+\item invierno: junio, julio y agosto;
+\item primavera: septiembre, octubre y noviembre.
+\end{itemize}
+
+La especialización estacional busca evitar que un único modelo anual promedie situaciones atmosféricas físicamente distintas. En particular, el verano concentra mayor actividad convectiva y mayor variabilidad subhoraria de la nubosidad, mientras que el invierno suele presentar condiciones radiativas más estables, aunque con menores alturas solares y mayor peso relativo de errores geométricos. Estas diferencias pueden modificar la relación entre reflectancia satelital e irradiancia observada en superficie.
+
+Al entrenar modelos separados por estación, cada subconjunto conserva una estructura atmosférica más homogénea. Esto facilita que el componente algorítmico del modelo, tanto en su versión directa como residual, aprenda patrones específicos de cada período del año sin diluirlos dentro de una calibración anual única.
+
+\subsection{Matriz regional-estacional de modelos}
+
+Combinando la regionalización espacial con la partición estacional, la calibración final se organizó como una matriz de modelos independientes. Para cada una de las cuatro regiones solares y cada una de las cuatro estaciones del año se ajustaron los tres enfoques predictivos considerados:
+
+\begin{equation}
+N_{subconjuntos}
+=
+N_{regiones}
+\times
+N_{estaciones}
+=
+4 \times 4 =
+16.
+\end{equation}
+
+Sobre cada uno de estos 16 subconjuntos regional-estacionales se evaluaron las tres arquitecturas de modelado:
+
+\begin{equation}
+N_{ajustes}
+=
+N_{subconjuntos}
+\times
+N_{arquitecturas}
+=
+16 \times 3 =
+48
+\end{equation}
+
+En términos operativos, esta estructura permite que cada combinación de región y estación disponga de una calibración específica. Por ejemplo, el comportamiento radiativo de una región serrana durante verano no se fuerza a compartir los mismos parámetros que una región de llanura durante invierno. Esta decisión es especialmente importante para el modelo híbrido, ya que el residual aprendido puede estar asociado a procesos físicos diferentes según el contexto espacial y temporal.
+
+La matriz regional-estacional también permite analizar el desempeño de los modelos de forma más diagnóstica. En lugar de reportar únicamente una métrica provincial agregada, es posible identificar en qué regiones o estaciones el modelo físico resulta suficiente, dónde el componente algorítmico aporta mayor corrección y en qué contextos persisten errores relevantes.
+
+\subsection{Criterios mínimos de entrenamiento}
+
+Para evitar ajustes inestables, cada subconjunto regional-estacional fue evaluado antes del entrenamiento. Solo se entrenaron modelos cuando existía una cantidad suficiente de observaciones y, especialmente, cuando el número de estaciones disponibles permitía realizar una validación cruzada espacial significativa.
+
+En la implementación, los subconjuntos con menos de dos estaciones o con un número muy bajo de observaciones fueron descartados del ajuste independiente. Esta condición evita generar métricas artificialmente optimistas o inestables en regiones donde la partición por estación no puede sostenerse metodológicamente.
+
+Una vez superados estos criterios, cada subconjunto fue evaluado mediante \texttt{GroupKFold} \cite{scikit-learn}, agrupando por estación, tal como se describió en la sección anterior. De este modo, la especialización regional y estacional no reemplaza la validación espacial estricta, sino que se combina con ella dentro de cada subconjunto de entrenamiento.
+
+\subsection{Rol de la especialización en la generación del atlas}
+
+La especialización regional-estacional cumple una función directa en la etapa posterior de generación cartográfica. Al aplicar el modelo sobre la grilla provincial, cada punto del dominio debe asociarse a una región solar y a una estación del año, seleccionando así el modelo calibrado correspondiente. Esta estrategia permite construir campos continuos de $GHI$ que respeten, en mayor medida, la heterogeneidad espacial y temporal observada en la red de superficie.
+
+En síntesis, la especialización de los modelos constituye un paso intermedio entre la calibración puntual satélite-superficie y la generación del atlas provincial. Su objetivo no es fragmentar artificialmente el dominio, sino representar de manera más realista las diferencias regionales y estacionales que condicionan la relación entre nubosidad satelital e irradiancia en superficie.
+
+
+
+\section{Resultados y análisis}
+
+La Tabla \ref{tab:resumen_metodologico} resume el desempeño promedio provincial de los tres esquemas predictivos evaluados bajo validación cruzada espacial \textit{out-of-fold}. Los valores corresponden al error reconstruido en unidades físicas de irradiancia global horizontal ($GHI$), luego de estimar el índice de claridad ($K_t$) y multiplicarlo por la irradiancia de cielo despejado correspondiente.
+
+\begin{table}[htpb]
+\centering
+\caption{Resumen del desempeño predictivo global bajo validación cruzada espacial. Promedio no ponderado de los 16 subconjuntos regional-estacionales.}
+\label{tab:resumen_metodologico}
+
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+
+\begin{tabularx}{\textwidth}{@{}Xcc@{}}
+\toprule
+\textbf{Modelo} &
+\textbf{RMSE} &
+\textbf{Reducción vs. BD-JPT} \\
+&
+\textbf{(W/m$^2$)} &
+\textbf{(\%)} \\
+\midrule
+\textbf{BD-JPT} & 238.3 & -- \\
+HGB directo ($K_t$) & 224.4 & 5.8 \\
+\textbf{Híbrido (BD-JPT + HGB)} & \textbf{219.0} & \textbf{8.1} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Los resultados muestran que el modelo físico-empírico BD-JPT constituye una referencia operativa interpretable, pero presenta errores sistemáticos que pueden ser reducidos mediante modelos algorítmicos entrenados sobre la red terrestre calibrada. El modelo HGB directo mejora el desempeño respecto del baseline físico, lo que confirma que las variables satelitales, geométricas y temporales contienen información relevante para capturar parte de la variabilidad atmosférica no representada completamente por la formulación BD-JPT.
+
+El mejor desempeño promedio corresponde al modelo híbrido BD-JPT + HGB. Este resultado indica que la estrategia residual permite aprovechar de manera simultánea la estructura física del modelo base y la capacidad del aprendizaje automático para corregir desviaciones sistemáticas. En términos relativos, el híbrido reduce el RMSE promedio en 8.1\% respecto de BD-JPT y mejora también al modelo HGB directo. Esta diferencia respalda la adopción del enfoque híbrido como núcleo predictivo operativo del Atlas Solar.
+
+\subsection{Comparación general de dispersión}
+
+La Figura \ref{fig:scatter_density} muestra la comparación entre las predicciones del modelo físico BD-JPT y del modelo híbrido frente a las observaciones de superficie. En ambos casos se presentan predicciones obtenidas bajo validación cruzada espacial \textit{out-of-fold}, por lo que las estaciones evaluadas no fueron utilizadas durante el ajuste del modelo correspondiente.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figuras/figuras_informa_03/figura_fase4_scatter_density.png}
+    \caption{Comparación de dispersión bajo validación cruzada espacial. Izquierda: modelo físico BD-JPT. Derecha: modelo híbrido BD-JPT + HGB. La línea punteada indica la relación ideal 1:1 entre irradiancia observada y estimada.}
+    \label{fig:scatter_density}
+\end{figure}
+
+La mayor concentración de densidad en torno a la línea identidad para el modelo híbrido indica una reducción de la dispersión del error y una mejor reconstrucción de los valores horarios de $GHI$. La mejora es particularmente visible en el rango medio y alto de irradiancia, donde el modelo físico tiende a presentar una mayor dispersión respecto de las observaciones.
+
+\subsection{Desempeño regional y estacional}
+
+La Figura \ref{fig:rmse_regional} resume el RMSE por región solar y estación del año para el modelo físico BD-JPT y el modelo híbrido. Esta comparación permite evaluar si la mejora del enfoque residual se mantiene bajo distintos contextos espaciales y temporales.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figuras/figuras_informa_03/fase4_seasonal_RMSE_comparison.png}
+    \caption{Comparación del RMSE entre el modelo BD-JPT y el modelo híbrido BD-JPT + HGB, discriminada por región solar y estación del año.}
+    \label{fig:rmse_regional}
+\end{figure}
+
+En las cuatro regiones solares y en todas las estaciones evaluadas, el modelo híbrido reduce el RMSE respecto de BD-JPT. La mejora no es uniforme, lo cual es esperable dada la heterogeneidad topográfica y atmosférica de la provincia. Sin embargo, el patrón general muestra que la corrección residual aporta una ganancia consistente sobre el modelo físico base.
+
+Como puede observarse en la Tabla del Anexo, el análisis relativo mediante nRMSE confirma la tendencia observada en RMSE absoluto: el modelo híbrido reduce sistemáticamente el error respecto del baseline físico. Esta reducción sugiere que la mejora no se debe únicamente a regiones o estaciones con mayor irradiancia absoluta, sino a una mejor representación de la relación satélite-superficie en el dominio normalizado de calibración.
+
+\subsection{Análisis del sesgo y dependencia geométrica}
+
+Además de reducir el error cuadrático, resulta importante evaluar si el modelo introduce o corrige sesgos sistemáticos. La Figura \ref{fig:mbe_regional} muestra el sesgo medio por región y estación. En términos generales, ambos modelos presentan una tendencia a la subestimación, aunque la magnitud del sesgo varía según la región y la estación.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figuras/figuras_informa_03/fase4_seasonal_MBE_comparison.png}
+    \caption{Comparación del sesgo medio (MBE) entre el modelo BD-JPT y el modelo híbrido BD-JPT + HGB, discriminada por región solar y estación del año. Valores negativos indican subestimación de la irradiancia.}
+    \label{fig:mbe_regional}
+\end{figure}
+
+La interpretación del MBE debe realizarse junto con las métricas de dispersión. Aunque el híbrido reduce de forma consistente el RMSE y el nRMSE, no elimina completamente el sesgo medio. Esto indica que la arquitectura residual mejora la precisión general, pero aún conserva una tendencia a la subestimación en algunos subconjuntos regional-estacionales. Esta característica deberá considerarse en futuras etapas de ajuste fino o corrección de sesgo.
+
+La Figura \ref{fig:error_zenith} muestra la dependencia del error medio con el ángulo cenital solar. Este diagnóstico permite evaluar si parte del error residual se asocia a la geometría de observación y a la altura solar.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figuras/figuras_informa_03/figura_fase4_error_zenith.png}
+    \caption{Dependencia geométrica del error predictivo medio (MBE) en función del ángulo cenital solar para el modelo BD-JPT y el modelo híbrido BD-JPT + HGB.}
+    \label{fig:error_zenith}
+\end{figure}
+
+El modelo BD-JPT muestra una dependencia geométrica más marcada, con sobrestimación para ángulos cenitales bajos y subestimación creciente hacia ángulos altos. El modelo híbrido reduce parte de esta amplitud, aunque no elimina completamente la dependencia del error con la geometría solar. Este resultado es consistente con el rol del componente HGB como corrector residual: el modelo aprende parte de los sesgos geométricos del baseline, pero la corrección no reemplaza la necesidad de mantener restricciones físicas explícitas.
+
+\subsection{Coeficiente de determinación}
+
+De igual manera, los valores detallados en la Tabla del Anexo indican que el modelo híbrido presenta valores de coeficiente de determinación ($R^2$) superiores al baseline físico en todas las regiones y estaciones evaluadas. Este resultado confirma que el modelo híbrido no solo reduce el error absoluto, sino que también mejora la capacidad de reconstruir la variabilidad temporal observada de la irradiancia.
+
+\subsection{Reconstrucción temporal en estación de validación}
+
+Además de las métricas agregadas, se evaluó la capacidad del modelo para reproducir la evolución temporal de la irradiancia en estaciones individuales no utilizadas durante el entrenamiento de cada \textit{fold}. Este análisis resulta útil para verificar si la mejora estadística se traduce también en una reconstrucción razonable de la variabilidad horaria.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figuras/figuras_informa_03/figura_fase4_timeseries_estacion550.png}
+    \caption{Reconstrucción temporal de irradiancia para una estación de validación durante un período de verano. Se comparan las observaciones de superficie con el modelo BD-JPT y el modelo híbrido BD-JPT + HGB.}
+    \label{fig:timeseries}
+\end{figure}
+
+La Figura \ref{fig:timeseries} muestra que el modelo híbrido reproduce adecuadamente la estructura diaria principal de la irradiancia y acompaña la evolución general del modelo físico. Sin embargo, también evidencia una limitación importante: los episodios de nubosidad convectiva o variabilidad subhoraria intensa pueden generar discrepancias significativas entre la observación puntual de superficie y la estimación satelital. Esto refuerza la necesidad de interpretar las métricas de validación como una evaluación integrada de toda la cadena satélite-superficie, incluyendo incertidumbres instrumentales, temporales y de representatividad espacial.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figuras/figuras_informa_03/figura_fase4_timeseries_estacion550_invierno.png}
+    \caption{Reconstrucción temporal de irradiancia para una estación de validación durante un período de invierno. Se comparan las observaciones de superficie con el modelo BD-JPT y el modelo híbrido BD-JPT + HGB.}
+    \label{fig:timeseries_invierno}
+\end{figure}
+
+La Figura \ref{fig:timeseries_invierno} complementa el caso de verano mostrando el comportamiento del modelo durante un período invernal. En este caso, la evolución temporal presenta una estructura diaria más regular y menor variabilidad convectiva subhoraria, lo que permite evaluar el desempeño del modelo bajo condiciones radiativas más estables. El modelo híbrido reproduce de manera adecuada la forma general del ciclo diario y mantiene un comportamiento próximo al modelo físico, aunque persisten diferencias en los máximos horarios observados. Este resultado refuerza la interpretación estacional del desempeño: el modelo presenta una respuesta más estable en invierno, mientras que los mayores desafíos aparecen en condiciones de nubosidad rápida o fragmentada.
+
+\subsection{Síntesis de resultados}
+
+Los resultados de esta fase permiten extraer cuatro conclusiones principales. En primer lugar, BD-JPT funciona como una referencia física interpretable y operacionalmente útil, pero presenta errores sistemáticos cuando se aplica sobre un dominio provincial heterogéneo. En segundo lugar, el modelo HGB directo confirma que las variables satelitales y geométricas permiten capturar relaciones no lineales relevantes para la estimación de $K_t$. En tercer lugar, el modelo híbrido BD-JPT + HGB obtiene el mejor desempeño promedio, reduciendo el RMSE respecto del baseline físico y superando también al modelo algorítmico directo. Finalmente, el análisis regional-estacional muestra que la mejora del híbrido es consistente en las cuatro regiones solares y durante todo el ciclo anual.
+
+Por estas razones, el enfoque híbrido se selecciona como arquitectura predictiva principal para la generación posterior de campos espaciales continuos de $GHI$ sobre la Provincia de Córdoba.
+
+
+
+\section{Discusión, conclusiones y transición hacia el potencial fotovoltaico}
+
+\subsection{Síntesis metodológica}
+
+Esta fase permitió consolidar el núcleo predictivo satelital del Atlas Solar Provincial. A partir de la red terrestre calibrada en las etapas previas, se construyó una base integrada satélite-superficie y se evaluaron distintas estrategias de estimación de irradiancia global horizontal ($GHI$) en el dominio del índice de claridad ($Kt$).
+
+El cambio de variable objetivo desde $GHI$ absoluto hacia $Kt$ resultó central para separar la componente astronómica y \textit{clear-sky} de primer orden de la atenuación atmosférica asociada a nubosidad, topografía, albedo superficial y efectos geométricos de observación. Esta reformulación permitió comparar de manera homogénea un modelo físico-empírico tradicional, un modelo puramente algorítmico y una arquitectura híbrida residual.
+
+Los resultados obtenidos bajo validación cruzada espacial muestran que el modelo BD-JPT funciona como una referencia física interpretable, pero presenta errores sistemáticos cuando se aplica sobre un dominio provincial heterogéneo. El modelo HGB directo mejora el desempeño respecto del baseline físico, confirmando que las variables satelitales y geométricas contienen información relevante para estimar la transmitancia efectiva de la atmósfera. Sin embargo, el mejor desempeño promedio se obtuvo con el modelo híbrido BD-JPT + HGB, que combina una estimación física inicial con una corrección residual aprendida a partir de los datos.
+
+\subsection{Interpretación del modelo híbrido}
+
+La principal ventaja del enfoque híbrido no radica únicamente en la reducción del error promedio, sino en la forma en que organiza el problema de predicción. En lugar de reemplazar completamente el modelo físico por un modelo \textit{data-driven}, la arquitectura conserva a BD-JPT como estimador de primer orden y limita el rol del aprendizaje automático a corregir el residual sistemático:
+
+\begin{equation}
+K_{t,\mathrm{hibrido}}
+=
+\operatorname{clip}
+\left(
+K_{t,\mathrm{BDJPT}}
++
+\lambda \, \Delta K_{t,\mathrm{HGB}},
+0,
+1.15
+\right).
+\label{eq:kt_hibrido_final}
+\end{equation}
+
+En esta formulación, el modelo HGB no debe reconstruir la irradiancia desde cero, sino aprender bajo qué condiciones el modelo físico tiende a sobreestimar o subestimar el índice de claridad. Esta descomposición mejora la interpretabilidad del pipeline, ya que separa explícitamente una componente radiativa base y una componente residual asociada a procesos no representados completamente por la parametrización BD-JPT.
+
+La adopción del modelo híbrido queda respaldada por tres resultados principales. Primero, reduce el RMSE promedio respecto del modelo físico de referencia. Segundo, mejora también el desempeño del modelo HGB directo, indicando que la estructura física inicial aporta información útil al aprendizaje residual. Tercero, mantiene un comportamiento acotado en el dominio de $Kt$, evitando valores no físicos mediante límites operativos explícitos.
+
+Por estas razones, el modelo híbrido se selecciona como arquitectura predictiva principal para la generación de campos continuos de $GHI$ sobre la Provincia de Córdoba.
+
+\subsection{Rol de la especialización regional y estacional}
+
+La regionalización solar y la subdivisión estacional permitieron adaptar la calibración a la heterogeneidad espacial y temporal del recurso. La división en cuatro regiones solares operativas, combinada con las cuatro estaciones del año, generó una matriz de 16 subconjuntos regional-estacionales. Sobre cada subconjunto se evaluaron las arquitecturas de modelado bajo validación cruzada espacial.
+
+Esta estrategia evita imponer una única parametrización provincial sobre condiciones radiativas heterogéneas. En particular, permite que el modelo aprenda relaciones satélite-superficie diferenciadas entre regiones serranas, pedemontanas y de llanura, así como entre períodos con distinta dinámica nubosa y distinto régimen geométrico solar.
+
+La especialización no debe interpretarse como una regionalización climática definitiva, sino como una herramienta operativa de calibración. Su utilidad principal es reducir la heterogeneidad interna de los datos de entrenamiento y mejorar la capacidad del modelo para representar patrones regionales y estacionales de atenuación atmosférica.
+
+\subsection{Limitaciones identificadas}
+
+A pesar de la mejora obtenida, la validación muestra que persisten fuentes de error relevantes. En primer lugar, la estimación satelital se enfrenta a un problema de representatividad espacial: una estación de superficie mide una condición puntual, mientras que la observación satelital representa un píxel o una celda espacial de mayor escala. Esta diferencia se vuelve especialmente importante bajo nubosidad fragmentada o convectiva.
+
+En segundo lugar, la comparación entre mediciones horarias de superficie e imágenes satelitales instantáneas introduce incertidumbre temporal. En condiciones de nubosidad de rápida evolución, una diferencia de pocos minutos puede generar discrepancias importantes entre la irradiancia observada y la señal satelital asociada.
+
+En tercer lugar, el modelo de cielo despejado utilizado para normalizar el problema introduce una incertidumbre adicional. En esta fase se adoptó una formulación operativa basada en Ineichen-Perez, más liviana computacionalmente que una simulación REST2 forzada hora a hora con reanálisis atmosféricos. Esta decisión facilita la aplicación provincial del modelo, pero implica que parte de la variabilidad atmosférica fina, especialmente asociada a aerosoles o vapor de agua, puede quedar absorbida por el componente residual del modelo híbrido.
+
+Finalmente, el análisis de sesgo muestra que el modelo híbrido reduce la dispersión del error, pero no elimina completamente la tendencia a la subestimación en todos los subconjuntos. Este resultado indica que futuras etapas podrían incorporar una corrección de sesgo posterior, una optimización explícita del parámetro $\lambda$ o variables atmosféricas adicionales para mejorar el comportamiento residual.
+
+\subsection{Transición hacia mapas provinciales de GHI}
+
+Con la arquitectura predictiva ya seleccionada, la etapa siguiente consiste en aplicar el modelo híbrido sobre la grilla provincial completa. Para cada punto de la grilla y cada hora disponible, el flujo operativo será:
+
+\begin{enumerate}
+    \item calcular la geometría solar y la irradiancia de cielo despejado;
+    \item obtener las variables satelitales correspondientes, incluyendo reflectancia, $B_0$ y $Fr$;
+    \item asignar la región solar operativa correspondiente;
+    \item seleccionar el modelo regional-estacional adecuado;
+    \item estimar $Kt_{hibrido}$;
+    \item reconstruir $GHI$ mediante:
+    \begin{equation}
+    GHI_{estimado} = Kt_{hibrido} \cdot GHI_{cs}.
+    \end{equation}
+\end{enumerate}
+
+A partir de las series horarias estimadas será posible generar productos agregados diarios, mensuales, estacionales y climatológicos. Estos productos constituirán la base cartográfica del Atlas Solar Provincial, incluyendo mapas de irradiancia media, variabilidad temporal e incertidumbre asociada.
+
+\subsection{Avance hacia el potencial de generación fotovoltaica}
+
+La estimación de $GHI$ constituye el insumo geofísico principal para caracterizar el recurso solar, pero no equivale directamente al potencial de generación fotovoltaica. El producto validado en esta fase corresponde a irradiancia global horizontal. Por lo tanto, cualquier estimación de irradiancia sobre el plano del generador y de producción eléctrica debe interpretarse como un producto derivado, apoyado en supuestos adicionales de descomposición radiativa, geometría del sistema, temperatura de celda y pérdidas energéticas.
+
+El primer paso de esa cadena consiste en transformar $GHI$ en irradiancia incidente sobre el plano del generador fotovoltaico ($G_T$ o $G_{POA}$). Esta transformación requiere considerar la inclinación del módulo, su azimut, la posición solar, el albedo superficial y la separación de la irradiancia horizontal en sus componentes directa normal ($DNI$) y difusa horizontal ($DHI$). La relación geométrica básica entre estas magnitudes es:
+
+\begin{equation}
+GHI = DNI \cos(\theta_z) + DHI.
+\end{equation}
+
+Sin embargo, esta ecuación no permite obtener de manera única $DNI$ y $DHI$ a partir de $GHI$ solamente, ya que representa una única relación con dos incógnitas. En consecuencia, la componente directa y la componente difusa no se obtendrán como mediciones independientes del presente atlas, sino como estimaciones derivadas mediante modelos empíricos o semiempíricos de descomposición de irradiancia, por ejemplo modelos de fracción difusa aplicados a $GHI$, geometría solar e índice de claridad \cite{erbs1982}.
+
+De manera operativa, la etapa de descomposición podrá expresarse como:
+
+\begin{equation}
+DHI = f_d(K_t, \theta_z, \ldots) \cdot GHI,
+\end{equation}
+
+\begin{equation}
+DNI = \frac{GHI - DHI}{\cos(\theta_z)},
+\end{equation}
+
+siempre aplicando controles físicos para ángulos cenitales altos, valores negativos, condiciones de baja irradiancia y límites superiores plausibles. Esta etapa introduce una fuente adicional de incertidumbre que deberá ser evaluada explícitamente en la fase fotovoltaica del convenio. Por este motivo, los futuros productos de $DNI$, $DHI$ y $G_{POA}$ deberán reportarse como campos modelados a partir de $GHI$, no como variables observadas o validadas de forma independiente.
+
+Una vez estimadas las componentes directa y difusa, la irradiancia sobre el plano inclinado podrá expresarse como la suma de las componentes directa sobre el plano, difusa del cielo y reflejada por el suelo:
+
+\begin{equation}
+G_{POA}
+=
+G_{b,POA}
++
+G_{d,sky}
++
+G_{d,ground}.
+\end{equation}
+
+El cálculo de $G_{d,sky}$ dependerá del modelo de transposición adoptado, que podrá ser isotrópico o anisotrópico según la disponibilidad de información y el nivel de detalle requerido. Una formulación posible para la etapa siguiente es el modelo de Perez, ampliamente utilizado para estimar componentes de irradiancia sobre planos inclinados a partir de componentes directa y global \cite{perez1990}. La implementación operativa podrá apoyarse en herramientas como \texttt{pvlib}, que incluye modelos de posición solar, cielo despejado, descomposición, transposición y conversión fotovoltaica \cite{pvlib}.
+
+Una vez calculada la irradiancia sobre el plano del panel, la potencia instantánea de corriente continua podrá aproximarse mediante un modelo paramétrico de conversión fotovoltaica, consistente con formulaciones simplificadas como PVWatts \cite{dobos2014}:
+
+\begin{equation}
+P_{DC}
+=
+P_{peak}
+\cdot
+\left(
+\frac{G_{POA}}{G_{STC}}
+\right)
+\cdot
+\left[
+1
++
+\gamma_{P}
+\cdot
+\left(
+T_{cell}
+-
+T_{STC}
+\right)
+\right].
+\end{equation}
+
+Donde $P_{DC}$ representa la potencia instantánea estimada en corriente continua, $P_{peak}$ la potencia pico nominal del sistema, $G_{POA}$ la irradiancia incidente sobre el plano del panel, $G_{STC}=1000\,W/m^2$ la irradiancia de referencia bajo condiciones estándar, $T_{STC}=25\,^{\circ}C$ la temperatura de celda de referencia y $\gamma_P$ el coeficiente térmico de potencia, usualmente negativo. Esta formulación no representa aún la energía entregada a la red, ya que no incluye pérdidas por inversor, cableado, mismatch, suciedad, sombreado, disponibilidad u otros factores de desempeño del sistema.
+
+La temperatura de celda podrá estimarse inicialmente mediante un modelo térmico simplificado basado en la temperatura del aire y la irradiancia incidente:
+
+\begin{equation}
+T_{cell}
+=
+T_{aire}
++
+\left(
+\frac{NOCT - 20}{800}
+\right)
+\cdot
+G_{POA}.
+\end{equation}
+
+Esta aproximación permite incorporar una penalización térmica de primer orden al potencial fotovoltaico, especialmente relevante durante períodos cálidos o eventos de ola de calor. No obstante, al no representar explícitamente el efecto dinámico del viento ni las condiciones particulares de montaje, deberá considerarse como una aproximación preliminar. En una etapa posterior podrán evaluarse modelos térmicos más completos, como Faiman o el modelo de desempeño de Sandia, que incorporan de manera más explícita variables meteorológicas y parámetros de módulo \cite{faiman2008,king2004}.
+
+Por lo tanto, el presente informe no cierra aún la estimación de generación fotovoltaica. En cambio, deja establecido el insumo radiativo principal, los campos provinciales de $GHI$, y delimita la cadena metodológica necesaria para transformarlos posteriormente en mapas de irradiancia sobre plano inclinado y en indicadores de energía fotovoltaica potencial. La etapa siguiente deberá documentar la selección del modelo de descomposición, la validación o comparación de sus resultados, la elección del modelo de transposición, los supuestos tecnológicos del sistema fotovoltaico y el tratamiento explícito de pérdidas e incertidumbres.
+
+
+\newpage
+\section*{Anexo: Tablas de Desempeño Detalladas}
+
+% --- TABLA PARTE 1 (Regiones 0 y 1) ---
+\begin{table}[!ht]
+\centering
+\footnotesize 
+\caption{Desempeño predictivo (Parte 1: Regiones 0 y 1).}
+\label{tab:bdjpt_regional_estacional_models_p1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l l l c c c c c c c}
+\toprule
+Región & Estación & Modelo & $R^2_{Kt}$ & $R^2_{GHI}$ & RMSE & MAE & MBE & nRMSE & nMBE \\
+ &  &  &  &  & (W/m$^2$) & (W/m$^2$) & (W/m$^2$) & (\%) & (\%) \\
+\midrule
+R0 & Verano & BD-JPT (Baseline) & -0.013 & 0.239 & 299.7 & 252.7 & -2.3 & 57.0 & -0.2 \\
+R0 & Verano & HGB directo ($Kt$) & 0.098 & 0.287 & 290.2 & 242.0 & -1.9 & 55.2 & -0.1 \\
+R0 & Verano & Híbrido (BD-JPT + HGB) & 0.147 & 0.319 & 283.6 & 238.1 & -12.3 & 53.9 & -2.1 \\
+R0 & Otono & BD-JPT (Baseline) & -0.034 & 0.168 & 249.5 & 212.2 & -10.9 & 59.5 & -2.5 \\
+R0 & Otono & HGB directo ($Kt$) & 0.166 & 0.273 & 233.2 & 192.2 & -6.7 & 55.6 & -1.5 \\
+R0 & Otono & Híbrido (BD-JPT + HGB) & 0.197 & 0.288 & 230.8 & 191.2 & -15.5 & 55.1 & -3.6 \\
+R0 & Invierno & BD-JPT (Baseline) & 0.028 & 0.258 & 193.9 & 165.2 & -7.9 & 53.1 & -2.1 \\
+R0 & Invierno & HGB directo ($Kt$) & 0.151 & 0.320 & 185.6 & 153.1 & -5.1 & 50.9 & -1.3 \\
+R0 & Invierno & Híbrido (BD-JPT + HGB) & 0.215 & 0.358 & 180.3 & 151.5 & -15.0 & 49.5 & -4.0 \\
+R0 & Primavera & BD-JPT (Baseline) & 0.016 & 0.264 & 282.0 & 238.7 & -12.3 & 55.5 & -2.3 \\
+R0 & Primavera & HGB directo ($Kt$) & 0.178 & 0.365 & 262.0 & 215.0 & -1.6 & 51.6 & -0.2 \\
+R0 & Primavera & Híbrido (BD-JPT + HGB) & 0.223 & 0.388 & 257.2 & 213.7 & -12.9 & 50.7 & -2.4 \\
+\midrule
+R1 & Verano & BD-JPT (Baseline) & -0.068 & 0.310 & 274.4 & 228.7 & -5.4 & 49.4 & -0.9 \\
+R1 & Verano & HGB directo ($Kt$) & 0.098 & 0.374 & 261.5 & 213.7 & -3.9 & 47.1 & -0.7 \\
+R1 & Verano & Híbrido (BD-JPT + HGB) & 0.126 & 0.390 & 258.0 & 213.0 & -12.1 & 46.5 & -2.1 \\
+R1 & Otono & BD-JPT (Baseline) & -0.130 & 0.213 & 222.5 & 188.7 & -21.0 & 51.1 & -4.8 \\
+R1 & Otono & HGB directo ($Kt$) & 0.171 & 0.350 & 202.1 & 163.7 & -10.6 & 46.5 & -2.4 \\
+R1 & Otono & Híbrido (BD-JPT + HGB) & 0.182 & 0.357 & 201.0 & 164.2 & -15.1 & 46.2 & -3.5 \\
+R1 & Invierno & BD-JPT (Baseline) & -0.099 & 0.219 & 182.2 & 156.3 & -12.7 & 52.8 & -3.5 \\
+R1 & Invierno & HGB directo ($Kt$) & 0.141 & 0.337 & 167.9 & 138.8 & -9.4 & 48.6 & -2.6 \\
+R1 & Invierno & Híbrido (BD-JPT + HGB) & 0.171 & 0.353 & 165.8 & 138.4 & -14.9 & 48.0 & -4.2 \\
+R1 & Primavera & BD-JPT (Baseline) & -0.049 & 0.298 & 262.0 & 221.0 & -13.2 & 51.7 & -2.6 \\
+R1 & Primavera & HGB directo ($Kt$) & 0.162 & 0.401 & 242.1 & 198.3 & -4.7 & 47.8 & -0.9 \\
+R1 & Primavera & Híbrido (BD-JPT + HGB) & 0.191 & 0.416 & 238.9 & 197.8 & -12.8 & 47.1 & -2.5 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\newpage
+
+% --- TABLA PARTE 2 (Regiones 2 y 3) ---
+\begin{table}[!ht]
+\centering
+\footnotesize 
+\caption{Desempeño predictivo (Parte 2: Regiones 2 y 3).}
+\label{tab:bdjpt_regional_estacional_models_p2}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l l l c c c c c c c}
+\toprule
+Región & Estación & Modelo & $R^2_{Kt}$ & $R^2_{GHI}$ & RMSE & MAE & MBE & nRMSE & nMBE \\
+ &  &  &  &  & (W/m$^2$) & (W/m$^2$) & (W/m$^2$) & (\%) & (\%) \\
+\midrule
+R2 & Verano & BD-JPT (Baseline) & -0.048 & 0.362 & 261.2 & 215.8 & -5.4 & 44.4 & -0.9 \\
+R2 & Verano & HGB directo ($Kt$) & 0.134 & 0.424 & 248.2 & 200.3 & -6.7 & 42.2 & -1.1 \\
+R2 & Verano & Híbrido (BD-JPT + HGB) & 0.174 & 0.454 & 241.8 & 199.1 & -16.2 & 41.1 & -2.7 \\
+R2 & Otono & BD-JPT (Baseline) & -0.101 & 0.286 & 218.8 & 184.9 & -22.2 & 48.7 & -4.9 \\
+R2 & Otono & HGB directo ($Kt$) & 0.178 & 0.403 & 200.0 & 161.5 & -10.6 & 44.5 & -2.3 \\
+R2 & Otono & Híbrido (BD-JPT + HGB) & 0.208 & 0.421 & 197.0 & 161.2 & -17.5 & 43.9 & -3.9 \\
+R2 & Invierno & BD-JPT (Baseline) & -0.025 & 0.294 & 178.2 & 151.4 & -14.6 & 48.8 & -3.9 \\
+R2 & Invierno & HGB directo ($Kt$) & 0.180 & 0.388 & 165.8 & 133.7 & -9.4 & 45.4 & -2.5 \\
+R2 & Invierno & Híbrido (BD-JPT + HGB) & 0.239 & 0.426 & 160.7 & 132.9 & -17.2 & 44.0 & -4.7 \\
+R2 & Primavera & BD-JPT (Baseline) & -0.026 & 0.332 & 256.9 & 216.4 & -13.6 & 48.1 & -2.5 \\
+R2 & Primavera & HGB directo ($Kt$) & 0.195 & 0.436 & 235.9 & 190.6 & -6.7 & 44.2 & -1.2 \\
+R2 & Primavera & Híbrido (BD-JPT + HGB) & 0.234 & 0.459 & 231.1 & 190.9 & -16.6 & 43.3 & -3.1 \\
+\midrule
+R3 & Verano & BD-JPT (Baseline) & 0.043 & 0.361 & 271.6 & 226.9 & -4.2 & 48.3 & -0.7 \\
+R3 & Verano & HGB directo ($Kt$) & 0.133 & 0.378 & 268.0 & 218.6 & -0.2 & 47.7 & -0.0 \\
+R3 & Verano & Híbrido (BD-JPT + HGB) & 0.220 & 0.437 & 254.9 & 212.9 & -15.2 & 45.4 & -2.7 \\
+R3 & Otono & BD-JPT (Baseline) & -0.041 & 0.294 & 222.5 & 188.5 & -17.2 & 50.7 & -3.9 \\
+R3 & Otono & HGB directo ($Kt$) & 0.173 & 0.377 & 209.1 & 168.5 & -5.4 & 47.6 & -1.2 \\
+R3 & Otono & Híbrido (BD-JPT + HGB) & 0.226 & 0.411 & 203.3 & 167.4 & -15.5 & 46.3 & -3.5 \\
+R3 & Invierno & BD-JPT (Baseline) & 0.068 & 0.343 & 179.7 & 151.4 & -14.6 & 46.9 & -3.8 \\
+R3 & Invierno & HGB directo ($Kt$) & 0.167 & 0.374 & 175.4 & 140.3 & -7.6 & 45.8 & -2.0 \\
+R3 & Invierno & Híbrido (BD-JPT + HGB) & 0.260 & 0.437 & 166.4 & 138.1 & -18.9 & 43.5 & -4.9 \\
+R3 & Primavera & BD-JPT (Baseline) & 0.065 & 0.361 & 257.5 & 217.8 & -16.6 & 47.8 & -3.1 \\
+R3 & Primavera & HGB directo ($Kt$) & 0.203 & 0.425 & 244.1 & 195.2 & -2.4 & 45.3 & -0.4 \\
+R3 & Primavera & Híbrido (BD-JPT + HGB) & 0.283 & 0.476 & 233.2 & 193.4 & -17.0 & 43.3 & -3.2 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+
+\newpage
+\begin{thebibliography}{99}
+
+\bibitem{gueymard2008}
+Gueymard, C. A. (2008).
+\textit{REST2: High-performance solar radiation model for cloudless-sky irradiance, illuminance, and photosynthetically active radiation: Validation with a benchmark dataset}.
+Solar Energy, 82(3), 272--285. doi:10.1016/j.solener.2007.04.008.
+
+\bibitem{tarpley1979}
+Tarpley, J. D. (1979).
+\textit{Estimating incident solar radiation at the surface from geostationary satellite data}.
+Journal of Applied Meteorology, 18(9), 1172--1181. doi:10.1175/1520-0450(1979)018\textless1172:EISRAT\textgreater2.0.CO;2.
+
+\bibitem{alonsosuarez2012}
+Alonso-Suárez, R., Abal, G., Siri, R., \& Musé, P. (2012).
+\textit{Brightness-dependent Tarpley model for global solar radiation estimation using GOES satellite images: Application to Uruguay}.
+Solar Energy, 86(11), 3205--3215. doi:10.1016/j.solener.2012.08.012.
+
+\bibitem{alonsosuarez2014}
+Alonso-Suárez, R., Abal, G., Musé, P., \& Siri, R. (2014).
+\textit{Satellite-derived solar irradiation map for Uruguay}.
+Energy Procedia, 57, 1237--1246. doi:10.1016/j.egypro.2014.10.072.
+
+\bibitem{ineichen2002}
+Ineichen, P., \& Perez, R. (2002).
+\textit{A new airmass independent formulation for the Linke turbidity coefficient}.
+Solar Energy, 73(3), 151--157. doi:10.1016/S0038-092X(02)00045-2.
+
+\bibitem{pvlib}
+Holmgren, W. F., Hansen, C. W., \& Mikofski, M. A. (2018).
+\textit{pvlib python: A Python package for modeling solar energy systems}.
+Journal of Open Source Software, 3(29), 884. doi:10.21105/joss.00884.
+
+\bibitem{scikit-learn}
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A., Cournapeau, D., Brucher, M., Perrot, M., \& Duchesnay, E. (2011).
+\textit{Scikit-learn: Machine learning in Python}.
+Journal of Machine Learning Research, 12, 2825--2830.
+
+\bibitem{long2002}
+Long, C. N., \& Dutton, E. G. (2002).
+\textit{BSRN Global Network recommended QC tests, Version 2.0}.
+BSRN Technical Report, 3 pp.
+
+\bibitem{erbs1982}
+Erbs, D. G., Klein, S. A., \& Duffie, J. A. (1982).
+\textit{Estimation of the diffuse radiation fraction for hourly, daily and monthly-average global radiation}.
+Solar Energy, 28(4), 293--302. doi:10.1016/0038-092X(82)90302-4.
+
+\bibitem{perez1990}
+Perez, R., Ineichen, P., Seals, R., Michalsky, J., \& Stewart, R. (1990).
+\textit{Modeling daylight availability and irradiance components from direct and global irradiance}.
+Solar Energy, 44(5), 271--289. doi:10.1016/0038-092X(90)90055-H.
+
+\bibitem{dobos2014}
+Dobos, A. P. (2014).
+\textit{PVWatts Version 5 Manual}.
+National Renewable Energy Laboratory, Technical Report NREL/TP-6A20-62641. doi:10.2172/1158421.
+
+\bibitem{faiman2008}
+Faiman, D. (2008).
+\textit{Assessing the outdoor operating temperature of photovoltaic modules}.
+Progress in Photovoltaics: Research and Applications, 16(4), 307--315. doi:10.1002/pip.813.
+
+\bibitem{king2004}
+King, D. L., Boyson, W. E., \& Kratochvil, J. A. (2004).
+\textit{Photovoltaic Array Performance Model}.
+Sandia National Laboratories, Report SAND2004-3535.
+
+\bibitem{schmit2017}
+Schmit, T. J., Griffith, P., Gunshor, M. M., Daniels, J. M., Goodman, S. J., \& Lebair, W. J. (2017).
+\textit{A closer look at the ABI on the GOES-R series}.
+Bulletin of the American Meteorological Society, 98(4), 681--698. doi:10.1175/BAMS-D-15-00230.1.
+
+\bibitem{hersbach2020}
+Hersbach, H., Bell, B., Berrisford, P., Hirahara, S., Horányi, A., Muñoz-Sabater, J., Nicolas, J., Peubey, C., Radu, R., Schepers, D., Simmons, A., Soci, C., Abdalla, S., Abellan, X., Balsamo, G., Bechtold, P., Biavati, G., Bidlot, J., Bonavita, M., ... Thépaut, J.-N. (2020).
+\textit{The ERA5 global reanalysis}.
+Quarterly Journal of the Royal Meteorological Society, 146(730), 1999--2049. doi:10.1002/qj.3803.
+
+\end{thebibliography}
+
+\end{document}
+
