@@ -45,7 +45,6 @@ def main():
     out_paths = [
         Path("reports/figures/figura_qc_trimestral_efecto.png"),
         Path("reportes/figures/figura_qc_trimestral_efecto.png"),
-        Path("/home/chula/.gemini/antigravity/brain/6c9b2b2f-9350-410d-8873-e5c094c49766/figura_qc_trimestral_efecto.png")
     ]
     
     for p in out_paths:

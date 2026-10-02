@@ -1,5 +1,5 @@
 import geopandas as gpd
-#!/usr/import/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -46,8 +46,8 @@ plt.rcParams.update({
 # Paths
 CALIBRATED_FILE = Path("data/processed/stations/davis_calibrated_hourly_final.parquet")
 META_FILE = Path("data/raw/aws/resumen_estaciones_sol_todas.csv")
-PROJECT_FIG_DIR = Path("reports/figures")
-ARTIFACT_DIR = Path("/home/chula/.gemini/antigravity/brain/6c9b2b2f-9350-410d-8873-e5c094c49766")
+PROJECT_FIG_DIR = Path("reportes/figures")
+ARTIFACT_DIR = Path("reportes/figures")
 OUTPUT_GPKG = Path("data/processed/stations/davis_solar_clusters.gpkg")
 
 def main():
@@ -100,8 +100,8 @@ def main():
     
     print(f"   ✓ Estaciones listas para clustering: {len(df_merge)}")
     
-    # 4. Preparación de variables de clustering puramente físicas
-    features = ['altitude_m', 'mean_calibrated_ghi', 'mean_clearness_index']
+    # 4. Preparación de variables de clustering físicas y espaciales
+    features = ['altitude_m', 'mean_calibrated_ghi', 'mean_clearness_index', 'lat_num', 'lon_num']
     print(f"   Variables seleccionadas: {features}")
     
     X = df_merge[features].copy()

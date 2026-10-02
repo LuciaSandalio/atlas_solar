@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas Solar de Córdoba — Visor Cartográfico GeoTIFF (2 km)</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <!-- Fuentes modernas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-panel: #1e293b;
+      --bg-card: #334155;
+      --bg-hover: #475569;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-solar: #f59e0b;
+      --accent-solar-glow: rgba(245, 158, 11, 0.25);
+      --accent-blue: #38bdf8;
+      --accent-green: #10b981;
+      --border: #334155;
+      --border-light: #475569;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* BARRA SUPERIOR */
+    header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .solar-icon {
+      font-size: 24px;
+      line-height: 1;
+      filter: drop-shadow(0 0 8px var(--accent-solar));
+    }
+
+    .header-titles h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-titles p {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 10.5px;
+      font-weight: 600;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-solar);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-blue {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      background: var(--bg-panel);
+      color: var(--text-main);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--bg-card);
+      border-color: var(--accent-solar);
+      color: #fff;
+    }
+
+    .btn-primary {
+      background: var(--accent-solar);
+      color: #0f172a;
+      font-weight: 600;
+      border-color: var(--accent-solar);
+    }
+
+    .btn-primary:hover {
+      background: #d97706;
+      border-color: #d97706;
+      color: #0f172a;
+      box-shadow: 0 0 12px var(--accent-solar-glow);
+    }
+
+    /* LAYOUT PRINCIPAL */
+    .app-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 58px);
+      position: relative;
+    }
+
+    /* PANEL LATERAL */
+    aside {
+      width: 390px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 900;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    aside::-webkit-scrollbar {
+      width: 6px;
+    }
+    aside::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .sidebar-section {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* SELECTOR DE CAPA */
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    select {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 13px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      transition: border 0.15s ease;
+    }
+
+    select:focus {
+      border-color: var(--accent-solar);
+      box-shadow: 0 0 0 2px var(--accent-solar-glow);
+    }
+
+    optgroup {
+      font-weight: 700;
+      color: var(--accent-blue);
+      background: var(--bg-panel);
+    }
+
+    option {
+      font-weight: 400;
+      color: var(--text-main);
+      background: var(--bg-dark);
+      padding: 6px;
+    }
+
+    .layer-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-top: 8px;
+      background: rgba(15, 23, 42, 0.4);
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border-left: 2px solid var(--accent-solar);
+    }
+
+    /* CONTROLES DE VISUALIZACIÓN */
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 12.5px;
+    }
+
+    .control-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      margin-left: 12px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 5px;
+      border-radius: 5px;
+      background: var(--bg-card);
+      outline: none;
+      accent-color: var(--accent-solar);
+      cursor: pointer;
+    }
+
+    .val-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      min-width: 38px;
+      text-align: right;
+      color: var(--accent-blue);
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .checkbox-item input {
+      accent-color: var(--accent-solar);
+      cursor: pointer;
+    }
+
+    /* LEYENDA */
+    .legend-box {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+
+    .legend-bar {
+      height: 14px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .legend-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .legend-categorical {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .legend-cat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+    }
+
+    .legend-color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* INSPECTOR DE PÍXEL */
+    .inspector-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .inspector-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent-solar);
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .inspector-val span {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .inspector-meta {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .inspector-meta b {
+      color: var(--text-main);
+    }
+
+    /* ESTADÍSTICAS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat-item {
+      background: var(--bg-dark);
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 2px;
+    }
+
+    .regional-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      margin-top: 6px;
+    }
+
+    .regional-table th, .regional-table td {
+      padding: 5px 6px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .regional-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 9.5px;
+    }
+
+    .regional-table td:last-child {
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-blue);
+    }
+
+    /* HISTOGRAMA */
+    #histCanvas {
+      width: 100%;
+      height: 90px;
+      background: var(--bg-dark);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      margin-top: 6px;
+    }
+
+    /* CONTENEDOR MAPA */
+    #map {
+      flex: 1;
+      height: 100%;
+      background: #111827;
+      z-index: 1;
+    }
+
+    /* INFO FLOATING BADGE */
+    .map-floating-info {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      z-index: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .map-floating-info b {
+      color: #fff;
+    }
+
+    /* POPUP LEAFLET PERSONALIZADO */
+    .leaflet-popup-content-wrapper {
+      background: var(--bg-panel);
+      color: var(--text-main);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow);
+    }
+
+    .leaflet-popup-tip {
+      background: var(--bg-panel);
+    }
+
+    .custom-popup {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .custom-popup h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-solar);
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .app-container {
+        flex-direction: column;
+      }
+      aside {
+        width: 100%;
+        height: 350px;
+      }
+      #map {
+        height: calc(100vh - 408px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="solar-icon">☀️</div>
+      <div class="header-titles">
+        <h1>
+          Atlas Solar de Córdoba
+          <span class="badge">PROMEDIO 2020, 2021, 2023</span>
+          <span class="badge badge-blue">GRILLA 2 KM</span>
+        </h1>
+        <p>Convenio ATLAS II — FCEFyN / UNC & OHMC — Visor Oficial de Entregables Ráster (GeoTIFF / COG)</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn" id="btnRecenter" title="Centrar mapa en Córdoba">🎯 Centrar</button>
+      <a class="btn btn-primary" id="btnDownloadTif" href="#" target="_blank" download>
+        ⬇️ Descargar GeoTIFF
+      </a>
+    </div>
+  </header>
+
+  <!-- CONTAINER -->
+  <div class="app-container">
+    
+    <!-- SIDEBAR -->
+    <aside>
+      
+      <!-- SELECCIÓN DE CAPA -->
+      <div class="sidebar-section">
+        <div class="section-title">
+          <span>Capa Ráster Temática</span>
+          <span id="layerCounter" style="font-family: monospace; font-size: 10px;"></span>
+        </div>
+        <div class="select-group">
+          <select id="layerSelect">
+            <option value="" disabled selected>Cargando capas...</option>
+          </select>
+          <div class="layer-desc" id="layerDesc">
+            Seleccione una capa para visualizar el campo territorial.
+          </div>
+        </div>
+      </div>
+
+      <!-- LEYENDA -->
+      <div class="sidebar-section">
+        <div class="section-title">
+          <span>Escala Radiométrica & Leyenda</span>
+          <span id="legendUnit" style="font-family: monospace; font-size: 10px; color: var(--accent-solar);"></span>
+        </div>
+        <div class="legend-box" id="legendBox">
+          <div class="legend-bar" id="legendBar"></div>
+          <div class="legend-ticks" id="legendTicks">
+            <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+          </div>
+          <div class="legend-categorical" id="legendCat" style="display: none;"></div>
+        </div>
+      </div>
+
+      <!-- CONTROLES -->
+      <div class="sidebar-section">
+        <div class="section-title">Visualización y Capas Base</div>
+        
+        <div class="control-row">
+          <span>Opacidad Ráster</span>
+          <div class="slider-container">
+            <input type="range" id="opacitySlider" min="0" max="100" value="85">
+            <span class="val-badge" id="opacityVal">85%</span>
+          </div>
+        </div>
+
+        <div class="control-row" style="margin-top: 10px;">
+          <span>Mapa Base</span>
+          <select id="basemapSelect" style="width: 170px; padding: 4px 8px; font-size: 11.5px;">
+            <option value="carto-dark" selected>CartoDB Oscuro</option>
+            <option value="carto-light">CartoDB Claro</option>
+            <option value="osm">OpenStreetMap</option>
+            <option value="esri-sat">Esri Satélite</option>
+          </select>
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="chkBoundary" checked>
+            <span>Límite Provincial de Córdoba</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="chkDeptos" checked>
+            <span>Departamentos (26 divisiones)</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="chkCities" checked>
+            <span>Ciudades de Referencia</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- INSPECTOR DE PÍXEL -->
+      <div class="sidebar-section">
+        <div class="section-title">
+          <span>Inspector de Píxel (Celda 2 km)</span>
+          <span style="font-size: 9.5px; color: var(--accent-solar);">INTERACTIVO</span>
+        </div>
+        <div class="inspector-card">
+          <div class="inspector-val" id="inspValue">
+            -- <span id="inspUnit"></span>
+          </div>
+          <div class="inspector-meta">
+            <div>📍 Coordenadas: <b id="inspCoords">-31.4200°, -64.1800°</b></div>
+            <div>🏛️ Departamento: <b id="inspDepto">--</b></div>
+            <div>🌄 Región Solar: <b id="inspRegion">--</b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTADÍSTICAS PROVINCIALES -->
+      <div class="sidebar-section">
+        <div class="section-title">Estadísticas Provinciales (48,645 celdas)</div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">Media Provincial</div>
+            <div class="stat-number" id="statMean">--</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Desv. Estándar</div>
+            <div class="stat-number" id="statStd">--</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Mínimo Provincial</div>
+            <div class="stat-number" id="statMin">--</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Máximo Provincial</div>
+            <div class="stat-number" id="statMax">--</div>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 14px; margin-bottom: 4px;">Desglose por Región Solar (k=3)</div>
+        <table class="regional-table">
+          <thead>
+            <tr>
+              <th>Región</th>
+              <th>Celdas</th>
+              <th style="text-align: right;">Media ± σ</th>
+            </tr>
+          </thead>
+          <tbody id="regionalTableBody">
+            <tr><td colspan="3" style="color: var(--text-muted);">Sin datos</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- HISTOGRAMA -->
+      <div class="sidebar-section">
+        <div class="section-title">Distribución de Frecuencias (Histograma)</div>
+        <canvas id="histCanvas"></canvas>
+      </div>
+
+    </aside>
+
+    <!-- MAPA -->
+    <main id="map"></main>
+
+    <!-- FLOATING INFO -->
+    <div class="map-floating-info">
+      <div>Resolución: <b>2.0 km nativo</b></div>
+      <div>Proyección: <b>EPSG:4326</b></div>
+      <div id="mouseCoords">Lat: -31.4200 | Lon: -64.1800</div>
+    </div>
+
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Base de datos multidimensional de celdas a 2 km -->
+  <script src="data/cell_database.js"></script>
+
+  <script>
+    // ESTADO GLOBAL
+    let manifestData = null;
+    let currentLayerMeta = null;
+    let currentGridData = null;
+    let currentImageOverlay = null;
+    let map = null;
+    let baseLayers = {};
+    let currentBasemap = null;
+    let layerProvBoundary = null;
+    let layerDeptos = null;
+    let layerCities = null;
+
+    const CITIES = [
+      { name: "Córdoba Capital", lat: -31.4201, lon: -64.1888 },
+      { name: "Río Cuarto", lat: -33.1232, lon: -64.3493 },
+      { name: "Villa María", lat: -32.4075, lon: -63.2403 },
+      { name: "San Francisco", lat: -31.4279, lon: -62.0827 },
+      { name: "Cruz del Eje", lat: -30.7247, lon: -64.8037 },
+      { name: "Villa Dolores", lat: -31.9442, lon: -65.1956 },
+      { name: "Marcos Juárez", lat: -32.6974, lon: -62.1067 },
+      { name: "Laboulaye", lat: -34.1264, lon: -63.3912 },
+      { name: "Jesús María", lat: -30.9818, lon: -64.0942 },
+      { name: "Deán Funes", lat: -30.4286, lon: -64.3503 }
+    ];
+
+    // INICIALIZACIÓN
+    document.addEventListener("DOMContentLoaded", () => {
+      initMap();
+      loadManifest();
+      bindEvents();
+    });
+
+    function initMap() {
+      // Centro aproximado de Córdoba: [-32.0, -63.8]
+      map = L.map('map', {
+        center: [-32.1, -63.8],
+        zoom: 7,
+        minZoom: 6,
+        maxZoom: 12,
+        zoomControl: true
+      });
+
+      // Capas Base
+      baseLayers['carto-dark'] = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; CartoDB, &copy; OpenStreetMap contributors',
+        subdomains: 'abcd',
+        maxZoom: 19
+      });
+
+      baseLayers['carto-light'] = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; CartoDB, &copy; OpenStreetMap contributors',
+        subdomains: 'abcd',
+        maxZoom: 19
+      });
+
+      baseLayers['osm'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+      });
+
+      baseLayers['esri-sat'] = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri, Earthstar Geographics',
+        maxZoom: 18
+      });
+
+      currentBasemap = baseLayers['carto-dark'];
+      currentBasemap.addTo(map);
+
+      // Cargar límites
+      loadVectors();
+      loadCities();
+
+      // Mouse coords tracker
+      map.on('mousemove', (e) => {
+        document.getElementById('mouseCoords').innerText = `Lat: ${e.latlng.lat.toFixed(4)}° | Lon: ${e.latlng.lng.toFixed(4)}°`;
+        inspectPoint(e.latlng.lat, e.latlng.lng);
+      });
+
+      map.on('click', (e) => {
+        inspectPoint(e.latlng.lat, e.latlng.lng, true);
+      });
+    }
+
+    function loadVectors() {
+      // 1. Departamentos
+      fetch('data/cordoba_deptos.geojson')
+        .then(r => r.json())
+        .then(data => {
+          layerDeptos = L.geoJSON(data, {
+            style: {
+              color: '#64748b',
+              weight: 0.8,
+              opacity: 0.6,
+              fillOpacity: 0.05,
+              fillColor: '#ffffff'
+            },
+            onEachFeature: (feature, layer) => {
+              const depto = feature.properties.DEPARTAMTO || 'Departamento';
+              const cab = feature.properties.CABECERA || '';
+              layer.bindTooltip(`<b>${depto}</b><br><span style="font-size:10px; color:#94a3b8;">Cabecera: ${cab}</span>`, {
+                sticky: true,
+                className: 'custom-tooltip'
+              });
+            }
+          }).addTo(map);
+        })
+        .catch(err => console.warn('Error cargando deptos:', err));
+
+      // 2. Límite Provincial
+      fetch('data/cordoba_boundary.geojson')
+        .then(r => r.json())
+        .then(data => {
+          layerProvBoundary = L.geoJSON(data, {
+            style: {
+              color: '#f8fafc',
+              weight: 2.2,
+              opacity: 0.85,
+              fill: false
+            }
+          }).addTo(map);
+        })
+        .catch(err => console.warn('Error cargando límite provincial:', err));
+    }
+
+    function loadCities() {
+      layerCities = L.layerGroup();
+      const cityIcon = L.divIcon({
+        className: 'city-marker',
+        html: `<div style="background:#f59e0b; width:7px; height:7px; border-radius:50%; border:1.5px solid #fff; box-shadow:0 0 6px rgba(0,0,0,0.8);"></div>`,
+        iconSize: [8, 8],
+        iconAnchor: [4, 4]
+      });
+
+      CITIES.forEach(c => {
+        const marker = L.marker([c.lat, c.lon], { icon: cityIcon });
+        marker.bindTooltip(`<b>${c.name}</b>`, {
+          permanent: false,
+          direction: 'top',
+          offset: [0, -4]
+        });
+        layerCities.addLayer(marker);
+      });
+
+      layerCities.addTo(map);
+    }
+
+    // CARGA DE MANIFEST
+    function loadManifest() {
+      fetch('data/manifest.json')
+        .then(r => r.json())
+        .then(data => {
+          manifestData = data;
+          populateLayerSelect(data.layers);
+          document.getElementById('layerCounter').innerText = `${data.layers.length} capas disponibles`;
+          
+          // Seleccionar GHI anual preliminar por defecto
+          if (data.layers.length > 0) {
+            selectLayer(data.layers[0].id);
+          }
+        })
+        .catch(err => {
+          console.error("Error cargando manifest:", err);
+          document.getElementById('layerDesc').innerHTML = `<span style="color:#ef4444;">❌ Error cargando manifest.json: ${err.message}</span>`;
+        });
+    }
+
+    function populateLayerSelect(layers) {
+      const select = document.getElementById('layerSelect');
+      select.innerHTML = '';
+
+      // Agrupar por categoría
+      const categories = {};
+      layers.forEach(l => {
+        if (!categories[l.category]) categories[l.category] = [];
+        categories[l.category].push(l);
+      });
+
+      for (const [catName, catLayers] of Object.entries(categories)) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = catName;
+        catLayers.forEach(l => {
+          const opt = document.createElement('option');
+          opt.value = l.id;
+          opt.textContent = `${l.name} (${l.unit})`;
+          optgroup.appendChild(opt);
+        });
+        select.appendChild(optgroup);
+      }
+    }
+
+    // CAMBIO DE CAPA
+    function selectLayer(layerId) {
+      const layerMeta = manifestData.layers.find(l => l.id === layerId);
+      if (!layerMeta) return;
+
+      currentLayerMeta = layerMeta;
+      document.getElementById('layerSelect').value = layerId;
+      document.getElementById('layerDesc').innerText = layerMeta.desc;
+      document.getElementById('btnDownloadTif').href = layerMeta.tif_url;
+      document.getElementById('btnDownloadTif').download = layerMeta.tif_file;
+
+      // Actualizar leyenda
+      updateLegend(layerMeta);
+
+      // Actualizar estadísticas
+      updateStats(layerMeta);
+
+      // Dibujar histograma
+      drawHistogram(layerMeta.histogram, layerMeta.unit, layerMeta.legend.colors);
+
+      // Actualizar overlay en mapa
+      updateMapOverlay(layerMeta);
+
+      // Cargar matriz de datos de la capa para el inspector
+      loadGridData(layerMeta.grid_data_url);
+    }
+
+    function updateMapOverlay(layerMeta) {
+      const opacity = parseInt(document.getElementById('opacitySlider').value) / 100.0;
+      
+      if (currentImageOverlay) {
+        map.removeLayer(currentImageOverlay);
+      }
+
+      currentImageOverlay = L.imageOverlay(layerMeta.png_overlay, manifestData.bounds, {
+        opacity: opacity,
+        interactive: false,
+        crossOrigin: true
+      }).addTo(map);
+
+      // Asegurar que los vectores estén por encima del ráster
+      if (layerDeptos) layerDeptos.bringToFront();
+      if (layerProvBoundary) layerProvBoundary.bringToFront();
+      if (layerCities) layerCities.bringToFront();
+    }
+
+    function loadGridData(url) {
+      currentGridData = null;
+      fetch(url)
+        .then(r => r.json())
+        .then(grid => {
+          currentGridData = grid;
+        })
+        .catch(err => console.warn("Error cargando grid data:", err));
+    }
+
+    // INSPECTOR DE PÍXEL CON TODAS LAS VARIABLES
+    function inspectPoint(lat, lon, isClick = false) {
+      document.getElementById('inspCoords').innerText = `${lat.toFixed(4)}°, ${lon.toFixed(4)}°`;
+      
+      const d_lat = 0.0180;
+      const d_lon = 0.0180;
+      const north = -29.294733;
+      const west = -65.97825;
+
+      const row = Math.round((north - lat) / d_lat);
+      const col = Math.round((lon - west) / d_lon);
+      const key = `${row}_${col}`;
+
+      // 1. Consulta en la base multivariada de 48,645 celdas
+      if (window.ATLAS_CELL_DB && window.ATLAS_CELL_DB[key]) {
+        const [ghi, dni, dhi, psh, poa_fix, poa_trk, yf_fix, yf_trk, cf_fix, cf_trk, gain_trk, reg, dep] = window.ATLAS_CELL_DB[key];
+        const regNames = ["Sierras Altas (R0)", "Sierras Bajas / Transición (R1)", "Llanura Pampeana (R2)"];
+
+        document.getElementById('inspDepto').innerText = dep;
+        document.getElementById('inspRegion').innerText = regNames[reg] || reg;
+
+        // Valor de la capa activa en el inspector lateral
+        if (currentGridData && row >= 0 && row < currentGridData.length && col >= 0 && col < currentGridData[0].length) {
+          const val = currentGridData[row][col];
+          if (val !== null && val > -9000) {
+            if (currentLayerMeta && currentLayerMeta.is_categorical) {
+              document.getElementById('inspValue').innerHTML = `${regNames[val] || val}`;
+            } else if (currentLayerMeta) {
+              document.getElementById('inspValue').innerHTML = `${val.toFixed(1)} <span>${currentLayerMeta.unit}</span>`;
+            }
+          }
+        }
+
+        // 2. Popup interactivo completo al hacer clic
+        if (isClick) {
+          const popupHtml = `
+            <div class="custom-popup" style="min-width: 250px; font-size: 11.5px; line-height: 1.45;">
+              <h4 style="font-size: 13px; color: #f59e0b; margin-bottom: 4px; border-bottom: 1px solid #334155; padding-bottom: 4px;">
+                ☀️ Celda Territorial 2 km
+              </h4>
+              <div style="font-family: monospace; color: #94a3b8; font-size: 10.5px; margin-bottom: 6px;">
+                Lat: ${lat.toFixed(4)}° &nbsp; Lon: ${lon.toFixed(4)}°<br>
+                <b>${dep}</b> &nbsp;|&nbsp; <span style="color:#38bdf8;">${regNames[reg]}</span>
+              </div>
+              
+              <div style="border-top: 1px solid #334155; padding-top: 6px; margin-top: 6px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                  <span style="color:#94a3b8;">GHI Anual:</span>
+                  <b style="color:#f59e0b; font-family: monospace;">${ghi.toLocaleString()} kWh/m²·a</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                  <span style="color:#94a3b8;">DNI Anual:</span>
+                  <b style="color:#f59e0b; font-family: monospace;">${dni.toLocaleString()} kWh/m²·a</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                  <span style="color:#94a3b8;">DHI Difusa:</span>
+                  <b style="color:#fff; font-family: monospace;">${dhi.toLocaleString()} kWh/m²·a</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                  <span style="color:#94a3b8;">HSP Diarias:</span>
+                  <b style="color:#fff; font-family: monospace;">${psh.toFixed(2)} HSP/día</b>
+                </div>
+              </div>
+
+              <div style="border-top: 1px solid #334155; padding-top: 6px; margin-top: 6px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                  <span style="color:#94a3b8;">POA Fijo (30°N):</span>
+                  <b style="color:#fff; font-family: monospace;">${poa_fix.toLocaleString()} kWh/m²·a</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                  <span style="color:#94a3b8;">POA Tracker 1-eje:</span>
+                  <b style="color:#fff; font-family: monospace;">${poa_trk.toLocaleString()} kWh/m²·a</b>
+                </div>
+              </div>
+
+              <div style="border-top: 1px solid #334155; padding-top: 6px; margin-top: 6px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                  <span style="color:#94a3b8;">Yf Fijo:</span>
+                  <b style="color:#10b981; font-family: monospace;">${yf_fix.toLocaleString()} kWh/kWp·a</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                  <span style="color:#94a3b8;">Yf Tracker:</span>
+                  <b style="color:#10b981; font-family: monospace;">${yf_trk.toLocaleString()} kWh/kWp·a</b>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                  <span style="color:#94a3b8;">Ganancia Tracker:</span>
+                  <b style="color:#f59e0b; font-family: monospace;">+${gain_trk.toFixed(2)} %</b>
+                </div>
+                <div style="font-size: 10px; color: #94a3b8; margin-top: 4px; text-align: center;">
+                  CF Fijo: ${cf_fix.toFixed(1)}% &nbsp;|&nbsp; CF Trk: ${cf_trk.toFixed(1)}%
+                </div>
+              </div>
+            </div>
+          `;
+
+          L.popup()
+            .setLatLng([lat, lon])
+            .setContent(popupHtml)
+            .openOn(map);
+        }
+        return;
+      }
+
+      document.getElementById('inspValue').innerHTML = `Fuera de provincia <span></span>`;
+      document.getElementById('inspDepto').innerText = `--`;
+      document.getElementById('inspRegion').innerText = `--`;
+    }
+
+    // LEYENDA
+    function updateLegend(layerMeta) {
+      document.getElementById('legendUnit').innerText = layerMeta.unit;
+      const bar = document.getElementById('legendBar');
+      const ticks = document.getElementById('legendTicks');
+      const catBox = document.getElementById('legendCat');
+
+      if (layerMeta.legend.is_categorical) {
+        bar.style.display = 'none';
+        ticks.style.display = 'none';
+        catBox.style.display = 'flex';
+        catBox.innerHTML = '';
+
+        layerMeta.legend.labels.forEach((lbl, idx) => {
+          const col = layerMeta.legend.colors[idx];
+          const div = document.createElement('div');
+          div.className = 'legend-cat-item';
+          div.innerHTML = `<div class="legend-color-dot" style="background:${col};"></div><span>${lbl}</span>`;
+          catBox.appendChild(div);
+        });
+      } else {
+        bar.style.display = 'block';
+        ticks.style.display = 'flex';
+        catBox.style.display = 'none';
+
+        const gradStops = layerMeta.legend.colors.join(', ');
+        bar.style.background = `linear-gradient(to right, ${gradStops})`;
+
+        ticks.innerHTML = layerMeta.legend.labels.map(l => `<span>${l}</span>`).join('');
+      }
+    }
+
+    // ESTADÍSTICAS
+    function updateStats(layerMeta) {
+      const stats = layerMeta.stats;
+      document.getElementById('statMean').innerText = `${stats.mean.toFixed(1)} ${layerMeta.unit}`;
+      document.getElementById('statStd').innerText = `± ${stats.std.toFixed(1)}`;
+      document.getElementById('statMin').innerText = `${stats.min.toFixed(1)}`;
+      document.getElementById('statMax').innerText = `${stats.max.toFixed(1)}`;
+
+      // Regionales
+      const tbody = document.getElementById('regionalTableBody');
+      tbody.innerHTML = '';
+      if (stats.regional && Object.keys(stats.regional).length > 0) {
+        for (const [rKey, rInfo] of Object.entries(stats.regional)) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><b>${rKey}</b>: ${rInfo.name}</td>
+            <td>${rInfo.cells.toLocaleString()}</td>
+            <td>${rInfo.mean.toFixed(1)} ± ${rInfo.std.toFixed(1)}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      } else {
+        tbody.innerHTML = `<tr><td colspan="3" style="color:var(--text-muted);">Sin desglose regional</td></tr>`;
+      }
+    }
+
+    // HISTOGRAMA CANVAS
+    function drawHistogram(hist, unit, colors) {
+      const canvas = document.getElementById('histCanvas');
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width = canvas.offsetWidth;
+      const height = canvas.height = canvas.offsetHeight;
+
+      ctx.clearRect(0, 0, width, height);
+
+      if (!hist || !hist.counts || hist.counts.length === 0) return;
+
+      const counts = hist.counts;
+      const maxCount = Math.max(...counts);
+      const nBars = counts.length;
+      const barWidth = (width - (nBars - 1) * 2) / nBars;
+
+      counts.forEach((c, i) => {
+        const barHeight = (c / maxCount) * (height - 18);
+        const x = i * (barWidth + 2);
+        const y = height - barHeight - 4;
+
+        // Color según posición
+        const colorIdx = Math.min(Math.floor((i / nBars) * colors.length), colors.length - 1);
+        ctx.fillStyle = colors[colorIdx] || '#f59e0b';
+        ctx.fillRect(x, y, barWidth, barHeight);
+      });
+
+      // Borde y ejes
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, height - 3);
+      ctx.lineTo(width, height - 3);
+      ctx.stroke();
+    }
+
+    // EVENTOS
+    function bindEvents() {
+      // Cambio de capa
+      document.getElementById('layerSelect').addEventListener('change', (e) => {
+        selectLayer(e.target.value);
+      });
+
+      // Opacidad
+      const opSlider = document.getElementById('opacitySlider');
+      opSlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        document.getElementById('opacityVal').innerText = `${val}%`;
+        if (currentImageOverlay) {
+          currentImageOverlay.setOpacity(parseInt(val) / 100.0);
+        }
+      });
+
+      // Mapa Base
+      document.getElementById('basemapSelect').addEventListener('change', (e) => {
+        const sel = e.target.value;
+        if (currentBasemap) map.removeLayer(currentBasemap);
+        currentBasemap = baseLayers[sel];
+        currentBasemap.addTo(map);
+        if (currentImageOverlay) currentImageOverlay.bringToFront();
+        if (layerDeptos) layerDeptos.bringToFront();
+        if (layerProvBoundary) layerProvBoundary.bringToFront();
+        if (layerCities) layerCities.bringToFront();
+      });
+
+      // Capas vectoriales checkboxes
+      document.getElementById('chkBoundary').addEventListener('change', (e) => {
+        if (e.target.checked) map.addLayer(layerProvBoundary);
+        else map.removeLayer(layerProvBoundary);
+      });
+
+      document.getElementById('chkDeptos').addEventListener('change', (e) => {
+        if (e.target.checked) map.addLayer(layerDeptos);
+        else map.removeLayer(layerDeptos);
+      });
+
+      document.getElementById('chkCities').addEventListener('change', (e) => {
+        if (e.target.checked) map.addLayer(layerCities);
+        else map.removeLayer(layerCities);
+      });
+
+      // Botón Recentrar
+      document.getElementById('btnRecenter').addEventListener('click', () => {
+        map.setView([-32.1, -63.8], 7);
+      });
+    }
+  </script>
+</body>
+</html>

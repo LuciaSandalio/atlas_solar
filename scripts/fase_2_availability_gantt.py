@@ -1,4 +1,4 @@
-#!/usr/import/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -30,7 +30,7 @@ plt.rcParams.update({
 PARQUET_FILE = Path("data/processed/stations/davis_calibrated_hourly_final.parquet")
 MATRIX_FILE = Path("data/processed/stations/davis_yearly_availability.csv")
 PROJECT_FIG_DIR = Path("reports/figures")
-ARTIFACT_DIR = Path("/home/chula/.gemini/antigravity/brain/6c9b2b2f-9350-410d-8873-e5c094c49766")
+ARTIFACT_DIR = Path("reportes/figures")
 
 def main():
     print("📊 Generando gráfico de línea de tiempo de disponibilidad de datos...")

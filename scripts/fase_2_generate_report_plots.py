@@ -1,5 +1,5 @@
 import geopandas as gpd
-#!/usr/import/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -40,7 +40,7 @@ PILAR_FILE = Path("data/processed/stations/pilar_cmp21_hourly.parquet")
 META_FILE = Path("data/raw/aws/resumen_estaciones_sol_todas.csv")
 
 PROJECT_FIG_DIR = Path("reports/figures")
-ARTIFACT_DIR = Path("/home/chula/.gemini/antigravity/brain/6c9b2b2f-9350-410d-8873-e5c094c49766")
+ARTIFACT_DIR = Path("reportes/figures")
 
 def poly_fit_k(cosZ, c0, c1, c2):
     return c0 + c1 * cosZ + c2 * (cosZ ** 2)

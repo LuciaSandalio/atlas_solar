@@ -1,0 +1,3015 @@
+{
+  "version": "1.0",
+  "title": "Atlas Solar de la Provincia de C\u00f3rdoba \u2014 Visor GeoTIFF 2 km",
+  "convenio": "ATLAS II \u2014 FCEFyN / UNC & OHMC",
+  "resolution": "2 km (0.018\u00b0)",
+  "bounds": [
+    [
+      -35.198733000000004,
+      -65.97825
+    ],
+    [
+      -29.294733,
+      -61.58625000000001
+    ]
+  ],
+  "grid_shape": [
+    328,
+    244
+  ],
+  "total_provincial_cells": 48645,
+  "layers": [
+    {
+      "id": "ghi_anual_preliminar",
+      "name": "Irradiancia Global Horizontal (GHI)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "kWh/m\u00b2\u00b7a\u00f1o",
+      "desc": "Energ\u00eda solar total incidente sobre una superficie horizontal en el a\u00f1o promedio.",
+      "format": ".1f",
+      "tif_file": "cordoba_ghi_anual_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_anual_2km_preliminar.tif",
+      "png_overlay": "overlays/ghi_anual_preliminar.png",
+      "grid_data_url": "data/grids/ghi_anual_preliminar.json",
+      "stats": {
+        "min": 1071.4000244140625,
+        "max": 2052.60009765625,
+        "mean": 1882.0765380859375,
+        "std": 78.84209442138672,
+        "p10": 1817.5999755859375,
+        "p50": 1878.199951171875,
+        "p90": 1987.4000244140625,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 1891.67578125,
+            "std": 69.24552154541016
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 1917.262451171875,
+            "std": 106.29505157470703
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1855.4591064453125,
+            "std": 37.39189529418945
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "1389.2",
+          "1553.0",
+          "1716.7",
+          "1880.5",
+          "2044.3"
+        ],
+        "norm_min": 1389.21802734375,
+        "norm_max": 2044.27802734375,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          3,
+          10,
+          28,
+          43,
+          49,
+          78,
+          65,
+          50,
+          41,
+          32,
+          40,
+          57,
+          76,
+          172,
+          1226,
+          15203,
+          17573,
+          6055,
+          4771,
+          3073
+        ],
+        "bins": [
+          1071.4000244140625,
+          1120.4600830078125,
+          1169.52001953125,
+          1218.580078125,
+          1267.6400146484375,
+          1316.7000732421875,
+          1365.760009765625,
+          1414.820068359375,
+          1463.8800048828125,
+          1512.9400634765625,
+          1562.0,
+          1611.06005859375,
+          1660.1201171875,
+          1709.1800537109375,
+          1758.2401123046875,
+          1807.300048828125,
+          1856.360107421875,
+          1905.4200439453125,
+          1954.4801025390625,
+          2003.5400390625,
+          2052.60009765625
+        ]
+      }
+    },
+    {
+      "id": "dni_anual_preliminar",
+      "name": "Irradiancia Directa Normal (DNI)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "kWh/m\u00b2\u00b7a\u00f1o",
+      "desc": "Energ\u00eda directa perpendicular al haz solar; esencial para seguidores solares y concentraci\u00f3n.",
+      "format": ".1f",
+      "tif_file": "cordoba_dni_anual_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_dni_anual_2km_preliminar.tif",
+      "png_overlay": "overlays/dni_anual_preliminar.png",
+      "grid_data_url": "data/grids/dni_anual_preliminar.json",
+      "stats": {
+        "min": 385.3999938964844,
+        "max": 2288.39990234375,
+        "mean": 1984.04345703125,
+        "std": 156.818115234375,
+        "p10": 1896.699951171875,
+        "p50": 1972.800048828125,
+        "p90": 2145.300048828125,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 2031.8521728515625,
+            "std": 119.4162826538086
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 2033.7593994140625,
+            "std": 228.46340942382812
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1938.8975830078125,
+            "std": 58.128746032714844
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#0d0887",
+          "#7e03a8",
+          "#cc4778",
+          "#f89540",
+          "#f0f921"
+        ],
+        "labels": [
+          "853.8",
+          "1208.5",
+          "1563.2",
+          "1918.0",
+          "2272.7"
+        ],
+        "norm_min": 853.775986328125,
+        "norm_max": 2272.6779833984374,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          9,
+          39,
+          55,
+          61,
+          87,
+          71,
+          60,
+          47,
+          53,
+          43,
+          55,
+          79,
+          158,
+          131,
+          202,
+          6383,
+          23389,
+          9682,
+          5098,
+          2943
+        ],
+        "bins": [
+          385.3999938964844,
+          480.54998779296875,
+          575.7000122070312,
+          670.8499755859375,
+          766.0,
+          861.1499633789062,
+          956.2999877929688,
+          1051.449951171875,
+          1146.5999755859375,
+          1241.75,
+          1336.89990234375,
+          1432.0499267578125,
+          1527.199951171875,
+          1622.3499755859375,
+          1717.4998779296875,
+          1812.64990234375,
+          1907.7999267578125,
+          2002.949951171875,
+          2098.099853515625,
+          2193.25,
+          2288.39990234375
+        ]
+      }
+    },
+    {
+      "id": "dhi_anual_preliminar",
+      "name": "Irradiancia Difusa Horizontal (DHI)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "kWh/m\u00b2\u00b7a\u00f1o",
+      "desc": "Fracci\u00f3n difusa de la radiaci\u00f3n dispersada por la atm\u00f3sfera y las nubes.",
+      "format": ".1f",
+      "tif_file": "cordoba_dhi_anual_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_dhi_anual_2km_preliminar.tif",
+      "png_overlay": "overlays/dhi_anual_preliminar.png",
+      "grid_data_url": "data/grids/dhi_anual_preliminar.json",
+      "stats": {
+        "min": 557.2000122070312,
+        "max": 907.0,
+        "mean": 601.0707397460938,
+        "std": 31.639135360717773,
+        "p10": 578.6399902343751,
+        "p50": 598.0,
+        "p90": 617.2999877929688,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 590.8593139648438,
+            "std": 27.25293731689453
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 604.5426025390625,
+            "std": 45.39165496826172
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 600.9000244140625,
+            "std": 16.991960525512695
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#00224e",
+          "#434e6c",
+          "#7d7c78",
+          "#bcae6c",
+          "#fee838"
+        ],
+        "labels": [
+          "565.7",
+          "633.2",
+          "700.7",
+          "768.2",
+          "835.7"
+        ],
+        "norm_min": 565.7000122070312,
+        "norm_max": 835.6780041503905,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          2487,
+          16463,
+          19029,
+          8326,
+          1026,
+          192,
+          104,
+          107,
+          143,
+          89,
+          39,
+          25,
+          71,
+          110,
+          92,
+          111,
+          95,
+          91,
+          40,
+          5
+        ],
+        "bins": [
+          557.2000122070312,
+          574.6900024414062,
+          592.1799926757812,
+          609.6699829101562,
+          627.1600341796875,
+          644.6500244140625,
+          662.1400146484375,
+          679.6300048828125,
+          697.1199951171875,
+          714.6099853515625,
+          732.0999755859375,
+          749.5900268554688,
+          767.0800170898438,
+          784.5700073242188,
+          802.0599975585938,
+          819.5499877929688,
+          837.0399780273438,
+          854.530029296875,
+          872.02001953125,
+          889.510009765625,
+          907.0
+        ]
+      }
+    },
+    {
+      "id": "psh_ghi_preliminar",
+      "name": "Horas Solar Pico Diarias (PSH)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "kWh/m\u00b2/d\u00eda",
+      "desc": "Equivalente diario en horas a 1000 W/m\u00b2 (HSP = GHI / 365.25).",
+      "format": ".2f",
+      "tif_file": "cordoba_psh_ghi_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_psh_ghi_2km_preliminar.tif",
+      "png_overlay": "overlays/psh_ghi_preliminar.png",
+      "grid_data_url": "data/grids/psh_ghi_preliminar.json",
+      "stats": {
+        "min": 2.933333396911621,
+        "max": 5.619712829589844,
+        "mean": 5.152844429016113,
+        "std": 0.21585789322853088,
+        "p10": 4.976317405700684,
+        "p50": 5.142230987548828,
+        "p90": 5.44120454788208,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 5.179125785827637,
+            "std": 0.1895839124917984
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 5.249178409576416,
+            "std": 0.291020005941391
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 5.079970359802246,
+            "std": 0.10237343609333038
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "3.80",
+          "4.25",
+          "4.70",
+          "5.15",
+          "5.60"
+        ],
+        "norm_min": 3.8034717416763306,
+        "norm_max": 5.596928358078003,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          3,
+          10,
+          28,
+          43,
+          49,
+          78,
+          65,
+          50,
+          41,
+          32,
+          40,
+          57,
+          76,
+          172,
+          1244,
+          15185,
+          17573,
+          6055,
+          4771,
+          3073
+        ],
+        "bins": [
+          2.933333396911621,
+          3.067652463912964,
+          3.2019712924957275,
+          3.3362903594970703,
+          3.470609188079834,
+          3.6049282550811768,
+          3.7392473220825195,
+          3.873566150665283,
+          4.007884979248047,
+          4.142204284667969,
+          4.276523113250732,
+          4.410841941833496,
+          4.545161247253418,
+          4.679480075836182,
+          4.813798904418945,
+          4.948118209838867,
+          5.082437038421631,
+          5.2167558670043945,
+          5.351074695587158,
+          5.48539400100708,
+          5.619712829589844
+        ]
+      }
+    },
+    {
+      "id": "poa_fijo_preliminar",
+      "name": "Irradiancia en Plano Fijo 30\u00b0 Norte (POA)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "kWh/m\u00b2\u00b7a\u00f1o",
+      "desc": "Radiaci\u00f3n total incidente sobre m\u00f3dulos fotovoltaicos fijos orientados al Norte ecuatorial.",
+      "format": ".1f",
+      "tif_file": "cordoba_poa_fijo_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_poa_fijo_2km_preliminar.tif",
+      "png_overlay": "overlays/poa_fijo_preliminar.png",
+      "grid_data_url": "data/grids/poa_fijo_preliminar.json",
+      "stats": {
+        "min": 1035.5,
+        "max": 2209.0,
+        "mean": 2013.4818115234375,
+        "std": 90.55423736572266,
+        "p10": 1951.5999755859375,
+        "p50": 2007.800048828125,
+        "p90": 2120.5,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 2033.898681640625,
+            "std": 72.24469757080078
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 2048.3505859375,
+            "std": 128.23825073242188
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1984.7047119140625,
+            "std": 36.70625305175781
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#51127c",
+          "#b73779",
+          "#fc8961",
+          "#fcfdbf"
+        ],
+        "labels": [
+          "1382.7",
+          "1586.5",
+          "1790.3",
+          "1994.1",
+          "2197.9"
+        ],
+        "norm_min": 1382.7319702148438,
+        "norm_max": 2197.8779345703124,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          4,
+          14,
+          38,
+          52,
+          58,
+          89,
+          54,
+          46,
+          25,
+          35,
+          47,
+          50,
+          90,
+          188,
+          221,
+          11863,
+          20732,
+          7655,
+          4601,
+          2783
+        ],
+        "bins": [
+          1035.5,
+          1094.175048828125,
+          1152.8499755859375,
+          1211.5250244140625,
+          1270.199951171875,
+          1328.875,
+          1387.550048828125,
+          1446.2249755859375,
+          1504.9000244140625,
+          1563.574951171875,
+          1622.25,
+          1680.925048828125,
+          1739.5999755859375,
+          1798.2750244140625,
+          1856.949951171875,
+          1915.625,
+          1974.300048828125,
+          2032.9749755859375,
+          2091.64990234375,
+          2150.324951171875,
+          2209.0
+        ]
+      }
+    },
+    {
+      "id": "poa_tracker_preliminar",
+      "name": "Irradiancia con Seguidor 1-Eje (POA)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "kWh/m\u00b2\u00b7a\u00f1o",
+      "desc": "Radiaci\u00f3n total incidente sobre paneles con seguimiento solar 1-eje N-S y backtracking.",
+      "format": ".1f",
+      "tif_file": "cordoba_poa_tracker_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_poa_tracker_2km_preliminar.tif",
+      "png_overlay": "overlays/poa_tracker_preliminar.png",
+      "grid_data_url": "data/grids/poa_tracker_preliminar.json",
+      "stats": {
+        "min": 1186.5999755859375,
+        "max": 2701.5,
+        "mean": 2452.38037109375,
+        "std": 119.09349822998047,
+        "p10": 2363.5,
+        "p50": 2447.39990234375,
+        "p90": 2602.5,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 2475.880859375,
+            "std": 98.52214050292969
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 2502.239501953125,
+            "std": 165.41835021972656
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 2412.4853515625,
+            "std": 50.447776794433594
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#51127c",
+          "#b73779",
+          "#fc8961",
+          "#fcfdbf"
+        ],
+        "labels": [
+          "1653.1",
+          "1911.7",
+          "2170.2",
+          "2428.8",
+          "2687.4"
+        ],
+        "norm_min": 1653.0719946289062,
+        "norm_max": 2687.39990234375,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          4,
+          13,
+          36,
+          42,
+          59,
+          78,
+          60,
+          48,
+          32,
+          37,
+          42,
+          58,
+          67,
+          178,
+          237,
+          12549,
+          18912,
+          8169,
+          4819,
+          3205
+        ],
+        "bins": [
+          1186.5999755859375,
+          1262.344970703125,
+          1338.0899658203125,
+          1413.8349609375,
+          1489.5799560546875,
+          1565.324951171875,
+          1641.0699462890625,
+          1716.81494140625,
+          1792.5599365234375,
+          1868.304931640625,
+          1944.050048828125,
+          2019.7950439453125,
+          2095.5400390625,
+          2171.284912109375,
+          2247.030029296875,
+          2322.77490234375,
+          2398.52001953125,
+          2474.264892578125,
+          2550.010009765625,
+          2625.7548828125,
+          2701.5
+        ]
+      }
+    },
+    {
+      "id": "yf_fijo_preliminar",
+      "name": "Rendimiento Espec\u00edfico Fijo (Yf)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "kWh/kWp\u00b7a\u00f1o",
+      "desc": "Generaci\u00f3n el\u00e9ctrica anual neta en corriente alterna inyectada a la red por cada kWp instalado.",
+      "format": ".1f",
+      "tif_file": "cordoba_rendimiento_fv_fijo_yf_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_rendimiento_fv_fijo_yf_2km_preliminar.tif",
+      "png_overlay": "overlays/yf_fijo_preliminar.png",
+      "grid_data_url": "data/grids/yf_fijo_preliminar.json",
+      "stats": {
+        "min": 865.0999755859375,
+        "max": 1795.0999755859375,
+        "mean": 1642.22412109375,
+        "std": 71.54290008544922,
+        "p10": 1591.800048828125,
+        "p50": 1638.5999755859375,
+        "p90": 1727.5999755859375,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 1657.8099365234375,
+            "std": 57.036293029785156
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 1670.45556640625,
+            "std": 100.89098358154297
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1619.13232421875,
+            "std": 29.37198257446289
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#440154",
+          "#3b528b",
+          "#21918c",
+          "#5ec962",
+          "#fde725"
+        ],
+        "labels": [
+          "1141.7",
+          "1302.9",
+          "1464.1",
+          "1625.2",
+          "1786.4"
+        ],
+        "norm_min": 1141.72197265625,
+        "norm_max": 1786.4000244140625,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          4,
+          13,
+          38,
+          49,
+          59,
+          85,
+          60,
+          43,
+          23,
+          29,
+          46,
+          48,
+          72,
+          185,
+          201,
+          11431,
+          20460,
+          8185,
+          4749,
+          2865
+        ],
+        "bins": [
+          865.0999755859375,
+          911.5999755859375,
+          958.0999755859375,
+          1004.5999755859375,
+          1051.0999755859375,
+          1097.5999755859375,
+          1144.0999755859375,
+          1190.5999755859375,
+          1237.0999755859375,
+          1283.5999755859375,
+          1330.0999755859375,
+          1376.5999755859375,
+          1423.0999755859375,
+          1469.5999755859375,
+          1516.0999755859375,
+          1562.5999755859375,
+          1609.0999755859375,
+          1655.5999755859375,
+          1702.0999755859375,
+          1748.5999755859375,
+          1795.0999755859375
+        ]
+      }
+    },
+    {
+      "id": "yf_tracker_preliminar",
+      "name": "Rendimiento Espec\u00edfico Seguidor (Yf)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "kWh/kWp\u00b7a\u00f1o",
+      "desc": "Generaci\u00f3n neta AC en plantas equipadas con seguidores horizontales en 1 eje.",
+      "format": ".1f",
+      "tif_file": "cordoba_rendimiento_fv_tracker_yf_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_rendimiento_fv_tracker_yf_2km_preliminar.tif",
+      "png_overlay": "overlays/yf_tracker_preliminar.png",
+      "grid_data_url": "data/grids/yf_tracker_preliminar.json",
+      "stats": {
+        "min": 984.2000122070312,
+        "max": 2166.699951171875,
+        "mean": 1975.34765625,
+        "std": 92.70063018798828,
+        "p10": 1904.5,
+        "p50": 1972.4000244140625,
+        "p90": 2092.60009765625,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 1993.3370361328125,
+            "std": 76.44898986816406
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 2014.8798828125,
+            "std": 128.22802734375
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1943.8565673828125,
+            "std": 39.758445739746094
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#440154",
+          "#3b528b",
+          "#21918c",
+          "#5ec962",
+          "#fde725"
+        ],
+        "labels": [
+          "1351.3",
+          "1552.8",
+          "1754.4",
+          "1955.9",
+          "2157.5"
+        ],
+        "norm_min": 1351.2979809570313,
+        "norm_max": 2157.4779785156247,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          4,
+          12,
+          35,
+          40,
+          57,
+          79,
+          61,
+          48,
+          32,
+          30,
+          39,
+          53,
+          61,
+          158,
+          225,
+          11971,
+          18409,
+          9153,
+          4759,
+          3419
+        ],
+        "bins": [
+          984.2000122070312,
+          1043.324951171875,
+          1102.449951171875,
+          1161.574951171875,
+          1220.699951171875,
+          1279.824951171875,
+          1338.949951171875,
+          1398.074951171875,
+          1457.199951171875,
+          1516.324951171875,
+          1575.449951171875,
+          1634.574951171875,
+          1693.699951171875,
+          1752.824951171875,
+          1811.949951171875,
+          1871.074951171875,
+          1930.199951171875,
+          1989.324951171875,
+          2048.449951171875,
+          2107.574951171875,
+          2166.699951171875
+        ]
+      }
+    },
+    {
+      "id": "cf_fijo_preliminar",
+      "name": "Factor de Capacidad Fijo (CF)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "%",
+      "desc": "Factor de planta porcentual anual para tecnolog\u00eda fotovoltaica fija (CF = Yf / 8760).",
+      "format": ".1f",
+      "tif_file": "cordoba_cf_fijo_pct_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_cf_fijo_pct_2km_preliminar.tif",
+      "png_overlay": "overlays/cf_fijo_preliminar.png",
+      "grid_data_url": "data/grids/cf_fijo_preliminar.json",
+      "stats": {
+        "min": 9.880000114440918,
+        "max": 20.489999771118164,
+        "mean": 18.746849060058594,
+        "std": 0.8167228698730469,
+        "p10": 18.170000076293945,
+        "p50": 18.709999084472656,
+        "p90": 19.719999313354492,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 18.924800872802734,
+            "std": 0.6511352062225342
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 19.06915283203125,
+            "std": 1.1517391204833984
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 18.48322296142578,
+            "std": 0.33531591296195984
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#440154",
+          "#3b528b",
+          "#21918c",
+          "#5ec962",
+          "#fde725"
+        ],
+        "labels": [
+          "13.0",
+          "14.9",
+          "16.7",
+          "18.5",
+          "20.4"
+        ],
+        "norm_min": 13.029999732971191,
+        "norm_max": 20.389999389648438,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          4,
+          13,
+          39,
+          50,
+          59,
+          83,
+          60,
+          43,
+          24,
+          29,
+          45,
+          48,
+          72,
+          182,
+          201,
+          11342,
+          20427,
+          8270,
+          4756,
+          2898
+        ],
+        "bins": [
+          9.880000114440918,
+          10.410500526428223,
+          10.940999984741211,
+          11.471500396728516,
+          12.001999855041504,
+          12.532500267028809,
+          13.062999725341797,
+          13.593500137329102,
+          14.12399959564209,
+          14.654500007629395,
+          15.184999465942383,
+          15.715499877929688,
+          16.246000289916992,
+          16.776500701904297,
+          17.30699920654297,
+          17.837499618530273,
+          18.368000030517578,
+          18.898500442504883,
+          19.428998947143555,
+          19.95949935913086,
+          20.489999771118164
+        ]
+      }
+    },
+    {
+      "id": "cf_tracker_preliminar",
+      "name": "Factor de Capacidad Seguidor (CF)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "%",
+      "desc": "Factor de planta anual para parques fotovoltaicos con seguimiento en 1 eje.",
+      "format": ".1f",
+      "tif_file": "cordoba_cf_tracker_pct_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_cf_tracker_pct_2km_preliminar.tif",
+      "png_overlay": "overlays/cf_tracker_preliminar.png",
+      "grid_data_url": "data/grids/cf_tracker_preliminar.json",
+      "stats": {
+        "min": 11.239999771118164,
+        "max": 24.729999542236328,
+        "mean": 22.549644470214844,
+        "std": 1.0582550764083862,
+        "p10": 21.739999771118164,
+        "p50": 22.520000457763672,
+        "p90": 23.889999389648438,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 22.754989624023438,
+            "std": 0.8727290034294128
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 23.000951766967773,
+            "std": 1.4638280868530273
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 22.19014549255371,
+            "std": 0.45387181639671326
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#440154",
+          "#3b528b",
+          "#21918c",
+          "#5ec962",
+          "#fde725"
+        ],
+        "labels": [
+          "15.4",
+          "17.7",
+          "20.0",
+          "22.3",
+          "24.6"
+        ],
+        "norm_min": 15.42220012664795,
+        "norm_max": 24.6299991607666,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          4,
+          12,
+          35,
+          40,
+          57,
+          79,
+          61,
+          48,
+          32,
+          30,
+          39,
+          54,
+          57,
+          161,
+          224,
+          11995,
+          18251,
+          9293,
+          4726,
+          3447
+        ],
+        "bins": [
+          11.239999771118164,
+          11.914499282836914,
+          12.58899974822998,
+          13.263500213623047,
+          13.937999725341797,
+          14.612499237060547,
+          15.286999702453613,
+          15.96150016784668,
+          16.63599967956543,
+          17.31049919128418,
+          17.985000610351562,
+          18.659500122070312,
+          19.333999633789062,
+          20.008499145507812,
+          20.682998657226562,
+          21.357500076293945,
+          22.031999588012695,
+          22.706499099731445,
+          23.381000518798828,
+          24.055500030517578,
+          24.729999542236328
+        ]
+      }
+    },
+    {
+      "id": "ganancia_tracker_preliminar",
+      "name": "Ganancia por Seguimiento Solar",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "%",
+      "desc": "Incremento relativo porcentual en generaci\u00f3n el\u00e9ctrica al incorporar seguimiento 1-eje.",
+      "format": ".2f",
+      "tif_file": "cordoba_ganancia_seguimiento_pct_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ganancia_seguimiento_pct_2km_preliminar.tif",
+      "png_overlay": "overlays/ganancia_tracker_preliminar.png",
+      "grid_data_url": "data/grids/ganancia_tracker_preliminar.json",
+      "stats": {
+        "min": 13.770000457763672,
+        "max": 23.110000610351562,
+        "mean": 20.265790939331055,
+        "std": 0.6056687831878662,
+        "p10": 19.559999465942383,
+        "p50": 20.329999923706055,
+        "p90": 20.979999542236328,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 20.2237548828125,
+            "std": 0.6756622195243835
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 20.587961196899414,
+            "std": 0.7031415700912476
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 20.050670623779297,
+            "std": 0.37322697043418884
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#a50026",
+          "#f98e52",
+          "#feffbe",
+          "#84ca66",
+          "#006837"
+        ],
+        "labels": [
+          "18.20",
+          "19.11",
+          "20.01",
+          "20.91",
+          "21.82"
+        ],
+        "norm_min": 18.200000762939453,
+        "norm_max": 21.81999969482422,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          2,
+          2,
+          10,
+          13,
+          22,
+          29,
+          34,
+          49,
+          56,
+          50,
+          63,
+          1484,
+          10695,
+          11103,
+          16802,
+          5920,
+          1933,
+          269,
+          100,
+          9
+        ],
+        "bins": [
+          13.770000457763672,
+          14.237000465393066,
+          14.704000473022461,
+          15.171000480651855,
+          15.63800048828125,
+          16.104999542236328,
+          16.57200050354004,
+          17.03900146484375,
+          17.506000518798828,
+          17.972999572753906,
+          18.440000534057617,
+          18.907001495361328,
+          19.374000549316406,
+          19.840999603271484,
+          20.308000564575195,
+          20.775001525878906,
+          21.242000579833984,
+          21.708999633789062,
+          22.176000595092773,
+          22.643001556396484,
+          23.110000610351562
+        ]
+      }
+    },
+    {
+      "id": "regiones_k3",
+      "name": "Regiones Solares Homog\u00e9neas (k=3)",
+      "category": "Multianual Consolidado (2020, 2021, 2023)",
+      "unit": "cluster",
+      "desc": "Provincias radiativas: 0=Sierras Altas (11.5%), 1=Sierras Bajas/Transici\u00f3n (36.3%), 2=Llanura Pampeana (52.2%).",
+      "format": ".0f",
+      "tif_file": "cordoba_regiones_solares_k3_2km_preliminar.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_regiones_solares_k3_2km_preliminar.tif",
+      "png_overlay": "overlays/regiones_k3.png",
+      "grid_data_url": "data/grids/regiones_k3.json",
+      "stats": {
+        "min": 0.0,
+        "max": 2.0,
+        "mean": 1.4069483280181885,
+        "std": 0.6862982511520386,
+        "p10": 0.0,
+        "p50": 2.0,
+        "p90": 2.0,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 0.0,
+            "std": 0.0
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 1.0,
+            "std": 0.0
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 2.0,
+            "std": 0.0
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#E67E22",
+          "#27AE60",
+          "#2980B9"
+        ],
+        "labels": [
+          "Regi\u00f3n 0 (Sierras Altas)",
+          "Regi\u00f3n 1 (Sierras Bajas)",
+          "Regi\u00f3n 2 (Llanura Pampeana)"
+        ],
+        "norm_min": 0,
+        "norm_max": 2,
+        "is_categorical": true
+      },
+      "histogram": {
+        "counts": [
+          5586,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          17677,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          25382
+        ],
+        "bins": [
+          0.0,
+          0.10000000149011612,
+          0.20000000298023224,
+          0.30000001192092896,
+          0.4000000059604645,
+          0.5,
+          0.6000000238418579,
+          0.699999988079071,
+          0.800000011920929,
+          0.8999999761581421,
+          1.0,
+          1.100000023841858,
+          1.2000000476837158,
+          1.2999999523162842,
+          1.399999976158142,
+          1.5,
+          1.600000023841858,
+          1.7000000476837158,
+          1.7999999523162842,
+          1.899999976158142,
+          2.0
+        ]
+      }
+    },
+    {
+      "id": "ghi_2020",
+      "name": "GHI Anual 2020",
+      "category": "A\u00f1os Individuales",
+      "unit": "kWh/m\u00b2\u00b7a\u00f1o",
+      "desc": "Irradiancia global horizontal anual en 2020 (a\u00f1o bisiesto La Ni\u00f1a d\u00e9bil).",
+      "format": ".1f",
+      "tif_file": "cordoba_ghi_anual_2020_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_anual_2020_2km.tif",
+      "png_overlay": "overlays/ghi_2020.png",
+      "grid_data_url": "data/grids/ghi_2020.json",
+      "stats": {
+        "min": 1027.1446533203125,
+        "max": 2102.51904296875,
+        "mean": 1921.3228759765625,
+        "std": 85.45750427246094,
+        "p10": 1864.3456787109376,
+        "p50": 1911.4208984375,
+        "p90": 2028.1433349609374,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 1935.3555908203125,
+            "std": 71.198486328125
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 1955.090576171875,
+            "std": 121.50582122802734
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1894.7177734375,
+            "std": 32.45602035522461
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "1326.1",
+          "1517.0",
+          "1708.0",
+          "1899.0",
+          "2090.0"
+        ],
+        "norm_min": 1326.0513623046875,
+        "norm_max": 2090.016044921875,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          13,
+          19,
+          36,
+          51,
+          76,
+          77,
+          45,
+          49,
+          37,
+          38,
+          48,
+          46,
+          71,
+          106,
+          267,
+          13373,
+          19202,
+          7727,
+          4550,
+          2814
+        ],
+        "bins": [
+          1027.1446533203125,
+          1080.913330078125,
+          1134.68212890625,
+          1188.4508056640625,
+          1242.219482421875,
+          1295.98828125,
+          1349.7569580078125,
+          1403.525634765625,
+          1457.29443359375,
+          1511.0631103515625,
+          1564.831787109375,
+          1618.6005859375,
+          1672.3692626953125,
+          1726.1380615234375,
+          1779.90673828125,
+          1833.6754150390625,
+          1887.4442138671875,
+          1941.212890625,
+          1994.9815673828125,
+          2048.750244140625,
+          2102.51904296875
+        ]
+      }
+    },
+    {
+      "id": "ghi_2021",
+      "name": "GHI Anual 2021",
+      "category": "A\u00f1os Individuales",
+      "unit": "kWh/m\u00b2\u00b7a\u00f1o",
+      "desc": "Irradiancia global horizontal anual en 2021 (La Ni\u00f1a moderada).",
+      "format": ".1f",
+      "tif_file": "cordoba_ghi_anual_2021_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_anual_2021_2km.tif",
+      "png_overlay": "overlays/ghi_2021.png",
+      "grid_data_url": "data/grids/ghi_2021.json",
+      "stats": {
+        "min": 1024.39599609375,
+        "max": 2035.87646484375,
+        "mean": 1887.2979736328125,
+        "std": 78.5106201171875,
+        "p10": 1822.1863037109374,
+        "p50": 1887.609130859375,
+        "p90": 1978.038134765625,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 1885.99609375,
+            "std": 66.05945587158203
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 1909.754150390625,
+            "std": 106.97940063476562
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1871.9449462890625,
+            "std": 47.907466888427734
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "1361.5",
+          "1527.7",
+          "1694.0",
+          "1860.2",
+          "2026.4"
+        ],
+        "norm_min": 1361.476376953125,
+        "norm_max": 2026.440244140625,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          2,
+          15,
+          19,
+          47,
+          55,
+          66,
+          63,
+          49,
+          43,
+          27,
+          44,
+          35,
+          86,
+          126,
+          301,
+          7321,
+          14818,
+          15223,
+          6164,
+          4141
+        ],
+        "bins": [
+          1024.39599609375,
+          1074.969970703125,
+          1125.5440673828125,
+          1176.1180419921875,
+          1226.692138671875,
+          1277.26611328125,
+          1327.840087890625,
+          1378.4141845703125,
+          1428.9881591796875,
+          1479.562255859375,
+          1530.13623046875,
+          1580.710205078125,
+          1631.2843017578125,
+          1681.8582763671875,
+          1732.432373046875,
+          1783.00634765625,
+          1833.580322265625,
+          1884.1544189453125,
+          1934.7283935546875,
+          1985.302490234375,
+          2035.87646484375
+        ]
+      }
+    },
+    {
+      "id": "ghi_2023",
+      "name": "GHI Anual 2023",
+      "category": "A\u00f1os Individuales",
+      "unit": "kWh/m\u00b2\u00b7a\u00f1o",
+      "desc": "Irradiancia global horizontal anual en 2023 (transici\u00f3n a El Ni\u00f1o).",
+      "format": ".1f",
+      "tif_file": "cordoba_ghi_anual_2023_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_anual_2023_2km.tif",
+      "png_overlay": "overlays/ghi_2023.png",
+      "grid_data_url": "data/grids/ghi_2023.json",
+      "stats": {
+        "min": 1137.053955078125,
+        "max": 2030.3720703125,
+        "mean": 1837.6085205078125,
+        "std": 79.57630920410156,
+        "p10": 1762.4570556640624,
+        "p50": 1829.6029052734375,
+        "p90": 1963.176416015625,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 1853.6741943359375,
+            "std": 74.55034637451172
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 1886.943603515625,
+            "std": 94.32527923583984
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1799.7138671875,
+            "std": 39.09835433959961
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "1485.8",
+          "1619.1",
+          "1752.4",
+          "1885.7",
+          "2019.0"
+        ],
+        "norm_min": 1485.7825170898439,
+        "norm_max": 2018.9683471679687,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          2,
+          2,
+          9,
+          36,
+          40,
+          43,
+          58,
+          67,
+          52,
+          40,
+          44,
+          82,
+          328,
+          4037,
+          13693,
+          12774,
+          8415,
+          2230,
+          4205,
+          2488
+        ],
+        "bins": [
+          1137.053955078125,
+          1181.7198486328125,
+          1226.3857421875,
+          1271.0516357421875,
+          1315.717529296875,
+          1360.383544921875,
+          1405.0494384765625,
+          1449.71533203125,
+          1494.3812255859375,
+          1539.047119140625,
+          1583.7130126953125,
+          1628.37890625,
+          1673.0447998046875,
+          1717.710693359375,
+          1762.3765869140625,
+          1807.04248046875,
+          1851.70849609375,
+          1896.3743896484375,
+          1941.040283203125,
+          1985.7061767578125,
+          2030.3720703125
+        ]
+      }
+    },
+    {
+      "id": "yf_tracker_2020",
+      "name": "Rendimiento Seguidor Yf 2020",
+      "category": "A\u00f1os Individuales",
+      "unit": "kWh/kWp\u00b7a\u00f1o",
+      "desc": "Rendimiento espec\u00edfico anual con seguidor solar en 2020.",
+      "format": ".1f",
+      "tif_file": "cordoba_rendimiento_tracker_yf_2020_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_rendimiento_tracker_yf_2020_2km.tif",
+      "png_overlay": "overlays/yf_tracker_2020.png",
+      "grid_data_url": "data/grids/yf_tracker_2020.json",
+      "stats": {
+        "min": 937.2661743164062,
+        "max": 2230.0029296875,
+        "mean": 2021.0489501953125,
+        "std": 101.91362762451172,
+        "p10": 1955.909521484375,
+        "p50": 2010.7393798828125,
+        "p90": 2145.14638671875,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 2044.4769287109375,
+            "std": 80.73973083496094
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 2059.969970703125,
+            "std": 146.9639892578125
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1988.7869873046875,
+            "std": 34.820098876953125
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#440154",
+          "#3b528b",
+          "#21918c",
+          "#5ec962",
+          "#fde725"
+        ],
+        "labels": [
+          "1282.0",
+          "1515.3",
+          "1748.6",
+          "1981.9",
+          "2215.1"
+        ],
+        "norm_min": 1282.0228857421876,
+        "norm_max": 2215.1415283203123,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          14,
+          20,
+          41,
+          56,
+          87,
+          66,
+          47,
+          42,
+          35,
+          36,
+          44,
+          42,
+          67,
+          100,
+          191,
+          9524,
+          21649,
+          8813,
+          4719,
+          3052
+        ],
+        "bins": [
+          937.2661743164062,
+          1001.9030151367188,
+          1066.539794921875,
+          1131.1766357421875,
+          1195.8134765625,
+          1260.4503173828125,
+          1325.087158203125,
+          1389.7239990234375,
+          1454.36083984375,
+          1518.9976806640625,
+          1583.634521484375,
+          1648.2713623046875,
+          1712.908203125,
+          1777.5450439453125,
+          1842.181884765625,
+          1906.8187255859375,
+          1971.45556640625,
+          2036.0924072265625,
+          2100.729248046875,
+          2165.3662109375,
+          2230.0029296875
+        ]
+      }
+    },
+    {
+      "id": "yf_tracker_2021",
+      "name": "Rendimiento Seguidor Yf 2021",
+      "category": "A\u00f1os Individuales",
+      "unit": "kWh/kWp\u00b7a\u00f1o",
+      "desc": "Rendimiento espec\u00edfico anual con seguidor solar en 2021.",
+      "format": ".1f",
+      "tif_file": "cordoba_rendimiento_tracker_yf_2021_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_rendimiento_tracker_yf_2021_2km.tif",
+      "png_overlay": "overlays/yf_tracker_2021.png",
+      "grid_data_url": "data/grids/yf_tracker_2021.json",
+      "stats": {
+        "min": 933.6139526367188,
+        "max": 2159.66357421875,
+        "mean": 1985.223388671875,
+        "std": 91.89139556884766,
+        "p10": 1916.273486328125,
+        "p50": 1988.2625732421875,
+        "p90": 2082.085546875,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 1991.3795166015625,
+            "std": 72.00457000732422
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 2010.31396484375,
+            "std": 129.74441528320312
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1966.394287109375,
+            "std": 50.171695709228516
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#440154",
+          "#3b528b",
+          "#21918c",
+          "#5ec962",
+          "#fde725"
+        ],
+        "labels": [
+          "1321.2",
+          "1526.3",
+          "1731.5",
+          "1936.7",
+          "2141.8"
+        ],
+        "norm_min": 1321.192861328125,
+        "norm_max": 2141.8174658203125,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          3,
+          18,
+          26,
+          52,
+          56,
+          70,
+          61,
+          45,
+          35,
+          26,
+          41,
+          36,
+          67,
+          138,
+          196,
+          3496,
+          16334,
+          17815,
+          6899,
+          3231
+        ],
+        "bins": [
+          933.6139526367188,
+          994.9164428710938,
+          1056.2188720703125,
+          1117.5213623046875,
+          1178.8238525390625,
+          1240.1263427734375,
+          1301.4288330078125,
+          1362.7313232421875,
+          1424.0338134765625,
+          1485.3363037109375,
+          1546.6387939453125,
+          1607.9412841796875,
+          1669.2437744140625,
+          1730.5462646484375,
+          1791.8486328125,
+          1853.151123046875,
+          1914.45361328125,
+          1975.756103515625,
+          2037.05859375,
+          2098.361083984375,
+          2159.66357421875
+        ]
+      }
+    },
+    {
+      "id": "yf_tracker_2023",
+      "name": "Rendimiento Seguidor Yf 2023",
+      "category": "A\u00f1os Individuales",
+      "unit": "kWh/kWp\u00b7a\u00f1o",
+      "desc": "Rendimiento espec\u00edfico anual con seguidor solar en 2023.",
+      "format": ".1f",
+      "tif_file": "cordoba_rendimiento_tracker_yf_2023_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_rendimiento_tracker_yf_2023_2km.tif",
+      "png_overlay": "overlays/yf_tracker_2023.png",
+      "grid_data_url": "data/grids/yf_tracker_2023.json",
+      "stats": {
+        "min": 1060.174072265625,
+        "max": 2134.588623046875,
+        "mean": 1919.769775390625,
+        "std": 91.65612030029297,
+        "p10": 1837.0618896484375,
+        "p50": 1913.1505126953125,
+        "p90": 2057.443408203125,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 1944.1534423828125,
+            "std": 81.4229507446289
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 1974.3551025390625,
+            "std": 111.88319396972656
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 1876.3883056640625,
+            "std": 42.8428840637207
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#440154",
+          "#3b528b",
+          "#21918c",
+          "#5ec962",
+          "#fde725"
+        ],
+        "labels": [
+          "1463.0",
+          "1627.2",
+          "1791.4",
+          "1955.6",
+          "2119.9"
+        ],
+        "norm_min": 1462.9697241210938,
+        "norm_max": 2119.865517578125,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          2,
+          3,
+          14,
+          40,
+          37,
+          55,
+          55,
+          68,
+          47,
+          34,
+          35,
+          72,
+          246,
+          706,
+          11960,
+          12595,
+          12862,
+          2700,
+          4335,
+          2779
+        ],
+        "bins": [
+          1060.174072265625,
+          1113.894775390625,
+          1167.615478515625,
+          1221.3363037109375,
+          1275.0570068359375,
+          1328.7777099609375,
+          1382.4984130859375,
+          1436.2191162109375,
+          1489.93994140625,
+          1543.66064453125,
+          1597.38134765625,
+          1651.10205078125,
+          1704.82275390625,
+          1758.5435791015625,
+          1812.2642822265625,
+          1865.9849853515625,
+          1919.7056884765625,
+          1973.4263916015625,
+          2027.147216796875,
+          2080.867919921875,
+          2134.588623046875
+        ]
+      }
+    },
+    {
+      "id": "ghi_dia_01_ene",
+      "name": "Enero \u2014 GHI Medio Diario",
+      "category": "Ciclo Estacional Mensual (kWh/m\u00b2/d\u00eda)",
+      "unit": "kWh/m\u00b2/d\u00eda",
+      "desc": "Media diaria mensual de irradiancia global horizontal en Enero (Verano pleno).",
+      "format": ".2f",
+      "tif_file": "cordoba_ghi_diario_01_enero_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_diario_01_enero_2km.tif",
+      "png_overlay": "overlays/ghi_dia_01_ene.png",
+      "grid_data_url": "data/grids/ghi_dia_01_ene.json",
+      "stats": {
+        "min": 4.373199462890625,
+        "max": 7.829174518585205,
+        "mean": 7.321351528167725,
+        "std": 0.29229602217674255,
+        "p10": 7.035696220397949,
+        "p50": 7.367965221405029,
+        "p90": 7.615941333770752,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 7.3891425132751465,
+            "std": 0.3133434057235718
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 7.235069751739502,
+            "std": 0.3805757761001587
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 7.366522789001465,
+            "std": 0.18173085153102875
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "2.00",
+          "3.50",
+          "5.00",
+          "6.50",
+          "8.00"
+        ],
+        "norm_min": 2.0,
+        "norm_max": 8.0,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          1,
+          4,
+          18,
+          38,
+          39,
+          48,
+          58,
+          63,
+          65,
+          61,
+          128,
+          179,
+          237,
+          550,
+          1585,
+          6347,
+          12426,
+          11279,
+          12495,
+          3024
+        ],
+        "bins": [
+          4.373199462890625,
+          4.5459980964660645,
+          4.718796730041504,
+          4.891595840454102,
+          5.064394474029541,
+          5.2371931076049805,
+          5.409992218017578,
+          5.582790851593018,
+          5.755589485168457,
+          5.9283881187438965,
+          6.101186752319336,
+          6.273985862731934,
+          6.446784496307373,
+          6.6195831298828125,
+          6.79238224029541,
+          6.96518087387085,
+          7.137979507446289,
+          7.3107781410217285,
+          7.483576774597168,
+          7.656375885009766,
+          7.829174518585205
+        ]
+      }
+    },
+    {
+      "id": "ghi_dia_02_feb",
+      "name": "Febrero \u2014 GHI Medio Diario",
+      "category": "Ciclo Estacional Mensual (kWh/m\u00b2/d\u00eda)",
+      "unit": "kWh/m\u00b2/d\u00eda",
+      "desc": "Media diaria mensual de irradiancia global horizontal en Febrero.",
+      "format": ".2f",
+      "tif_file": "cordoba_ghi_diario_02_febrero_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_diario_02_febrero_2km.tif",
+      "png_overlay": "overlays/ghi_dia_02_feb.png",
+      "grid_data_url": "data/grids/ghi_dia_02_feb.json",
+      "stats": {
+        "min": 4.406224250793457,
+        "max": 7.244264602661133,
+        "mean": 6.677918910980225,
+        "std": 0.22106866538524628,
+        "p10": 6.473378372192383,
+        "p50": 6.70501184463501,
+        "p90": 6.869621467590332,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 6.667619705200195,
+            "std": 0.2590411305427551
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 6.651849269866943,
+            "std": 0.307277649641037
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 6.6983418464660645,
+            "std": 0.11056160926818848
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "2.00",
+          "3.50",
+          "5.00",
+          "6.50",
+          "8.00"
+        ],
+        "norm_min": 2.0,
+        "norm_max": 8.0,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          3,
+          8,
+          15,
+          19,
+          25,
+          32,
+          74,
+          68,
+          89,
+          171,
+          266,
+          400,
+          647,
+          1278,
+          4074,
+          13375,
+          19578,
+          5811,
+          1980,
+          732
+        ],
+        "bins": [
+          4.406224250793457,
+          4.548126220703125,
+          4.690028190612793,
+          4.831930160522461,
+          4.973832130432129,
+          5.115734100341797,
+          5.257636547088623,
+          5.399538516998291,
+          5.541440486907959,
+          5.683342456817627,
+          5.825244426727295,
+          5.967146396636963,
+          6.109048366546631,
+          6.250950336456299,
+          6.392852306365967,
+          6.534754753112793,
+          6.676656723022461,
+          6.818558692932129,
+          6.960460662841797,
+          7.102362632751465,
+          7.244264602661133
+        ]
+      }
+    },
+    {
+      "id": "ghi_dia_03_mar",
+      "name": "Marzo \u2014 GHI Medio Diario",
+      "category": "Ciclo Estacional Mensual (kWh/m\u00b2/d\u00eda)",
+      "unit": "kWh/m\u00b2/d\u00eda",
+      "desc": "Media diaria mensual de irradiancia global horizontal en Marzo (Equinoccio).",
+      "format": ".2f",
+      "tif_file": "cordoba_ghi_diario_03_marzo_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_diario_03_marzo_2km.tif",
+      "png_overlay": "overlays/ghi_dia_03_mar.png",
+      "grid_data_url": "data/grids/ghi_dia_03_mar.json",
+      "stats": {
+        "min": 3.7342844009399414,
+        "max": 5.746271133422852,
+        "mean": 5.210884094238281,
+        "std": 0.19146987795829773,
+        "p10": 5.006064128875733,
+        "p50": 5.186096668243408,
+        "p90": 5.515618801116943,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 5.201466083526611,
+            "std": 0.20874997973442078
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 5.3254594802856445,
+            "std": 0.19713152945041656
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 5.133162498474121,
+            "std": 0.1356603056192398
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "2.00",
+          "3.50",
+          "5.00",
+          "6.50",
+          "8.00"
+        ],
+        "norm_min": 2.0,
+        "norm_max": 8.0,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          1,
+          0,
+          3,
+          3,
+          8,
+          14,
+          34,
+          39,
+          85,
+          130,
+          196,
+          773,
+          7964,
+          10424,
+          10417,
+          8440,
+          3118,
+          3169,
+          3128,
+          699
+        ],
+        "bins": [
+          3.7342844009399414,
+          3.834883689880371,
+          3.935482978820801,
+          4.0360822677612305,
+          4.13668155670166,
+          4.23728084564209,
+          4.337880611419678,
+          4.438479900360107,
+          4.539079189300537,
+          4.639678478240967,
+          4.7402777671813965,
+          4.840877056121826,
+          4.941476345062256,
+          5.0420756340026855,
+          5.142674922943115,
+          5.243274688720703,
+          5.343873977661133,
+          5.4444732666015625,
+          5.545072555541992,
+          5.645671844482422,
+          5.746271133422852
+        ]
+      }
+    },
+    {
+      "id": "ghi_dia_04_abr",
+      "name": "Abril \u2014 GHI Medio Diario",
+      "category": "Ciclo Estacional Mensual (kWh/m\u00b2/d\u00eda)",
+      "unit": "kWh/m\u00b2/d\u00eda",
+      "desc": "Media diaria mensual de irradiancia global horizontal en Abril.",
+      "format": ".2f",
+      "tif_file": "cordoba_ghi_diario_04_abril_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_diario_04_abril_2km.tif",
+      "png_overlay": "overlays/ghi_dia_04_abr.png",
+      "grid_data_url": "data/grids/ghi_dia_04_abr.json",
+      "stats": {
+        "min": 2.4820802211761475,
+        "max": 4.5977325439453125,
+        "mean": 4.186295986175537,
+        "std": 0.13033823668956757,
+        "p10": 4.050623607635498,
+        "p50": 4.1807451248168945,
+        "p90": 4.3656134605407715,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 4.202278137207031,
+            "std": 0.1255328506231308
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 4.248860836029053,
+            "std": 0.15374742448329926
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 4.139206886291504,
+            "std": 0.08733552694320679
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "2.00",
+          "3.50",
+          "5.00",
+          "6.50",
+          "8.00"
+        ],
+        "norm_min": 2.0,
+        "norm_max": 8.0,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          2,
+          2,
+          1,
+          4,
+          3,
+          7,
+          17,
+          36,
+          29,
+          32,
+          55,
+          61,
+          113,
+          195,
+          6868,
+          15835,
+          15922,
+          5531,
+          3276,
+          656
+        ],
+        "bins": [
+          2.4820802211761475,
+          2.587862730026245,
+          2.693645477294922,
+          2.7994279861450195,
+          2.9052107334136963,
+          3.010993242263794,
+          3.1167759895324707,
+          3.2225584983825684,
+          3.328341245651245,
+          3.4341237545013428,
+          3.5399065017700195,
+          3.645689010620117,
+          3.751471519470215,
+          3.8572542667388916,
+          3.9630367755889893,
+          4.068819522857666,
+          4.174602031707764,
+          4.280384540557861,
+          4.386167526245117,
+          4.491950035095215,
+          4.5977325439453125
+        ]
+      }
+    },
+    {
+      "id": "ghi_dia_05_may",
+      "name": "Mayo \u2014 GHI Medio Diario",
+      "category": "Ciclo Estacional Mensual (kWh/m\u00b2/d\u00eda)",
+      "unit": "kWh/m\u00b2/d\u00eda",
+      "desc": "Media diaria mensual de irradiancia global horizontal en Mayo.",
+      "format": ".2f",
+      "tif_file": "cordoba_ghi_diario_05_mayo_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_diario_05_mayo_2km.tif",
+      "png_overlay": "overlays/ghi_dia_05_may.png",
+      "grid_data_url": "data/grids/ghi_dia_05_may.json",
+      "stats": {
+        "min": 1.6581379175186157,
+        "max": 3.7914669513702393,
+        "mean": 3.345440149307251,
+        "std": 0.2089127153158188,
+        "p10": 3.0901819229125977,
+        "p50": 3.3708391189575195,
+        "p90": 3.571865177154541,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 3.336693048477173,
+            "std": 0.2273985743522644
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 3.468932867050171,
+            "std": 0.2212364226579666
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 3.2613604068756104,
+            "std": 0.14307482540607452
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "2.00",
+          "3.50",
+          "5.00",
+          "6.50",
+          "8.00"
+        ],
+        "norm_min": 2.0,
+        "norm_max": 8.0,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          4,
+          14,
+          46,
+          73,
+          71,
+          47,
+          26,
+          27,
+          23,
+          42,
+          42,
+          82,
+          1937,
+          7104,
+          6576,
+          7759,
+          7538,
+          13120,
+          4040,
+          74
+        ],
+        "bins": [
+          1.6581379175186157,
+          1.7648043632507324,
+          1.8714708089828491,
+          1.9781372547149658,
+          2.084803819656372,
+          2.191470146179199,
+          2.2981367111206055,
+          2.4048030376434326,
+          2.511469602584839,
+          2.618135929107666,
+          2.7248024940490723,
+          2.8314688205718994,
+          2.9381353855133057,
+          3.044801712036133,
+          3.151468276977539,
+          3.258134603500366,
+          3.3648011684417725,
+          3.4714674949645996,
+          3.578134059906006,
+          3.684800386428833,
+          3.7914669513702393
+        ]
+      }
+    },
+    {
+      "id": "ghi_dia_06_jun",
+      "name": "Junio \u2014 GHI Medio Diario",
+      "category": "Ciclo Estacional Mensual (kWh/m\u00b2/d\u00eda)",
+      "unit": "kWh/m\u00b2/d\u00eda",
+      "desc": "Media diaria mensual de irradiancia global horizontal en Junio (M\u00ednimo invernal).",
+      "format": ".2f",
+      "tif_file": "cordoba_ghi_diario_06_junio_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_diario_06_junio_2km.tif",
+      "png_overlay": "overlays/ghi_dia_06_jun.png",
+      "grid_data_url": "data/grids/ghi_dia_06_jun.json",
+      "stats": {
+        "min": 1.2617461681365967,
+        "max": 3.2896933555603027,
+        "mean": 2.6843483448028564,
+        "std": 0.26886534690856934,
+        "p10": 2.35549373626709,
+        "p50": 2.696082592010498,
+        "p90": 3.0259343147277833,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 2.723846673965454,
+            "std": 0.2978305518627167
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 2.879664421081543,
+            "std": 0.25281912088394165
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 2.5396299362182617,
+            "std": 0.16325227916240692
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "2.00",
+          "3.50",
+          "5.00",
+          "6.50",
+          "8.00"
+        ],
+        "norm_min": 2.0,
+        "norm_max": 8.0,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          89,
+          117,
+          55,
+          29,
+          20,
+          15,
+          24,
+          20,
+          50,
+          1410,
+          4337,
+          6603,
+          5225,
+          5407,
+          6214,
+          6109,
+          4276,
+          7343,
+          1169,
+          133
+        ],
+        "bins": [
+          1.2617461681365967,
+          1.3631435632705688,
+          1.4645408391952515,
+          1.5659382343292236,
+          1.6673356294631958,
+          1.768733024597168,
+          1.8701303005218506,
+          1.9715276956558228,
+          2.072925090789795,
+          2.1743223667144775,
+          2.27571964263916,
+          2.377117156982422,
+          2.4785144329071045,
+          2.579911947250366,
+          2.681309223175049,
+          2.7827064990997314,
+          2.884104013442993,
+          2.985501289367676,
+          3.0868985652923584,
+          3.18829607963562,
+          3.2896933555603027
+        ]
+      }
+    },
+    {
+      "id": "ghi_dia_07_jul",
+      "name": "Julio \u2014 GHI Medio Diario",
+      "category": "Ciclo Estacional Mensual (kWh/m\u00b2/d\u00eda)",
+      "unit": "kWh/m\u00b2/d\u00eda",
+      "desc": "Media diaria mensual de irradiancia global horizontal en Julio (Inicio de recuperaci\u00f3n).",
+      "format": ".2f",
+      "tif_file": "cordoba_ghi_diario_07_julio_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_ghi_diario_07_julio_2km.tif",
+      "png_overlay": "overlays/ghi_dia_07_jul.png",
+      "grid_data_url": "data/grids/ghi_dia_07_jul.json",
+      "stats": {
+        "min": 1.3529729843139648,
+        "max": 3.653456211090088,
+        "mean": 3.0710713863372803,
+        "std": 0.2895483374595642,
+        "p10": 2.7713862895965575,
+        "p50": 3.0365045070648193,
+        "p90": 3.470021963119507,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 3.1186842918395996,
+            "std": 0.2922925353050232
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 3.2583513259887695,
+            "std": 0.3235958218574524
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 2.930163860321045,
+            "std": 0.15545935928821564
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#000004",
+          "#57106e",
+          "#bc3754",
+          "#f98e09",
+          "#fcffa4"
+        ],
+        "labels": [
+          "2.00",
+          "3.50",
+          "5.00",
+          "6.50",
+          "8.00"
+        ],
+        "norm_min": 2.0,
+        "norm_max": 8.0,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          191,
+          69,
+          32,
+          21,
+          18,
+          39,
+          61,
+          70,
+          52,
+          60,
+          70,
+          1718,
+          8230,
+          7636,
+          9262,
+          5278,
+          4998,
+          3560,
+          5165,
+          2115
+        ],
+        "bins": [
+          1.3529729843139648,
+          1.4679971933364868,
+          1.5830212831497192,
+          1.6980454921722412,
+          1.8130695819854736,
+          1.9280937910079956,
+          2.0431180000305176,
+          2.15814208984375,
+          2.2731661796569824,
+          2.388190507888794,
+          2.5032145977020264,
+          2.618238687515259,
+          2.7332630157470703,
+          2.8482871055603027,
+          2.963311195373535,
+          3.0783352851867676,
+          3.193359613418579,
+          3.3083837032318115,
+          3.423407793045044,
+          3.5384321212768555,
+          3.653456211090088
+        ]
+      }
+    },
+    {
+      "id": "cv_interanual",
+      "name": "Variabilidad Interanual (CV %)",
+      "category": "Diagn\u00f3sticos de Estabilidad Territorial",
+      "unit": "%",
+      "desc": "Coeficiente de variaci\u00f3n interanual porcentual observado entre 2020, 2021 y 2023.",
+      "format": ".2f",
+      "tif_file": "cordoba_cv_interanual_pct_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_cv_interanual_pct_2km.tif",
+      "png_overlay": "overlays/cv_interanual.png",
+      "grid_data_url": "data/grids/cv_interanual.json",
+      "stats": {
+        "min": 0.03419734910130501,
+        "max": 11.546792030334473,
+        "mean": 2.0343050956726074,
+        "std": 0.6667253971099854,
+        "p10": 1.4012979030609132,
+        "p50": 1.992353081703186,
+        "p90": 2.5712268352508545,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": 1.8971630334854126,
+            "std": 0.44793835282325745
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": 1.7672473192214966,
+            "std": 0.7030606269836426
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": 2.250476121902466,
+            "std": 0.6024883389472961
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#ffffcc",
+          "#fed976",
+          "#fd8c3c",
+          "#e2191c",
+          "#800026"
+        ],
+        "labels": [
+          "0.81",
+          "2.13",
+          "3.44",
+          "4.75",
+          "6.07"
+        ],
+        "norm_min": 0.8115117454528809,
+        "norm_max": 6.065687780380247,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          89,
+          1795,
+          13167,
+          22987,
+          8980,
+          709,
+          163,
+          139,
+          148,
+          159,
+          125,
+          59,
+          49,
+          42,
+          16,
+          13,
+          3,
+          0,
+          1,
+          1
+        ],
+        "bins": [
+          0.03419734910130501,
+          0.6098271012306213,
+          1.1854568719863892,
+          1.7610865831375122,
+          2.3367161750793457,
+          2.912346124649048,
+          3.487975835800171,
+          4.063605308532715,
+          4.639235019683838,
+          5.214864730834961,
+          5.790494918823242,
+          6.366124629974365,
+          6.941754341125488,
+          7.517384052276611,
+          8.093013763427734,
+          8.6686429977417,
+          9.24427318572998,
+          9.819902420043945,
+          10.395532608032227,
+          10.971161842346191,
+          11.546792030334473
+        ]
+      }
+    },
+    {
+      "id": "delta_2",
+      "name": "Sensibilidad Temporal Delta 2",
+      "category": "Diagn\u00f3sticos de Estabilidad Territorial",
+      "unit": "%",
+      "desc": "Tasa de variaci\u00f3n espacial relativa al incorporar 2 a\u00f1os respecto de 1 a\u00f1o (M20-21 vs M20).",
+      "format": ".2f",
+      "tif_file": "cordoba_delta_2_pct_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_delta_2_pct_2km.tif",
+      "png_overlay": "overlays/delta_2.png",
+      "grid_data_url": "data/grids/delta_2.json",
+      "stats": {
+        "min": -6.2648749351501465,
+        "max": 13.204569816589355,
+        "mean": -0.872433602809906,
+        "std": 0.7429575324058533,
+        "p10": -1.6564318656921386,
+        "p50": -0.964564323425293,
+        "p90": 0.10164109468460082,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": -1.2687809467315674,
+            "std": 0.5496814846992493
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": -1.1303203105926514,
+            "std": 0.7812095880508423
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": -0.605604350566864,
+            "std": 0.6436442732810974
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#053061",
+          "#6bacd1",
+          "#f7f6f6",
+          "#e48066",
+          "#67001f"
+        ],
+        "labels": [
+          "-6.00",
+          "-3.00",
+          "0.00",
+          "3.00",
+          "6.00"
+        ],
+        "norm_min": -6.0,
+        "norm_max": 6.0,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          3,
+          4,
+          50,
+          545,
+          10220,
+          26023,
+          10872,
+          707,
+          104,
+          40,
+          29,
+          22,
+          8,
+          6,
+          6,
+          3,
+          0,
+          2,
+          0,
+          1
+        ],
+        "bins": [
+          -6.2648749351501465,
+          -5.291402816772461,
+          -4.317930221557617,
+          -3.3444581031799316,
+          -2.370985984802246,
+          -1.397513747215271,
+          -0.4240415096282959,
+          0.5494307279586792,
+          1.5229029655456543,
+          2.49637508392334,
+          3.4698474407196045,
+          4.443319797515869,
+          5.416791915893555,
+          6.39026403427124,
+          7.363736152648926,
+          8.33720874786377,
+          9.310680389404297,
+          10.28415298461914,
+          11.257625579833984,
+          12.231097221374512,
+          13.204569816589355
+        ]
+      }
+    },
+    {
+      "id": "delta_3",
+      "name": "Sensibilidad Temporal Delta 3",
+      "category": "Diagn\u00f3sticos de Estabilidad Territorial",
+      "unit": "%",
+      "desc": "Tasa de variaci\u00f3n espacial relativa al incorporar 3 a\u00f1os respecto de 2 a\u00f1os (M20-21-23 vs M20-21).",
+      "format": ".2f",
+      "tif_file": "cordoba_delta_3_pct_2km.tif",
+      "tif_url": "data/ready/maps_geotiff/cordoba_delta_3_pct_2km.tif",
+      "png_overlay": "overlays/delta_3.png",
+      "grid_data_url": "data/grids/delta_3.json",
+      "stats": {
+        "min": -5.948673248291016,
+        "max": 7.068202972412109,
+        "mean": -1.1589561700820923,
+        "std": 0.668814480304718,
+        "p10": -1.6730812311172485,
+        "p50": -1.2331680059432983,
+        "p90": -0.5934973478317261,
+        "regional": {
+          "R0": {
+            "name": "Sierras Altas",
+            "cells": 5586,
+            "mean": -0.9964295625686646,
+            "std": 0.46114322543144226
+          },
+          "R1": {
+            "name": "Sierras Bajas / Trans.",
+            "cells": 17677,
+            "mean": -0.7523273825645447,
+            "std": 0.7775205969810486
+          },
+          "R2": {
+            "name": "Llanura Pampeana",
+            "cells": 25382,
+            "mean": -1.4779163599014282,
+            "std": 0.40835678577423096
+          }
+        }
+      },
+      "legend": {
+        "colors": [
+          "#053061",
+          "#6bacd1",
+          "#f7f6f6",
+          "#e48066",
+          "#67001f"
+        ],
+        "labels": [
+          "-6.00",
+          "-3.00",
+          "0.00",
+          "3.00",
+          "6.00"
+        ],
+        "norm_min": -6.0,
+        "norm_max": 6.0,
+        "is_categorical": false
+      },
+      "histogram": {
+        "counts": [
+          17,
+          43,
+          77,
+          132,
+          144,
+          336,
+          14883,
+          24955,
+          7270,
+          210,
+          78,
+          70,
+          82,
+          92,
+          88,
+          75,
+          47,
+          27,
+          13,
+          6
+        ],
+        "bins": [
+          -5.948673248291016,
+          -5.297829627990723,
+          -4.6469855308532715,
+          -3.9961419105529785,
+          -3.3452980518341064,
+          -2.6944541931152344,
+          -2.0436103343963623,
+          -1.3927665948867798,
+          -0.7419227361679077,
+          -0.09107895195484161,
+          0.5597648620605469,
+          1.210608720779419,
+          1.8614524602890015,
+          2.512296199798584,
+          3.163140058517456,
+          3.813983917236328,
+          4.464827537536621,
+          5.115671634674072,
+          5.766515254974365,
+          6.417359352111816,
+          7.068202972412109
+        ]
+      }
+    }
+  ]
+}

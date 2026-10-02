@@ -15,26 +15,27 @@ def extract_table():
             # Example line: R0 & Primavera & BD-JPT (Baseline) & -1.403 & -0.233 & 372.3 & 271.6 & -12.8 \\
             clean_line = line.replace('\\\\', '').replace('\n', '').strip()
             parts = [p.strip() for p in clean_line.split('&')]
-            if len(parts) == 8:
+            if len(parts) == 10:
                 data.append(parts)
                 
-    df = pd.DataFrame(data, columns=['Region', 'Season', 'Model', 'R2_Kt', 'R2_GHI', 'RMSE', 'MAE', 'MBE'])
+    df = pd.DataFrame(data, columns=['Region', 'Season', 'Model', 'R2_Kt', 'R2_GHI', 'RMSE', 'MAE', 'MBE', 'nRMSE', 'nMBE'])
     
     # The table appended cumulative means for every fold (5 folds).
     # We only want the last entry for each Region-Season-Model combo
     df_final = df.drop_duplicates(subset=['Region', 'Season', 'Model'], keep='last').copy()
     
     # Convert numerical columns
-    for col in ['R2_Kt', 'R2_GHI', 'RMSE', 'MAE', 'MBE']:
+    for col in ['R2_Kt', 'R2_GHI', 'RMSE', 'MAE', 'MBE', 'nRMSE', 'nMBE']:
         df_final[col] = pd.to_numeric(df_final[col])
         
     return df_final
 
 def plot_performance(df):
+    plt.rcParams.update({'font.size': 14, 'axes.labelsize': 16, 'xtick.labelsize': 14, 'ytick.labelsize': 14, 'legend.fontsize': 14, 'axes.titlesize': 18})
     plt.style.use('seaborn-v0_8-whitegrid')
     
-    # Solo comparar BD-JPT vs RandomForest para simplificar
-    df_plot = df[df['Model'].isin(['BD-JPT (Baseline)', 'RandomForest (Kt)'])]
+    # Comparar BD-JPT vs Híbrido
+    df_plot = df[df['Model'].isin(['BD-JPT (Baseline)', 'Híbrido (BD-JPT + ML)'])].copy()
     
     # Map season to correct order
     season_order = ['Verano', 'Otono', 'Invierno', 'Primavera']
@@ -44,44 +45,57 @@ def plot_performance(df):
     regions = sorted(df_plot['Region'].unique())
     n_regions = len(regions)
     cols = 2
-    rows = (n_regions + 1) // cols
+    rows = max(1, (n_regions + 1) // cols)
     
-    fig, axes = plt.subplots(rows, cols, figsize=(16, 5 * rows), sharey=True)
-    fig.suptitle('Desempeño de Calibración: RMSE (W/m²) por Región y Estación\nBaseline Físico vs Machine Learning', fontsize=18, fontweight='bold', y=0.95)
+    metrics = {
+        'RMSE': 'RMSE (W/m²)',
+        'MAE': 'MAE (W/m²)',
+        'MBE': 'MBE (W/m²)',
+        'R2_GHI': '$R^2$ (GHI)',
+        'nRMSE': 'nRMSE (%)'
+    }
     
-    # Flatten axes if necessary
-    if rows == 1:
-        axes = [axes]
-    else:
-        axes = axes.ravel()
+    for metric, ylabel in metrics.items():
+        fig, axes = plt.subplots(rows, cols, figsize=(16, 6 * rows), sharey=True)
+        fig.suptitle(f'Desempeño de Calibración: {metric} por Región y Estación\nBaseline Físico vs Machine Learning', fontsize=22, fontweight='bold', y=0.96)
         
-    for i, reg in enumerate(regions):
-        ax = axes[i]
-        df_reg = df_plot[df_plot['Region'] == reg]
-        
-        sns.barplot(data=df_reg, x='Season', y='RMSE', hue='Model', ax=ax, palette=['#e74c3c', '#2ecc71'])
-        ax.set_title(f"Región {reg}", fontsize=14)
-        ax.set_xlabel('')
-        ax.set_ylabel('RMSE (W/m²)' if i % cols == 0 else '')
-        
-        # Add values on top of bars
-        for container in ax.containers:
-            ax.bar_label(container, fmt='%.0f', padding=3, fontsize=10)
-            
-        if i != 1:
-            if ax.get_legend() is not None:
-                ax.legend_.remove()
+        # Flatten axes if necessary
+        if rows == 1 and cols == 1:
+            axes_flat = [axes]
+        elif rows == 1 or cols == 1:
+            axes_flat = axes
         else:
-            if ax.get_legend() is not None:
-                ax.legend(title='', fontsize=12)
+            axes_flat = axes.ravel()
+            
+        for i, reg in enumerate(regions):
+            ax = axes_flat[i]
+            df_reg = df_plot[df_plot['Region'] == reg]
+            
+            sns.barplot(data=df_reg, x='Season', y=metric, hue='Model', palette={'BD-JPT (Baseline)': '#ff9999', 'Híbrido (BD-JPT + ML)': '#66b3ff'}, ax=ax).set_title(f"Región {reg}", fontsize=18)
+            ax.set_xlabel('')
+            ax.set_ylabel(ylabel if i % cols == 0 else '')
+            
+            # Add values on top of bars
+            for container in ax.containers:
+                fmt_str = '%.2f' if metric == 'R2_GHI' else '%.0f'
+                ax.bar_label(container, fmt=fmt_str, padding=3, fontsize=12)
+                
+            if i != 1:
+                if ax.get_legend() is not None:
+                    ax.legend_.remove()
+            else:
+                if ax.get_legend() is not None:
+                    ax.legend(title='', fontsize=14)
 
-    # Hide any unused subplots
-    for j in range(i + 1, len(axes)):
-        fig.delaxes(axes[j])
+        # Hide any unused subplots
+        for j in range(len(regions), len(axes_flat)):
+            fig.delaxes(axes_flat[j])
 
-    plt.tight_layout(rect=[0, 0, 1, 0.93])
-    plt.savefig('results/fase4_seasonal_rmse_comparison.png', dpi=300, bbox_inches='tight')
-    print("Gráfico guardado en results/fase4_seasonal_rmse_comparison.png")
+        plt.tight_layout(rect=[0, 0, 1, 0.93])
+        out_path = f'results/fase4_seasonal_{metric}_comparison.png'
+        plt.savefig(out_path, dpi=120, bbox_inches='tight')
+        print(f"Gráfico guardado en {out_path}")
+        plt.close(fig)
 
 if __name__ == '__main__':
     df = extract_table()

@@ -22,17 +22,17 @@ except ImportError:
         return np.sqrt(mean_squared_error(y_true, y_pred))
 
 def main():
-    plt.rcParams.update({'font.family': 'sans-serif', 'font.size': 11})
+    plt.rcParams.update({'font.family': 'sans-serif', 'font.size': 14, 'axes.labelsize': 16, 'xtick.labelsize': 14, 'ytick.labelsize': 14, 'legend.fontsize': 14, 'axes.titlesize': 18})
     
-    val_file = Path("data/processed/bdjpt_validation_results.parquet")
+    val_file = Path("results/fase4_cv_predictions.parquet")
     if not val_file.exists():
         print(f"Error: No se encontró {val_file}")
         return
         
     df = pd.read_parquet(val_file)
     
-    target = df['target_GHI'].values
-    pred = df['pred_GHI'].values
+    target = df['GHI_Real'].values
+    pred = df['Híbrido (BD-JPT + ML)'].values
     
     # Calculate metrics
     rmse = root_mean_squared_error(target, pred)
@@ -40,7 +40,7 @@ def main():
     r2 = r2_score(target, pred)
     n = len(df)
     
-    fig, ax = plt.subplots(figsize=(7, 6), dpi=300)
+    fig, ax = plt.subplots(figsize=(7, 6), dpi=120)
     
     # Scatter plot with hexbin or hist2d for density
     h = ax.hist2d(target, pred, bins=100, cmap='viridis', norm=LogNorm(), alpha=0.9)
@@ -51,9 +51,9 @@ def main():
     ax.plot([0, max_val], [0, max_val], color='red', linestyle='--', linewidth=1.5, label='1:1 Ideal')
     
     # Styling
-    ax.set_xlabel("GHI Observado (W/m²) - Estaciones de Validación")
-    ax.set_ylabel("GHI Estimado Satelital (W/m²) - Modelo BD-JPT")
-    ax.set_title("Validación Espacial Independiente: Modelo BD-JPT vs Red Davis", fontsize=12, pad=15, weight='bold')
+    ax.set_xlabel("GHI Observado (W/m²) - Red Davis")
+    ax.set_ylabel("GHI Estimado Satelital (W/m²) - Modelo Híbrido")
+    ax.set_title("Validación Espacial Independiente: Modelo Híbrido Final", fontsize=16, pad=15, weight='bold')
     
     ax.set_xlim(0, max_val)
     ax.set_ylim(0, max_val)
@@ -67,7 +67,7 @@ def main():
         f'$R^2$ = {r2:.3f}'
     ))
     props = dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='gray')
-    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10,
+    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14,
             verticalalignment='top', bbox=props)
             
     ax.legend(loc='lower right')

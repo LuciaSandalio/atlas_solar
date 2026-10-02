@@ -1,0 +1,49 @@
+# REST2 Clear-Sky Model Configuration (Validated v1.0)
+# Date: 2025-12-11
+# Status: VALIDATED (MBE +3.6 W/m^2)
+
+model:
+  name: "REST2"
+  implementation: "pvlib.clearsky.simplified_solis"
+  description: "Physically-based clear-sky model using reanalysis atmosphere data."
+
+inputs:
+  pressure:
+    source: "ERA5 Reanalysis (Single Levels)"
+    variable: "sp" (Surface Pressure)
+    unit_conversion: "Pa (native)"
+  
+  water_vapor:
+    source: "ERA5 Reanalysis (Single Levels)"
+    variable: "tcwv" (Total Column Water Vapour)
+    unit_conversion: "mm -> cm (divide by 10)"
+
+  aerosols:
+    source: "CAMS Global Reanalysis (EAC4)"
+    variable: "total_aerosol_optical_depth_550nm"
+    fallback_value: 0.1
+    unit_conversion: "550nm -> 700nm (Angstrom Law)"
+
+parameters:
+  angstrom_alpha: 1.3
+  target_wavelength_nm: 700
+  source_wavelength_nm: 550
+
+processing:
+  temporal_resolution: "1h"
+  spatial_interpolation: "Linear / RegularGridInterpolator"
+  zenith_source: "Calculated (Phase 1 Geometry)"
+  elevation_source: "90 - Zenith"
+
+validation_results:
+  period: "Jan, Apr, Jul, Oct 2020"
+  station: "Pilar (Cordoba)"
+  bias_mbe: 3.55
+  rmse: 40.62
+
+validation_filters:
+  description: "Criteria used to identify clear-sky periods for validation."
+  k_cs_range: [0.9, 1.1]   # Ratio GHI_obs / GHI_model
+  min_ghi: 50              # W/m^2 (Avoid night/twilight noise)
+  min_elevation: 10        # Degrees (Avoid horizon shading)
+  headline_zenith_limit: 70 # Degrees (Exclude low sun for primary metrics)

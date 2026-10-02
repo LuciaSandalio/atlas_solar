@@ -1,5 +1,5 @@
 import geopandas as gpd
-#!/usr/import/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -39,7 +39,7 @@ CALIBRATED_FILE = Path("data/processed/stations/davis_calibrated_hourly_final.pa
 META_FILE = Path("data/raw/aws/resumen_estaciones_sol_todas.csv")
 REPORT_OUT = Path("data/processed/stations/davis_completeness_metrics.csv")
 PROJECT_FIG_DIR = Path("reports/figures")
-ARTIFACT_DIR = Path("/home/chula/.gemini/antigravity/brain/6c9b2b2f-9350-410d-8873-e5c094c49766")
+ARTIFACT_DIR = Path("reportes/figures")
 
 def main():
     print("📊 Iniciando análisis de completitud de datos y generación de gráficos...")

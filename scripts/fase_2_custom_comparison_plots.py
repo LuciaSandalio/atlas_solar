@@ -32,7 +32,7 @@ plt.rcParams.update({
 CALIBRATED_FILE = Path("data/processed/stations/davis_calibrated_hourly_final.parquet")
 PROJECT_FIG_DIR = Path("reports/figures")
 REPORTES_FIG_DIR = Path("reportes/figures")
-ARTIFACT_DIR = Path("/home/chula/.gemini/antigravity/brain/6c9b2b2f-9350-410d-8873-e5c094c49766")
+ARTIFACT_DIR = Path("reportes/figures")
 
 def main():
     print("🎨 Iniciando la generación de gráficos personalizados (Figuras 12, 13 y 14)...")

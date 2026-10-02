@@ -1,0 +1,61 @@
+{
+  "pipeline_version": "5B.2.0",
+  "trained_at": "2026-09-24T21:06:31.403390+00:00",
+  "model_architecture": "HybridBDJPT_HGB",
+  "target_variable": "clearness_index_kt",
+  "kt_bounds": {
+    "min": 0.0,
+    "max": 1.15
+  },
+  "features": [
+    "reflectance",
+    "B0",
+    "Fr",
+    "cosZ",
+    "day_of_year"
+  ],
+  "temporal_alignment": {
+    "strategy": "B (t+1)",
+    "r2_pilar": 0.06847071196662424,
+    "r2_davis": 0.01126612002415317,
+    "n_pairs": 2288333,
+    "description": "Desplazamiento temporal t+1 h para sincronizar la observaci\u00f3n satelital instant\u00e1nea con la integral horaria precedente de superficie."
+  },
+  "b0_model": {
+    "type": "Tarpley_Clear_Sky",
+    "params_file": "data/ready/b0_model/B0_params.json",
+    "coefficients": {
+      "A": 0.1346578073247487,
+      "B": -0.008863163257346221,
+      "C": -0.15056174570503686,
+      "D": 0.24349199068570698
+    }
+  },
+  "models_file": "data/processed/bdjpt_final_models_regional_estacional.pkl",
+  "pv_system_specs": {
+    "module_type": "Mono-PERC",
+    "pdc0_w": 1000.0,
+    "gamma_pdc": -0.0035,
+    "noct_c": 45.0,
+    "inverter_nominal_eff": 0.96,
+    "bos_losses": 0.1,
+    "fixed_tilt_deg": 30.0,
+    "fixed_azimuth_deg": 0.0,
+    "tracker_type": "singleaxis_horizontal_NS",
+    "tracker_backtrack": true,
+    "tracker_gcr": 0.35,
+    "tracker_max_angle": 60.0
+  },
+  "operational_grid": {
+    "grid_file": "data/ready/cordoba_grid_2km_regions.parquet",
+    "n_cells_buffered": 59837,
+    "n_cells_province": 48645,
+    "resolution_km": 2.0,
+    "step_deg": 0.018,
+    "spatial_interpolation_required": false,
+    "crs": "EPSG:4326",
+    "metric_crs": "EPSG:5345 (POSGAR 2007 Faja 3)"
+  },
+  "audit_status": "APPROVED_STRICT_2KM",
+  "audited_at": "2026-09-24T21:09:58.321438+00:00"
+}

@@ -1,4 +1,4 @@
-#!/usr/import/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -39,7 +39,7 @@ plt.rcParams.update({
 CALIBRATED_FILE = Path("data/processed/stations/davis_calibrated_hourly_final.parquet")
 PARAMS_FILE = Path("data/processed/stations/davis_calibration_params_final.json")
 PROJECT_FIG_DIR = Path("reports/figures")
-ARTIFACT_DIR = Path("/home/chula/.gemini/antigravity/brain/6c9b2b2f-9350-410d-8873-e5c094c49766")
+ARTIFACT_DIR = Path("reportes/figures")
 
 def poly_fit_k(cosZ, c0, c1, c2):
     return c0 + c1 * cosZ + c2 * (cosZ ** 2)

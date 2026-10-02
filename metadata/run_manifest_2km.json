@@ -1,0 +1,13 @@
+{
+  "run_id": "20260924_1355",
+  "region": "C\u00f3rdoba",
+  "grid_res_km": 2.0,
+  "res_deg": 0.018,
+  "n_cells_total": 59837,
+  "n_cells_in_province": 48645,
+  "projection": "EPSG:4326",
+  "buffer_deg": 0.2,
+  "formato": "geojson",
+  "fuente_datos": "GADM 4.1 / Convenio ATLAS II",
+  "notas": "Grilla oficial de alta resoluci\u00f3n 2 km (0.018\u00b0) para Informe 4"
+}

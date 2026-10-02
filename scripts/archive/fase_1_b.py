@@ -18,9 +18,13 @@ import xarray as xr
 import geopandas as gpd
 import pvlib
 
-import boto3
-from botocore import UNSIGNED
-from botocore.config import Config
+try:
+    import boto3
+    from botocore import UNSIGNED
+    from botocore.config import Config
+    _HAS_BOTO3 = True
+except ImportError:
+    _HAS_BOTO3 = False
 from urllib.parse import urlparse
 
 try:
