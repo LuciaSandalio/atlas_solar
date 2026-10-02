@@ -2,25 +2,38 @@ name: atlas_solar
 channels:
   - conda-forge
 dependencies:
-  - python=3.8
+  - python=3.12
   - numpy
   - pandas
   - xarray
   - netcdf4
+  - h5netcdf
+  - h5py
   - bottleneck
   - dask
   - geopandas
   - pyproj
   - shapely
   - rtree
+  - rasterio
+  - affine
+  - pillow
   - pvlib
+  - scipy
+  - scikit-learn
+  - joblib
+  - matplotlib
+  - seaborn
   - boto3
   - botocore
+  - s3fs
   - pyarrow
   - fastparquet
   - tqdm
+  - pytest
   - pip
   - pip:
+      - cdsapi
       - ruff
       - black
       - pre-commit

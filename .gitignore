@@ -6,14 +6,29 @@ __pycache__/
 .env
 .venv/
 .ipynb_checkpoints/
+.pytest_cache/
 
 # Datos y artefactos pesados (no versionar)
 data/goes/
+data/.tmp_download/
 data/processed/
+data/processed_2km/
+data/ready/
+data/archive_5km/
+data/.cache_scan/
 data/geometry/*.parquet
 data/**/*.nc
 *.nc
 *.parquet
+*.npz
+*.npy
+*.pkl
+*.tif
+*.gpkg
+
+# Salidas regenerables del visor (scripts/prepare_viewer.py)
+viewer/data/grids/
+viewer/overlays/
 
 # Manifests generados
 metadata/fase1_manifest.json
