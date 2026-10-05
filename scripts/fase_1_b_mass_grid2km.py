@@ -276,8 +276,8 @@ def get_daylight_scenes_for_day(
                 if "band" in df_idx.columns:
                     df_idx = df_idx[df_idx["band"] == "C02"]
                 if "sat" in df_idx.columns:
-                    df_idx = df_idx[df_idx["sat"] == "goes16"]
-                df_idx = df_idx[df_idx["url"].str.contains("noaa-goes16", na=False)]
+                    df_idx = df_idx[df_idx["sat"].isin(["goes16", "goes19"])]
+                df_idx = df_idx[df_idx["url"].str.contains(r"noaa-goes(?:16|19)", regex=True, na=False)]
                 if not df_idx.empty:
                     df_idx["ts"] = pd.to_datetime(df_idx["start_iso"], utc=True)
                     df_res = select_daylight_scenes_from_df(df_idx, minute_step=minute_step)
@@ -286,7 +286,7 @@ def get_daylight_scenes_for_day(
             except Exception:
                 pass
 
-    # 2. Descubrimiento directo al vuelo en NOAA S3 (autónomo y sin dependencias locales)
+    # 2. Descubrimiento directo al vuelo en NOAA S3 (autónomo y multi-satélite G16/G19)
     if s3_client is None:
         s3_client = boto3.client(
             "s3",
@@ -312,24 +312,43 @@ def get_daylight_scenes_for_day(
     if not daylight_hours:
         return pd.DataFrame()
 
+    # Selección dinámica de satélite/bucket según fecha de traspaso operativo (8 de abril de 2025 = DOY 98)
+    if dt.year < 2025 or (dt.year == 2025 and doy < 92):
+        sat_candidates = [("noaa-goes16", "C02_G16", "goes16")]
+    elif dt.year == 2025 and doy <= 97:
+        sat_candidates = [("noaa-goes16", "C02_G16", "goes16"), ("noaa-goes19", "C02_G19", "goes19")]
+    else:
+        # A partir del 8 de abril de 2025: GOES-19 operativo como GOES-East
+        sat_candidates = [("noaa-goes19", "C02_G19", "goes19"), ("noaa-goes16", "C02_G16", "goes16")]
+
     records = []
-    for h in daylight_hours:
-        prefix = f"ABI-L1b-RadF/{dt.year}/{doy:03d}/{h:02d}/"
-        try:
-            resp = s3_client.list_objects_v2(Bucket="noaa-goes16", Prefix=prefix)
-            for obj in resp.get("Contents", []):
-                key = obj["Key"]
-                if "C02_G16" in key:
-                    filename = key.split("/")[-1]
-                    m = re.search(r"_s(\d{13})", filename)
-                    if m:
-                        ts = datetime.strptime(m.group(1), "%Y%j%H%M%S").replace(tzinfo=timezone.utc)
-                        records.append({
-                            "url": f"s3://noaa-goes16/{key}",
-                            "ts": ts
-                        })
-        except Exception:
-            continue
+    selected_sat = "goes16"
+
+    for bucket, band_tag, sat_name in sat_candidates:
+        cand_records = []
+        for h in daylight_hours:
+            prefix = f"ABI-L1b-RadF/{dt.year}/{doy:03d}/{h:02d}/"
+            try:
+                resp = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
+                for obj in resp.get("Contents", []):
+                    key = obj["Key"]
+                    if band_tag in key:
+                        filename = key.split("/")[-1]
+                        m = re.search(r"_s(\d{13})", filename)
+                        if m:
+                            ts = datetime.strptime(m.group(1), "%Y%j%H%M%S").replace(tzinfo=timezone.utc)
+                            cand_records.append({
+                                "url": f"s3://{bucket}/{key}",
+                                "ts": ts,
+                                "sat": sat_name
+                            })
+            except Exception:
+                continue
+
+        if cand_records:
+            records = cand_records
+            selected_sat = sat_name
+            break
 
     if not records:
         return pd.DataFrame()
@@ -348,7 +367,7 @@ def get_daylight_scenes_for_day(
                     "url": df_selected["url"],
                     "start_iso": df_selected["ts"].dt.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
                     "band": "C02",
-                    "sat": "goes16"
+                    "sat": selected_sat
                 })
                 cache_df.to_csv(cache_file, index=False)
         except Exception:
@@ -490,12 +509,15 @@ def check_environment(grid_file: Path, out_dir: Path, tmp_dir: Path):
             print(f"  ❌ {pkg:12s}: NO INSTALADO")
             all_ok = False
 
-    # 2. Conectividad NOAA S3
+    # 2. Conectividad NOAA S3 (GOES-16 y GOES-19)
     try:
         s3 = boto3.client("s3", config=Config(signature_version=UNSIGNED))
-        resp = s3.list_objects_v2(Bucket="noaa-goes16", Prefix="ABI-L1b-RadF/2021/018/14/", MaxKeys=1)
-        if "Contents" in resp and len(resp["Contents"]) > 0:
-            print("  ✓ Conexión S3 : NOAA GOES-16 público accesible (sin credenciales)")
+        resp16 = s3.list_objects_v2(Bucket="noaa-goes16", Prefix="ABI-L1b-RadF/2021/018/14/", MaxKeys=1)
+        resp19 = s3.list_objects_v2(Bucket="noaa-goes19", Prefix="ABI-L1b-RadF/2025/100/15/", MaxKeys=1)
+        if "Contents" in resp16 and "Contents" in resp19:
+            print("  ✓ Conexión S3 : NOAA GOES-16 y GOES-19 públicos accesibles (sin credenciales)")
+        elif "Contents" in resp16:
+            print("  ✓ Conexión S3 : NOAA GOES-16 accesible (GOES-19 sin respuesta)")
         else:
             print("  ⚠️ Conexión S3 : No devolvió objetos de prueba")
     except Exception as e:
