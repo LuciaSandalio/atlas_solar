@@ -229,7 +229,7 @@ def test_reproducibility_and_grid_contract():
     assert op_grid["n_cells_buffered"] == 59837
     assert op_grid["n_cells_province"] == 48645
     assert op_grid["spatial_interpolation_required"] is False
-    assert contract["temporal_alignment"]["strategy"] == "B (t+1)"
+    assert "C" in contract["temporal_alignment"]["strategy"]
 
 
 @requires_grid

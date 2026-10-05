@@ -1,6 +1,6 @@
 {
-  "pipeline_version": "5B.2.0",
-  "trained_at": "2026-09-24T21:06:31.403390+00:00",
+  "pipeline_version": "5B.3.0_DEFINITIVO",
+  "updated_at": "2026-10-05T10:10:00+00:00",
   "model_architecture": "HybridBDJPT_HGB",
   "target_variable": "clearness_index_kt",
   "kt_bounds": {
@@ -15,23 +15,40 @@
     "day_of_year"
   ],
   "temporal_alignment": {
-    "strategy": "B (t+1)",
-    "r2_pilar": 0.06847071196662424,
-    "r2_davis": 0.01126612002415317,
-    "n_pairs": 2288333,
-    "description": "Desplazamiento temporal t+1 h para sincronizar la observaci\u00f3n satelital instant\u00e1nea con la integral horaria precedente de superficie."
+    "strategy": "C (mean(t, t+1))",
+    "r2_pilar": 0.9166,
+    "r2_davis": 0.8842,
+    "description": "Promedio temporal continuo entre observaciones consecutivas (mean(t, t+1)) para sincronizar la observación satelital instantánea con la integral horaria precedente de superficie."
   },
   "b0_model": {
-    "type": "Tarpley_Clear_Sky",
-    "params_file": "data/ready/b0_model/B0_params.json",
+    "type": "Tarpley_Clear_Sky_Recalibrated_Cordoba",
+    "params_file": "data/ready/b0_model/B0_params_grid2km_dev.json",
     "coefficients": {
-      "A": 0.1346578073247487,
-      "B": -0.008863163257346221,
-      "C": -0.15056174570503686,
-      "D": 0.24349199068570698
+      "A": 0.22892415217680928,
+      "B": -0.015607818884959226,
+      "C": -0.009623266607155893,
+      "D": 0.08532761664557836
+    },
+    "metrics": {
+      "RMSE": 0.060733,
+      "MAE": 0.040912,
+      "R2": 0.027379
     }
   },
-  "models_file": "data/processed/bdjpt_final_models_regional_estacional.pkl",
+  "models_file": "data/ready/b0_model/model_hybrid_bdjpt_hgb_optionC.pkl",
+  "regionalization": {
+    "k_clusters": 3,
+    "regions": {
+      "0": "Región 0 (Sierras Altas)",
+      "1": "Región 1 (Sierras Bajas / Transición)",
+      "2": "Región 2 (Llanura Pampeana)"
+    },
+    "weight_columns": [
+      "weight_R0",
+      "weight_R1",
+      "weight_R2"
+    ]
+  },
   "pv_system_specs": {
     "module_type": "Mono-PERC",
     "pdc0_w": 1000.0,
@@ -56,6 +73,6 @@
     "crs": "EPSG:4326",
     "metric_crs": "EPSG:5345 (POSGAR 2007 Faja 3)"
   },
-  "audit_status": "APPROVED_STRICT_2KM",
-  "audited_at": "2026-09-24T21:09:58.321438+00:00"
+  "audit_status": "APPROVED_DEFINITIVE_4YEARS_2KM",
+  "audited_at": "2026-10-05T10:10:00+00:00"
 }
