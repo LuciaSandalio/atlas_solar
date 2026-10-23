@@ -538,7 +538,7 @@
       <div class="header-titles">
         <h1>
           Atlas Solar de Córdoba
-          <span class="badge">PROMEDIO 2020, 2021, 2023</span>
+          <span class="badge">MULTIANUAL 2020–2025</span>
           <span class="badge badge-blue">GRILLA 2 KM</span>
         </h1>
         <p>Convenio ATLAS II — FCEFyN / UNC & OHMC — Visor Oficial de Entregables Ráster (GeoTIFF / COG)</p>
@@ -750,6 +750,12 @@
         zoomControl: true
       });
 
+      // Crear panes dedicados para garantizar apilamiento visual perfecto
+      map.createPane('vectorsPane');
+      map.getPane('vectorsPane').style.zIndex = 450;
+      map.createPane('citiesPane');
+      map.getPane('citiesPane').style.zIndex = 650;
+
       // Capas Base
       baseLayers['carto-dark'] = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; CartoDB, &copy; OpenStreetMap contributors',
@@ -797,6 +803,7 @@
         .then(r => r.json())
         .then(data => {
           layerDeptos = L.geoJSON(data, {
+            pane: 'vectorsPane',
             style: {
               color: '#64748b',
               weight: 0.8,
@@ -821,6 +828,7 @@
         .then(r => r.json())
         .then(data => {
           layerProvBoundary = L.geoJSON(data, {
+            pane: 'vectorsPane',
             style: {
               color: '#f8fafc',
               weight: 2.2,
@@ -842,7 +850,7 @@
       });
 
       CITIES.forEach(c => {
-        const marker = L.marker([c.lat, c.lon], { icon: cityIcon });
+        const marker = L.marker([c.lat, c.lon], { icon: cityIcon, pane: 'citiesPane' });
         marker.bindTooltip(`<b>${c.name}</b>`, {
           permanent: false,
           direction: 'top',
@@ -937,11 +945,6 @@
         interactive: false,
         crossOrigin: true
       }).addTo(map);
-
-      // Asegurar que los vectores estén por encima del ráster
-      if (layerDeptos) layerDeptos.bringToFront();
-      if (layerProvBoundary) layerProvBoundary.bringToFront();
-      if (layerCities) layerCities.bringToFront();
     }
 
     function loadGridData(url) {
@@ -954,7 +957,7 @@
         .catch(err => console.warn("Error cargando grid data:", err));
     }
 
-    // INSPECTOR DE PÍXEL CON TODAS LAS VARIABLES
+    // INSPECTOR DE PÍXEL CON TODAS LAS VARIABLES (CON SNAP DE PROXIMIDAD EN BORDES)
     function inspectPoint(lat, lon, isClick = false) {
       document.getElementById('inspCoords').innerText = `${lat.toFixed(4)}°, ${lon.toFixed(4)}°`;
       
@@ -963,24 +966,51 @@
       const north = -29.294733;
       const west = -65.97825;
 
-      const row = Math.round((north - lat) / d_lat);
-      const col = Math.round((lon - west) / d_lon);
-      const key = `${row}_${col}`;
+      const row = Math.floor((north - lat) / d_lat);
+      const col = Math.floor((lon - west) / d_lon);
+      let key = `${row}_${col}`;
+      let cell = window.ATLAS_CELL_DB ? window.ATLAS_CELL_DB[key] : null;
+      let effectiveRow = row;
+      let effectiveCol = col;
+
+      // Snap de proximidad a vecinos si el clic cae levemente en el borde
+      if (!cell && window.ATLAS_CELL_DB) {
+        let minD2 = Infinity;
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            const k = `${row + dr}_${col + dc}`;
+            if (window.ATLAS_CELL_DB[k]) {
+              const cLat = north - (row + dr + 0.5) * d_lat;
+              const cLon = west + (col + dc + 0.5) * d_lon;
+              const d2 = (lat - cLat)**2 + (lon - cLon)**2;
+              if (d2 < minD2 && Math.sqrt(d2) <= 0.025) {
+                minD2 = d2;
+                cell = window.ATLAS_CELL_DB[k];
+                effectiveRow = row + dr;
+                effectiveCol = col + dc;
+              }
+            }
+          }
+        }
+      }
 
       // 1. Consulta en la base multivariada de 48,645 celdas
-      if (window.ATLAS_CELL_DB && window.ATLAS_CELL_DB[key]) {
-        const [ghi, dni, dhi, psh, poa_fix, poa_trk, yf_fix, yf_trk, cf_fix, cf_trk, gain_trk, reg, dep] = window.ATLAS_CELL_DB[key];
-        const regNames = ["Sierras Altas (R0)", "Sierras Bajas / Transición (R1)", "Llanura Pampeana (R2)"];
+      if (cell) {
+        const [ghi, dni, dhi, psh, poa_fix, poa_trk, yf_fix, yf_trk, cf_fix, cf_trk, gain_trk, reg, dep] = cell;
+        const regNames = ["Sierras Altas (R0)", "Transición / Piedemonte (R1)", "Llanura Pampeana (R2)"];
+        const regColors = ["#2980b9", "#e67e22", "#27ae60"];
+        const regName = regNames[reg] || `Región ${reg}`;
+        const regColor = regColors[reg] || "#38bdf8";
 
         document.getElementById('inspDepto').innerText = dep;
-        document.getElementById('inspRegion').innerText = regNames[reg] || reg;
+        document.getElementById('inspRegion').innerHTML = `<span style="color:${regColor}; font-weight:600;">${regName}</span>`;
 
         // Valor de la capa activa en el inspector lateral
-        if (currentGridData && row >= 0 && row < currentGridData.length && col >= 0 && col < currentGridData[0].length) {
-          const val = currentGridData[row][col];
+        if (currentGridData && effectiveRow >= 0 && effectiveRow < currentGridData.length && effectiveCol >= 0 && effectiveCol < currentGridData[0].length) {
+          const val = currentGridData[effectiveRow][effectiveCol];
           if (val !== null && val > -9000) {
             if (currentLayerMeta && currentLayerMeta.is_categorical) {
-              document.getElementById('inspValue').innerHTML = `${regNames[val] || val}`;
+              document.getElementById('inspValue').innerHTML = `<span style="color:${regColor}">${regName}</span>`;
             } else if (currentLayerMeta) {
               document.getElementById('inspValue').innerHTML = `${val.toFixed(1)} <span>${currentLayerMeta.unit}</span>`;
             }
@@ -996,7 +1026,7 @@
               </h4>
               <div style="font-family: monospace; color: #94a3b8; font-size: 10.5px; margin-bottom: 6px;">
                 Lat: ${lat.toFixed(4)}° &nbsp; Lon: ${lon.toFixed(4)}°<br>
-                <b>${dep}</b> &nbsp;|&nbsp; <span style="color:#38bdf8;">${regNames[reg]}</span>
+                <b>${dep}</b> &nbsp;|&nbsp; <span style="display:inline-flex; align-items:center; gap:3px;"><span style="display:inline-block; width:7px; height:7px; border-radius:2px; background:${regColor};"></span><b style="color:${regColor};">${regName}</b></span>
               </div>
               
               <div style="border-top: 1px solid #334155; padding-top: 6px; margin-top: 6px;">
@@ -1013,7 +1043,7 @@
                   <b style="color:#fff; font-family: monospace;">${dhi.toLocaleString()} kWh/m²·a</b>
                 </div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
-                  <span style="color:#94a3b8;">HSP Diarias:</span>
+                  <span style="color:#94a3b8;">Horas Sol Pico:</span>
                   <b style="color:#fff; font-family: monospace;">${psh.toFixed(2)} HSP/día</b>
                 </div>
               </div>
