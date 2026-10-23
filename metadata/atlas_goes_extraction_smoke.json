@@ -1,0 +1,83 @@
+{
+  "status": "EXTRACTION_SMOKE_TEST_PASSED_NOT_SCIENTIFIC_RELEASE",
+  "scenes": [
+    {
+      "source_file": "OR_ABI-L1b-RadF-M6C02_G16_s20210011600211_e20210011609519_c20210011609564.nc",
+      "sha256": "4f7bf639b8fa41239a8fc1b417d3be58224d8b22ce3c2e77c1c753a9bf4412c6",
+      "satellite": "G16",
+      "timestamp": "2021-01-01 16:00:21.100000+00:00",
+      "projection": {
+        "long_name": "GOES-R ABI fixed grid projection",
+        "grid_mapping_name": "geostationary",
+        "perspective_point_height": 35786023.0,
+        "semi_major_axis": 6378137.0,
+        "semi_minor_axis": 6356752.31414,
+        "inverse_flattening": 298.2572221,
+        "latitude_of_projection_origin": 0.0,
+        "longitude_of_projection_origin": -75.0,
+        "sweep_angle_axis": "x"
+      },
+      "radiometry": "legacy_pi_Rad_div_ESUN_div_cosZ_clip_0_1.2",
+      "ESUN_C02": 663.274,
+      "radiometry_validation": "PENDING; preserved convention, not cross-satellite calibration approval",
+      "sample": [
+        {
+          "cell_id": 0,
+          "reflectance": 0.2121555656194687,
+          "zenith_deg": 13.318276405334473
+        },
+        {
+          "cell_id": 25000,
+          "reflectance": 0.3392205238342285,
+          "zenith_deg": 10.082443237304688
+        },
+        {
+          "cell_id": 50000,
+          "reflectance": 0.3975531756877899,
+          "zenith_deg": 8.503069877624512
+        }
+      ],
+      "url": "s3://noaa-goes16/ABI-L1b-RadF/2021/001/16/OR_ABI-L1b-RadF-M6C02_G16_s20210011600211_e20210011609519_c20210011609564.nc"
+    },
+    {
+      "source_file": "OR_ABI-L1b-RadF-M6C02_G19_s20251801600210_e20251801609518_c20251801609556.nc",
+      "sha256": "4e133c086f7e320839522c068b85be0d0ac48a469b49f211f05f6e4fa18e6709",
+      "satellite": "G19",
+      "timestamp": "2025-06-29 16:00:21+00:00",
+      "projection": {
+        "long_name": "GOES-R ABI fixed grid projection",
+        "grid_mapping_name": "geostationary",
+        "perspective_point_height": 35786023.0,
+        "semi_major_axis": 6378137.0,
+        "semi_minor_axis": 6356752.31414,
+        "inverse_flattening": 298.2572221,
+        "latitude_of_projection_origin": 0.0,
+        "longitude_of_projection_origin": -75.0,
+        "sweep_angle_axis": "x"
+      },
+      "radiometry": "legacy_pi_Rad_div_ESUN_div_cosZ_clip_0_1.2",
+      "ESUN_C02": 663.274,
+      "radiometry_validation": "PENDING; preserved convention, not cross-satellite calibration approval",
+      "sample": [
+        {
+          "cell_id": 0,
+          "reflectance": 0.3174377977848053,
+          "zenith_deg": 58.65237808227539
+        },
+        {
+          "cell_id": 25000,
+          "reflectance": 0.7143222093582153,
+          "zenith_deg": 55.786434173583984
+        },
+        {
+          "cell_id": 50000,
+          "reflectance": 1.2000000476837158,
+          "zenith_deg": 53.8273811340332
+        }
+      ],
+      "url": "s3://noaa-goes19/ABI-L1b-RadF/2025/180/16/OR_ABI-L1b-RadF-M6C02_G19_s20251801600210_e20251801609518_c20251801609556.nc"
+    }
+  ],
+  "extractor_sha256": "06b1e5883dc77008764a60349ba5e8cd0fe7c9038103670127a1792d682beac6",
+  "scope": "Two real NOAA scenes, three canonical cells each. Projection/identity/read/interpolation only; no cross-satellite calibration or annual coverage validation."
+}

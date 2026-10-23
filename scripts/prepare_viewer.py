@@ -59,6 +59,11 @@ def get_hex_colors_from_cmap(cmap_name, n_stops=5):
 
 
 def main():
+    # Do not silently certify the legacy scientific pipeline.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from models.atlas_contract import reject_legacy
+    reject_legacy('Legacy viewer generation')
+
     print("=" * 80)
     print("🚀 PREPARANDO DATOS PARA EL VISOR WEB INTERACTIVO GEOTIFF")
     print("=" * 80)

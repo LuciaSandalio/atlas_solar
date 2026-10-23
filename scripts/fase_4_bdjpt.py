@@ -56,6 +56,11 @@ def calc_cs(timestamps, lat, lon):
     return cs['ghi'].values, np.maximum(np.cos(np.radians(solpos['apparent_zenith'])), 0.0)
 
 def main():
+    # Do not silently certify the legacy scientific pipeline.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from models.atlas_contract import reject_legacy
+    reject_legacy('Legacy training: use train_atlas_candidate.py')
+
     print("=" * 80)
     print("🚀 FASE 4: ENTRENAMIENTO Y CALIBRACIÓN DE MODELOS SATELITALES (Kt)")
     print("=" * 80)

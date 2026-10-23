@@ -210,6 +210,11 @@ def calculate_refraction_apparent_zenith(zenith_true: np.ndarray, pressure_pa: n
 
 
 def run_streaming_atlas(mode='blended', max_days=None, start_date=None, end_date=None, resume=False, checkpoint_freq=200, stop_after_days=None):
+    # Do not silently certify the legacy scientific pipeline.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from models.atlas_contract import reject_legacy
+    reject_legacy('Legacy inference')
+
     print("=" * 80)
     print(f"🚀 FASE 5B-02: MOTOR DE INFERENCIA STREAMING TERRITORIAL 2 KM (Modo: {mode.upper()})")
     print("=" * 80)

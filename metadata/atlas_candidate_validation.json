@@ -1,0 +1,33 @@
+{
+  "status": "CANDIDATE_NOT_FOR_RELEASE",
+  "contract": "data/ready/atlas_candidate_20261005_v2/contract.json",
+  "contract_sha256": "5bc8c6219a9b31ebde08f0f6886cc8df598292958263e1f9b08df365d357e7aa",
+  "metrics": {
+    "pilar_independent": {
+      "n_pairs": 5122,
+      "R2_GHI": 0.92476192200952,
+      "RMSE_GHI_W_m2": 74.61199583452462,
+      "MBE_GHI_W_m2": 3.2678080905244653
+    },
+    "spatial_oof_2020": {
+      "n_pairs": 170254,
+      "R2_GHI": 0.8214851837206696,
+      "RMSE_GHI_W_m2": 123.02761829594259,
+      "MBE_GHI_W_m2": -16.00591800171702
+    },
+    "temporal_holdout_2021": {
+      "n_pairs": 198609,
+      "R2_GHI": 0.7578462837347335,
+      "RMSE_GHI_W_m2": 130.82218697881635,
+      "MBE_GHI_W_m2": -14.667194101678716
+    }
+  },
+  "limitations": [
+    "Raw scene/projection provenance missing for historical native features.",
+    "B0 calibration not nested inside validation folds; metrics conditional on fixed B0.",
+    "Regionalization itself is precomputed, not nested inside validation folds.",
+    "No agreed, passed independent release QA; annual production not certified.",
+    "Temporal holdout does not cover spring.",
+    "Region 0 winter temporal R2 is 0.189112; aggregate metrics conceal regional weaknesses."
+  ]
+}

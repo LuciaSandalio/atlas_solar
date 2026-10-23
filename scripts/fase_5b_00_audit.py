@@ -103,6 +103,11 @@ def test_clearsky_equivalence(n_samples=500):
         print("   ✅ Equivalencia numérica EXACTA demostrada: calc_cs() e ineichen() vectorizado son idénticos.")
 
 def run_audit():
+    # Do not silently certify the legacy scientific pipeline.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from models.atlas_contract import reject_legacy
+    reject_legacy('Legacy audit')
+
     print("=" * 80)
     print("🔍 FASE 5B-00: AUDITORÍA DE ENTRADAS, INTEGRIDAD 2 KM Y CONTRATO METODOLÓGICO")
     print("=" * 80)

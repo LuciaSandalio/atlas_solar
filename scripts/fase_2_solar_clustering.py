@@ -199,7 +199,7 @@ def main():
         )
         
     ax.grid(True)
-    ax.set_title("Regionalización Solar Climatológica de la Provincia de Córdoba\nClustering Multivariado K-Means (Red Davis)", pad=15, weight='bold', color='#2C3E50')
+    ax.set_title("Regionalización Solar Operativa de la Provincia de Córdoba\nClustering Multivariado K-Means (Red de Estaciones)", pad=15, weight='bold', color='#2C3E50')
     
     # Ocultar ejes lat/lon según pedido
     ax.set_xticks([])

@@ -16,8 +16,6 @@
   ],
   "temporal_alignment": {
     "strategy": "C (mean(t, t+1))",
-    "r2_pilar": 0.9166,
-    "r2_davis": 0.8842,
     "description": "Promedio temporal continuo entre observaciones consecutivas (mean(t, t+1)) para sincronizar la observación satelital instantánea con la integral horaria precedente de superficie."
   },
   "b0_model": {
@@ -73,6 +71,22 @@
     "crs": "EPSG:4326",
     "metric_crs": "EPSG:5345 (POSGAR 2007 Faja 3)"
   },
-  "audit_status": "APPROVED_DEFINITIVE_4YEARS_2KM",
-  "audited_at": "2026-10-05T10:10:00+00:00"
+  "historical_unverified_claims": {
+    "audit_status": "APPROVED_DEFINITIVE_4YEARS_2KM",
+    "audited_at": "2026-10-05T10:10:00+00:00",
+    "temporal_alignment_metrics": {
+      "r2_pilar": 0.9166,
+      "r2_davis": 0.8842
+    }
+  },
+  "audit_status": "BLOCKED_UNVERIFIED_PIPELINE",
+  "reviewed_at": "2026-10-05T17:47:17.932100+00:00",
+  "release_blockers": [
+    "The selected model is global; required layout is 3 regions x 4 seasons.",
+    "Legacy inference uses different temporal, spatial and B0 conventions.",
+    "Existing annual outputs lack lineage and per-cell coverage.",
+    "2025 is incomplete.",
+    "Candidate training does not establish raw-scene provenance or validate definitive production."
+  ],
+  "candidate_contract": "data/ready/atlas_candidate_20261005_v2/contract.json"
 }

@@ -9,6 +9,11 @@ __pycache__/
 .pytest_cache/
 
 # Datos y artefactos pesados (no versionar)
+data/raw/
+data/shapefiles/
+shapes_cba/
+data/grids/*.geojson
+data/grids/*.json
 data/goes/
 data/.tmp_download/
 data/processed/
@@ -29,12 +34,21 @@ data/**/*.nc
 # Salidas regenerables del visor (scripts/prepare_viewer.py)
 viewer/data/grids/
 viewer/overlays/
+viewer/data/ready
+viewer/data/*.js
+viewer/data/*.geojson
+atlas_solar.html
 
 # Manifests generados
 metadata/fase1_manifest.json
 data/goes/*/_index.csv
 
-# Otros
+# Otros y figuras sobredimensionadas regenerables
+inidce_4.pdf
+reportes/figures/figura_atlas_*.png
+reportes/figures/figura_ciclo_*.png
+reportes/figures/figura_convergencia_*.png
+reportes/figures/figura_estabilidad_*.png
 *.log
 .DS_Store
 *.zip

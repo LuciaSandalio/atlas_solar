@@ -42,6 +42,7 @@ import json
 import argparse
 import signal
 import shutil
+import hashlib
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -61,7 +62,7 @@ from boto3.s3.transfer import TransferConfig
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_GRID_FILE = ROOT_DIR / "data" / "ready" / "cordoba_grid_2km_regions.parquet"
-DEFAULT_OUT_DIR = ROOT_DIR / "data" / "processed_2km"
+DEFAULT_OUT_DIR = ROOT_DIR / "data" / "processed_2km_v2"
 DEFAULT_TMP_DIR = ROOT_DIR / "data" / ".tmp_download"
 DEFAULT_INDEX_DIR = ROOT_DIR / "data" / "goes"
 DEFAULT_FAILED_LOG = ROOT_DIR / "metadata" / "failed_scenes_2km.jsonl"
@@ -79,7 +80,9 @@ SCHEMA_2KM = pa.schema([
     ("zenith_deg", pa.float32()),
     ("azimuth_deg", pa.float32()),
     ("reflectance", pa.float32()),
-    ("timestamp", pa.timestamp("us", tz="UTC"))
+    ("timestamp", pa.timestamp("us", tz="UTC")),
+    ("satellite", pa.string()),
+    ("source_file", pa.string())
 ])
 
 # Variables globales inicializadas una sola vez por proceso worker
@@ -88,30 +91,63 @@ _WORKER_X_SCAN = None
 _WORKER_Y_SCAN = None
 _WORKER_S3_CLIENT = None
 _WORKER_TRANSFER_CONFIG = None
+_WORKER_GRID_SHA256 = None
+
+
+def file_sha256(path):
+    digest = hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def scan_coordinates(ds, lons, lats):
+    """Read the scene's own CF projection; never assume satellite longitude."""
+    mapping = ds['Rad'].attrs.get('grid_mapping', 'goes_imager_projection')
+    attrs = dict(ds[mapping].attrs)
+    if attrs.get('grid_mapping_name') != 'geostationary':
+        raise ValueError('Expected CF geostationary projection.')
+    for key in ('perspective_point_height', 'longitude_of_projection_origin',
+                'semi_major_axis', 'semi_minor_axis', 'sweep_angle_axis'):
+        if key not in attrs:
+            raise ValueError(f'Missing GOES projection parameter: {key}')
+    if ds.x.attrs.get('units') not in ('rad', 'radian', 'radians') or ds.y.attrs.get('units') not in ('rad', 'radian', 'radians'):
+        raise ValueError('GOES scan coordinates must be in radians.')
+    h = float(attrs['perspective_point_height'])
+    if h <= 0:
+        raise ValueError('Invalid perspective height.')
+    projection = pyproj.Proj(pyproj.CRS.from_cf(attrs))
+    x, y = projection(lons, lats)
+    if not np.isfinite(x).all() or not np.isfinite(y).all():
+        raise ValueError('Canonical cells outside satellite projection.')
+    return np.asarray(x)/h, np.asarray(y)/h, attrs
+
+
+def is_current_extraction(path, grid_hash, minute_step):
+    """Legacy files and incomplete publications cannot silently count as done."""
+    if not Path(path).is_file():
+        return False
+    try:
+        info = json.loads((pq.read_metadata(path).metadata or {})[b'atlas_extraction'])
+        sidecar = json.loads(Path(path).with_suffix('.provenance.json').read_text())
+        return (info['version'] == 2 and info['grid_sha256'] == grid_hash
+                and info['extractor_sha256'] == file_sha256(__file__)
+                and info['minute_step'] == minute_step and bool(sidecar['scenes'])
+                and sidecar['output_sha256'] == file_sha256(path))
+    except (KeyError, ValueError, OSError):
+        return False
 
 
 def init_worker(grid_file: Path, concurrency_per_file: int = 4):
     """Inicializador de worker: carga grilla, precomputa scan coords y crea cliente S3 tunado."""
-    global _WORKER_GRID_DF, _WORKER_X_SCAN, _WORKER_Y_SCAN, _WORKER_S3_CLIENT, _WORKER_TRANSFER_CONFIG
+    global _WORKER_GRID_DF, _WORKER_X_SCAN, _WORKER_Y_SCAN, _WORKER_S3_CLIENT, _WORKER_TRANSFER_CONFIG, _WORKER_GRID_SHA256
 
     if not Path(grid_file).exists():
         raise FileNotFoundError(f"Archivo de grilla 2 km no encontrado: {grid_file}")
 
     _WORKER_GRID_DF = pd.read_parquet(grid_file)
-
-    h = 35786023.0
-    a = 6378137.0
-    b = 6356752.31414
-    lon_0 = -75.0
-    sweep = "x"
-
-    p_geos = pyproj.Proj(proj="geos", h=h, a=a, b=b, lon_0=lon_0, sweep=sweep)
-    lons = _WORKER_GRID_DF["lon"].values
-    lats = _WORKER_GRID_DF["lat"].values
-
-    X, Y = p_geos(lons, lats)
-    _WORKER_X_SCAN = (X / h).astype(np.float64)
-    _WORKER_Y_SCAN = (Y / h).astype(np.float64)
+    _WORKER_GRID_SHA256 = file_sha256(grid_file)
 
     _WORKER_S3_CLIENT = boto3.client(
         "s3",
@@ -175,6 +211,13 @@ def extract_scene_from_local_netcdf(
     global _WORKER_GRID_DF, _WORKER_X_SCAN, _WORKER_Y_SCAN
 
     with xr.open_dataset(nc_path, engine="h5netcdf") as ds:
+        _WORKER_X_SCAN, _WORKER_Y_SCAN, projection_attrs = scan_coordinates(
+            ds, _WORKER_GRID_DF['lon'].values, _WORKER_GRID_DF['lat'].values)
+        satellite = str(ds.attrs.get('platform_ID', ''))
+        if satellite not in ('G16', 'G19'):
+            raise ValueError(f'Unsupported or missing platform_ID: {satellite!r}')
+        if 'band_id' not in ds or int(ds['band_id'].item()) != 2:
+            raise ValueError('Expected ABI C02 radiance.')
         # Buffer adaptativo: 2 píxeles ABI reales
         dx = abs(float(ds.x[1] - ds.x[0]))
         dy = abs(float(ds.y[1] - ds.y[0]))
@@ -208,7 +251,7 @@ def extract_scene_from_local_netcdf(
     reflectance = np.where(cosz > 0.0, (np.pi * rad_pts) / (ESUN_C02 * cosz), np.nan)
     reflectance = np.clip(reflectance, 0.0, 1.2).astype(np.float32)
 
-    return pd.DataFrame({
+    result = pd.DataFrame({
         "cell_id": _WORKER_GRID_DF["cell_id"].values.astype(np.int32),
         "lon": lons.astype(np.float32),
         "lat": lats.astype(np.float32),
@@ -216,8 +259,19 @@ def extract_scene_from_local_netcdf(
         "zenith_deg": zenith_deg,
         "azimuth_deg": azimuth_deg,
         "reflectance": reflectance,
-        "timestamp": scene_time
+        "timestamp": scene_time,
+        "satellite": satellite,
+        "source_file": Path(nc_path).name
     })
+    result.attrs['scene_provenance'] = {
+        'source_file': Path(nc_path).name, 'sha256': file_sha256(nc_path),
+        'satellite': satellite, 'timestamp': str(scene_time),
+        'projection': projection_attrs,
+        'radiometry': 'legacy_pi_Rad_div_ESUN_div_cosZ_clip_0_1.2',
+        'ESUN_C02': ESUN_C02,
+        'radiometry_validation': 'PENDING; preserved convention, not cross-satellite calibration approval',
+    }
+    return result
 
 
 def select_daylight_scenes_from_df(df_raw: pd.DataFrame, minute_step: int = 30) -> pd.DataFrame:
@@ -390,8 +444,10 @@ def process_single_day_worker(
     pid = os.getpid()
     tmp_out = out_dir / f"reflectancia_{day_str}.parquet.tmp_{pid}"
 
-    if out_file.exists() and out_file.stat().st_size > 1024 * 1024:
+    if is_current_extraction(out_file, _WORKER_GRID_SHA256, minute_step):
         return {"status": "SKIPPED", "day": day_str, "scenes": 0, "time": 0.0, "failed_scenes": []}
+    if out_file.exists():
+        raise FileExistsError(f'Refusing to replace unverified/different extraction: {out_file}; use a new --outdir.')
 
     df_selected = get_daylight_scenes_for_day(
         day_str,
@@ -409,10 +465,17 @@ def process_single_day_worker(
 
     failed_scenes = []
     downloaded_scenes = 0
+    scene_provenance = []
     t0 = time.time()
 
     # Iniciar ParquetWriter incremental
-    writer = pq.ParquetWriter(str(tmp_out), SCHEMA_2KM, compression="zstd", compression_level=3)
+    extraction_info = {
+        'version': 2, 'grid_sha256': _WORKER_GRID_SHA256,
+        'extractor_sha256': file_sha256(__file__), 'minute_step': minute_step,
+        'coverage_status': 'DISCOVERED_SCENES_ONLY_NOT_ANNUAL_COVERAGE_APPROVAL'
+    }
+    schema = SCHEMA_2KM.with_metadata({'atlas_extraction': json.dumps(extraction_info)})
+    writer = pq.ParquetWriter(str(tmp_out), schema, compression="zstd", compression_level=3)
 
     try:
         for _, row in df_selected.iterrows():
@@ -428,9 +491,11 @@ def process_single_day_worker(
                     continue
 
                 df_s = extract_scene_from_local_netcdf(temp_nc, scene_ts)
+                provenance = dict(df_s.attrs['scene_provenance'], url=url)
                 table = pa.Table.from_pandas(df_s, schema=SCHEMA_2KM, preserve_index=False)
                 writer.write_table(table)
                 downloaded_scenes += 1
+                scene_provenance.append(provenance)
                 del df_s, table
 
             except Exception as e:
@@ -456,6 +521,12 @@ def process_single_day_worker(
 
     # Publicación atómica
     tmp_out.replace(out_file)
+    sidecar = out_file.with_suffix('.provenance.json')
+    tmp_sidecar = sidecar.with_suffix(f'.json.tmp_{pid}')
+    tmp_sidecar.write_text(json.dumps(dict(extraction_info, scenes=scene_provenance,
+                                         output_sha256=file_sha256(out_file)),
+                                    default=lambda value: value.item() if isinstance(value, np.generic) else str(value)))
+    tmp_sidecar.replace(sidecar)
 
     elapsed = time.time() - t0
     return {
@@ -476,7 +547,7 @@ def resolve_grid_file(user_path: str = None) -> Path:
         p = Path(user_path)
         if p.exists() and p.is_file():
             return p.resolve()
-        candidates.append(p)
+        raise FileNotFoundError(f'Explicit grid file does not exist: {p}')
 
     candidates.append(Path(__file__).resolve().parent / "cordoba_grid_2km_regions.parquet")
     candidates.append(Path.cwd() / "cordoba_grid_2km_regions.parquet")
@@ -563,7 +634,7 @@ Ejemplos de Uso Multinodo / Multimáquina:
    python3 scripts/fase_1_b_mass_grid2km.py --start 2020-01-01 --end 2022-12-31
 
 2. Computadora 2 (Años 2023 a 2025):
-   python3 scripts/fase_1_b_mass_grid2km.py --start 2023-01-01 --end 2025-11-30
+   python3 scripts/fase_1_b_mass_grid2km.py --start 2023-01-01 --end 2025-12-31
 
 3. Sharding balanceado (2 máquinas en paralelo sobre todo el período):
    PC 1: python3 scripts/fase_1_b_mass_grid2km.py --shard 0 --total-shards 2
@@ -574,7 +645,7 @@ Ejemplos de Uso Multinodo / Multimáquina:
         """
     )
     parser.add_argument("--start", default="2020-01-01", help="Fecha inicio YYYY-MM-DD (def: 2020-01-01)")
-    parser.add_argument("--end", default="2025-11-30", help="Fecha fin YYYY-MM-DD (def: 2025-11-30)")
+    parser.add_argument("--end", default="2025-12-31", help="Fecha fin YYYY-MM-DD (def: 2025-12-31)")
     parser.add_argument("--years", default=None, help="Años específicos separados por coma (ej: 2020,2021,2022)")
     parser.add_argument("--days", default=None, help="Lista de días YYYYMMDD separados por coma o archivo .txt")
     parser.add_argument("--shard", type=int, default=0, help="ID de shard para ejecución distribuida (0-indexed)")
@@ -623,7 +694,7 @@ Ejemplos de Uso Multinodo / Multimáquina:
         days_to_process = []
         for y in target_years:
             y_start = datetime(y, 1, 1)
-            y_end = min(datetime(y, 12, 31), datetime(2025, 11, 30))
+            y_end = min(datetime(y, 12, 31), datetime(2025, 12, 31))
             cur = y_start
             while cur <= y_end:
                 days_to_process.append(cur.strftime("%Y%m%d"))
@@ -661,8 +732,9 @@ Ejemplos de Uso Multinodo / Multimáquina:
     print("=" * 80)
 
     existing_days = set()
+    grid_hash = file_sha256(grid_path)
     for f in out_dir.glob("reflectancia_*.parquet"):
-        if f.stat().st_size > 1024 * 1024:
+        if is_current_extraction(f, grid_hash, args.minute_step):
             existing_days.add(f.stem.replace("reflectancia_", ""))
 
     pending_days = [d for d in days_to_process if d not in existing_days]
@@ -690,6 +762,7 @@ Ejemplos de Uso Multinodo / Multimáquina:
     completed_days = 0
     total_scenes = 0
     partial_days = 0
+    failed_days = 0
 
     with ProcessPoolExecutor(
         max_workers=args.workers,
@@ -714,6 +787,7 @@ Ejemplos de Uso Multinodo / Multimáquina:
             try:
                 res = future.result()
             except Exception as exc:
+                failed_days += 1
                 print(f"🔥 ERROR CATASTRÓFICO EN WORKER ({day_str}): {exc}")
                 with open(log_file, "a") as f_log:
                     f_log.write(json.dumps({
@@ -753,6 +827,7 @@ Ejemplos de Uso Multinodo / Multimáquina:
             elif status == "SKIPPED":
                 pass
             else:
+                failed_days += 1
                 print(f"⚠️ {day_str}: {status}")
 
     total_time = time.time() - t_global
@@ -765,7 +840,8 @@ Ejemplos de Uso Multinodo / Multimáquina:
     if completed_days > 0:
         print(f"   • Velocidad media lograda: {completed_days / (total_time/3600):.1f} días/hora")
     print("=" * 80)
+    return 1 if partial_days or failed_days else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

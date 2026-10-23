@@ -128,6 +128,11 @@ def export_cog_raster(filename: Path, data_2d: np.ndarray, transform, var_metada
 
 
 def run_export_and_mapping(mode='blended'):
+    # Do not silently certify the legacy scientific pipeline.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from models.atlas_contract import reject_legacy
+    reject_legacy('Legacy export')
+
     print("=" * 80)
     print(f"🗺️ FASE 5B-04: EXPORTACIÓN RÁSTER OFICIAL Y CARTOGRAFÍA 2 KM (Modo: {mode.upper()})")
     print("=" * 80)
