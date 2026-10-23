@@ -18,7 +18,9 @@ data/goes/
 data/.tmp_download/
 data/processed/
 data/processed_2km/
-data/ready/
+data/ready/*
+!data/ready/maps_geotiff/
+data/ready/maps_geotiff/00_archivo_historico_previo/
 data/archive_5km/
 data/.cache_scan/
 data/geometry/*.parquet
@@ -29,6 +31,12 @@ data/**/*.nc
 *.npy
 *.pkl
 *.tif
+!data/ready/maps_geotiff/01_*/**/*.tif
+!data/ready/maps_geotiff/02_*/**/*.tif
+!data/ready/maps_geotiff/03_*/**/*.tif
+!data/ready/maps_geotiff/04_*/**/*.tif
+!data/ready/maps_geotiff/05_*/**/*.tif
+!data/ready/maps_geotiff/06_*/**/*.tif
 *.gpkg
 
 # Salidas regenerables del visor (scripts/prepare_viewer.py)
@@ -45,6 +53,7 @@ data/goes/*/_index.csv
 
 # Otros y figuras sobredimensionadas regenerables
 inidce_4.pdf
+*.aux.xml
 reportes/figures/figura_atlas_*.png
 reportes/figures/figura_ciclo_*.png
 reportes/figures/figura_convergencia_*.png
