@@ -54,10 +54,16 @@ data/goes/*/_index.csv
 # Otros y figuras sobredimensionadas regenerables
 inidce_4.pdf
 *.aux.xml
-reportes/figures/figura_atlas_*.png
-reportes/figures/figura_ciclo_*.png
-reportes/figures/figura_convergencia_*.png
-reportes/figures/figura_estabilidad_*.png
+docs/
+reportes/
+results/**/*.png
+results/**/*.jpg
+results/**/*.jpeg
+results/**/*.webp
+results/*.png
+results/*.jpg
+results/*.jpeg
+results/*.webp
 *.log
 .DS_Store
 *.zip
